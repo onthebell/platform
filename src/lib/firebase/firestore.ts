@@ -21,8 +21,14 @@ export const postsCollection = collection(db, 'posts');
 
 export async function createPost(post: Omit<CommunityPost, 'id' | 'createdAt' | 'updatedAt'>) {
   const now = new Date();
+  
+  // Filter out undefined values to prevent Firestore errors
+  const cleanPost = Object.fromEntries(
+    Object.entries(post).filter(([_, value]) => value !== undefined)
+  );
+  
   const postData = {
-    ...post,
+    ...cleanPost,
     createdAt: Timestamp.fromDate(now),
     updatedAt: Timestamp.fromDate(now),
   };
