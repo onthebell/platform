@@ -123,11 +123,12 @@ const samplePosts: CommunityPost[] = [
 
 export default function CommunityPage() {
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-      <div className="space-y-8">
-        <div className="max-w-3xl">
-          <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">Community</h1>
-          <p className="mt-4 text-lg text-gray-600">
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Community</h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Connect with your Bellarine Peninsula community. Browse local events, marketplace items,
             and connect with your neighbors.
           </p>

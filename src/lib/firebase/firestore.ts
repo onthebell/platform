@@ -24,7 +24,7 @@ export async function createPost(post: Omit<CommunityPost, 'id' | 'createdAt' | 
   
   // Filter out undefined values to prevent Firestore errors
   const cleanPost = Object.fromEntries(
-    Object.entries(post).filter(([_, value]) => value !== undefined)
+    Object.entries(post).filter(([, value]) => value !== undefined)
   );
   
   const postData = {

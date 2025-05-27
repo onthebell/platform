@@ -63,7 +63,8 @@ export default function BusinessForm({ business, onSubmit, isEditing = false }: 
       Saturday: { open: '09:00', close: '17:00', isClosed: false },
       Sunday: { open: '10:00', close: '16:00', isClosed: true }
     },
-    coordinates: business?.coordinates || { lat: 0, lng: 0 }
+    coordinates: business?.coordinates || { lat: 0, lng: 0 },
+    isVerified: business?.isVerified || false,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -115,7 +116,7 @@ export default function BusinessForm({ business, onSubmit, isEditing = false }: 
         hours: formData.hours,
         coordinates: formData.coordinates,
         ownerId: user.id,
-        isVerified: false, // New businesses start unverified
+        isVerified: formData.isVerified,
         rating: 0,
         reviewCount: 0
       };

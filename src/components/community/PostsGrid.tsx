@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import PostCard from './PostCard';
 import { CommunityPost } from '@/types';
-import { Button } from '@/components/ui/Button';
 import { 
   AdjustmentsHorizontalIcon, 
   MagnifyingGlassIcon,
@@ -49,12 +48,13 @@ export default function PostsGrid({
         <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
         
         {showCreateButton && (
-          <Button asChild variant="default">
-            <Link href="/community/create">
-              <PlusIcon className="h-5 w-5 mr-1.5" />
-              Create Post
-            </Link>
-          </Button>
+          <Link
+            href="/community/create"
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            <PlusIcon className="h-4 w-4 mr-2" />
+            Create Post
+          </Link>
         )}
       </div>
       
