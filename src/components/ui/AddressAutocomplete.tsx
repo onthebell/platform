@@ -56,7 +56,7 @@ export default function GooglePlacesAutocomplete({
             if (script.parentNode) {
                 script.parentNode.removeChild(script);
             }
-            // @ts-expect-error
+            // @ts-expect-error Allow delete global function
             delete window.initGooglePlaces;
         };
     }, []);
