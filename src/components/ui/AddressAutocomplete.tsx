@@ -13,6 +13,7 @@ interface GooglePlacesAutocompleteProps {
 
 declare global {
     interface Window {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         google: any;
         initGooglePlaces: () => void;
     }
@@ -28,6 +29,7 @@ export default function GooglePlacesAutocomplete({
     className = ""
 }: GooglePlacesAutocompleteProps) {
     const inputRef = useRef<HTMLInputElement>(null);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const autocompleteRef = useRef<any>(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [inputValue, setInputValue] = useState(value);
@@ -88,6 +90,7 @@ export default function GooglePlacesAutocomplete({
 
             // Extract postcode from address components
             const addressComponents = place.address_components || [];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const postcodeComponent = addressComponents.find((component: any) =>
                 component.types.includes('postal_code')
             );
