@@ -19,6 +19,10 @@ import { CommunityPost, Event, Business, User, Notification } from '@/types';
 // Posts operations
 export const postsCollection = collection(db, 'posts');
 
+// Test Firebase connection
+console.log('Firebase DB initialized:', !!db);
+console.log('Posts collection reference:', postsCollection.path);
+
 export async function createPost(post: Omit<CommunityPost, 'id' | 'createdAt' | 'updatedAt'>) {
   const now = new Date();
   
@@ -47,42 +51,54 @@ export async function getPosts(
   limitCount: number = 20,
   lastDoc?: unknown
 ) {
-  const constraints: QueryConstraint[] = [];
-  
-  if (filters.category) {
-    constraints.push(where('category', '==', filters.category));
-  }
-  
-  if (filters.status) {
-    constraints.push(where('status', '==', filters.status));
-  } else {
-    constraints.push(where('status', '==', 'active'));
-  }
-  
-  if (filters.visibility) {
-    constraints.push(where('visibility', '==', filters.visibility));
-  }
-  
-  if (filters.authorId) {
-    constraints.push(where('authorId', '==', filters.authorId));
-  }
+  try {
+    const constraints: QueryConstraint[] = [];
+    
+    if (filters.category) {
+      constraints.push(where('category', '==', filters.category));
+    }
+    
+    if (filters.status) {
+      constraints.push(where('status', '==', filters.status));
+    } else {
+      constraints.push(where('status', '==', 'active'));
+    }
+    
+    if (filters.visibility) {
+      constraints.push(where('visibility', '==', filters.visibility));
+    }
+    
+    if (filters.authorId) {
+      constraints.push(where('authorId', '==', filters.authorId));
+    }
 
-  constraints.push(orderBy('createdAt', 'desc'));
-  constraints.push(limit(limitCount));
-  
-  if (lastDoc) {
-    constraints.push(startAfter(lastDoc));
-  }
+    constraints.push(orderBy('createdAt', 'desc'));
+    constraints.push(limit(limitCount));
+    
+    if (lastDoc) {
+      constraints.push(startAfter(lastDoc));
+    }
 
-  const q = query(postsCollection, ...constraints);
-  const snapshot = await getDocs(q);
-  
-  return snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data(),
-    createdAt: doc.data().createdAt?.toDate() || new Date(),
-    updatedAt: doc.data().updatedAt?.toDate() || new Date(),
-  } as CommunityPost));
+    const q = query(postsCollection, ...constraints);
+    const snapshot = await getDocs(q);
+    
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toDate() || new Date(),
+      updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+    } as CommunityPost));
+    
+  } catch (error) {
+    console.error('Error in getPosts:', error);
+    console.error('Error details:', {
+      name: (error as any)?.name,
+      message: (error as any)?.message,
+      code: (error as any)?.code,
+      stack: (error as any)?.stack
+    });
+    throw error;
+  }
 }
 
 export async function getPost(id: string) {

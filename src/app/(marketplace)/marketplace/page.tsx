@@ -1,223 +1,100 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import PostsGrid from '@/components/community/PostsGrid';
+import { getPosts } from '@/lib/firebase/firestore';
 import { CommunityPost } from '@/types';
-
-// Sample marketplace data
-const marketplacePosts: CommunityPost[] = [
-  {
-    id: 'mp1',
-    title: 'Vintage Raleigh Bicycle',
-    description: 'Beautiful vintage Raleigh bicycle from the 1970s. Recently restored with new chain, brakes, and tires. Perfect for leisurely rides around the Peninsula.',
-    category: 'marketplace',
-    type: 'sale',
-    authorId: 'user1',
-    authorName: 'Daniel Wilson',
-    price: 350,
-    currency: 'AUD',
-    location: {
-      lat: -38.1529,
-      lng: 144.3627,
-      address: 'Hill Street, Geelong',
-    },
-    images: ['/images/vintage-bicycle.jpg'],
-    status: 'active',
-    visibility: 'public',
-    createdAt: new Date('2025-05-26'), // 1 day ago
-    updatedAt: new Date('2025-05-26'),
-    tags: ['bicycle', 'vintage', 'transport', 'restored'],
-  },
-  {
-    id: 'mp2',
-    title: 'Dining Table & Chairs Set',
-    description: 'Solid wood dining table with 6 matching chairs. Some wear and tear but still very sturdy. Great for a family home or holiday house.',
-    category: 'marketplace',
-    type: 'sale',
-    authorId: 'user2',
-    authorName: 'Sarah Mitchell',
-    price: 450,
-    currency: 'AUD',
-    location: {
-      lat: -38.2654,
-      lng: 144.6631,
-      address: 'Queenscliff, VIC',
-    },
-    images: ['/images/dining-set.jpg'],
-    status: 'active',
-    visibility: 'public',
-    createdAt: new Date('2025-05-25'), // 2 days ago
-    updatedAt: new Date('2025-05-25'),
-    tags: ['furniture', 'dining', 'wood', 'family'],
-  },
-  {
-    id: 'mp3',
-    title: 'Surfboard - 6\'2" Shortboard',
-    description: 'Well-maintained 6\'2" shortboard, perfect for Point Danger or Thirteenth Beach. A few small dings but watertight.',
-    category: 'marketplace',
-    type: 'sale',
-    authorId: 'user3',
-    authorName: 'Jake Thompson',
-    price: 280,
-    currency: 'AUD',
-    location: {
-      lat: -38.2734,
-      lng: 144.5151,
-      address: 'Ocean Grove, VIC',
-    },
-    images: ['/images/surfboard.jpg'],
-    status: 'active',
-    visibility: 'public',
-    createdAt: new Date('2025-05-24'),
-    updatedAt: new Date('2025-05-24'),
-    tags: ['surfboard', 'surf', 'beach', 'sport'],
-  },
-  {
-    id: 'mp4',
-    title: 'Garden Tools Bundle',
-    description: 'Complete set of garden tools including spade, rake, hoe, secateurs, and hand tools. Perfect for maintaining your Peninsula garden.',
-    category: 'marketplace',
-    type: 'sale',
-    authorId: 'user4',
-    authorName: 'Margaret Green',
-    price: 120,
-    currency: 'AUD',
-    location: {
-      lat: -38.1889,
-      lng: 144.4017,
-      address: 'Portarlington, VIC',
-    },
-    images: ['/images/garden-tools-bundle.jpg'],
-    status: 'active',
-    visibility: 'public',
-    createdAt: new Date('2025-05-23'),
-    updatedAt: new Date('2025-05-23'),
-    tags: ['garden', 'tools', 'bundle', 'outdoor'],
-  },
-  {
-    id: 'mp5',
-    title: 'Kids\' Playground Set',
-    description: 'Wooden playground set with swing, slide, and climbing frame. Great condition, just outgrown by our kids. Easy to disassemble and transport.',
-    category: 'marketplace',
-    type: 'sale',
-    authorId: 'user5',
-    authorName: 'Amanda and Rob Foster',
-    price: 800,
-    currency: 'AUD',
-    location: {
-      lat: -38.2450,
-      lng: 144.5989,
-      address: 'Barwon Heads, VIC',
-    },
-    images: ['/images/playground-set.jpg'],
-    status: 'active',
-    visibility: 'public',
-    createdAt: new Date('2025-05-22'),
-    updatedAt: new Date('2025-05-22'),
-    tags: ['kids', 'playground', 'outdoor', 'family'],
-  },
-  {
-    id: 'mp6',
-    title: 'Fishing Gear Collection',
-    description: 'Various fishing rods, reels, tackle box, and nets. Perfect for fishing off the Queenscliff pier or trying your luck at the breakwater.',
-    category: 'marketplace',
-    type: 'sale',
-    authorId: 'user6',
-    authorName: 'Peter Marinos',
-    price: 200,
-    currency: 'AUD',
-    location: {
-      lat: -38.2654,
-      lng: 144.6631,
-      address: 'Queenscliff, VIC',
-    },
-    images: ['/images/fishing-gear.jpg'],
-    status: 'active',
-    visibility: 'public',
-    createdAt: new Date('2025-05-21'),
-    updatedAt: new Date('2025-05-21'),
-    tags: ['fishing', 'gear', 'collection', 'pier'],
-  },
-];
-
-const freePosts: CommunityPost[] = [
-  {
-    id: 'free1',
-    title: 'Free Moving Boxes',
-    description: 'About 20 moving boxes in various sizes, all in good condition. We\'ve finished our move and want to pass them on to someone who needs them.',
-    category: 'free_items',
-    type: 'free',
-    authorId: 'user7',
-    authorName: 'Chris and Emma Lee',
-    location: {
-      lat: -38.1599,
-      lng: 144.3517,
-      address: 'Bellarine Street, Geelong',
-    },
-    images: ['/images/moving-boxes.jpg'],
-    status: 'active',
-    visibility: 'public',
-    createdAt: new Date('2025-05-26'),
-    updatedAt: new Date('2025-05-26'),
-    tags: ['boxes', 'moving', 'free', 'cardboard'],
-  },
-  {
-    id: 'free2',
-    title: 'Plant Cuttings & Seeds',
-    description: 'Free native plant cuttings and vegetable seeds. Perfect for starting your Peninsula garden with local varieties.',
-    category: 'free_items',
-    type: 'free',
-    authorId: 'user8',
-    authorName: 'Bellarine Gardening Club',
-    location: {
-      lat: -38.2450,
-      lng: 144.5989,
-      address: 'Barwon Heads Community Centre',
-    },
-    images: ['/images/plant-cuttings.jpg'],
-    status: 'active',
-    visibility: 'public',
-    createdAt: new Date('2025-05-25'),
-    updatedAt: new Date('2025-05-25'),
-    tags: ['plants', 'garden', 'native', 'seeds'],
-  },
-  {
-    id: 'free3',
-    title: 'Old Magazines & Books',
-    description: 'Collection of magazines and paperback books, mostly travel and cooking. Free to anyone who wants them for reading or craft projects.',
-    category: 'free_items',
-    type: 'free',
-    authorId: 'user9',
-    authorName: 'Linda Jackson',
-    location: {
-      lat: -38.1889,
-      lng: 144.4017,
-      address: 'Portarlington, VIC',
-    },
-    images: ['/images/books-magazines.jpg'],
-    status: 'active',
-    visibility: 'public',
-    createdAt: new Date('2025-05-24'),
-    updatedAt: new Date('2025-05-24'),
-    tags: ['books', 'magazines', 'reading', 'craft'],
-  },
-];
 
 export default function MarketplacePage() {
   const [activeTab, setActiveTab] = useState<'for-sale' | 'free'>('for-sale');
+  const [marketplacePosts, setMarketplacePosts] = useState<CommunityPost[]>([]);
+  const [freePosts, setFreePosts] = useState<CommunityPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadMarketplaceData() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Fetch marketplace posts (for sale items)
+        const marketplaceData = await getPosts({ category: 'marketplace' }, 50);
+        setMarketplacePosts(marketplaceData);
+
+        // Fetch free items
+        const freeData = await getPosts({ category: 'free_items' }, 50);
+        setFreePosts(freeData);
+
+      } catch (err) {
+        console.error('Error loading marketplace data:', err);
+        setError('Failed to load marketplace data. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadMarketplaceData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">Marketplace</h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Buy, sell, and trade with your Bellarine Peninsula neighbors
+            </p>
+          </div>
+          
+          <div className="animate-pulse space-y-6">
+            <div className="flex justify-center mb-8">
+              <div className="bg-gray-200 rounded-lg h-12 w-64"></div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                  <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
+                  <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center py-12">
+            <p className="text-gray-600 mb-4">{error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Bellarine Marketplace
-          </h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Marketplace</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Buy, sell, and share items with your local community. From furniture to free plants, 
-            find what you need or give away what you don&apos;t.
+            Buy, sell, and trade with your Bellarine Peninsula neighbors. From furniture to 
+            electronics, find great deals or list your own items.
           </p>
         </div>
 

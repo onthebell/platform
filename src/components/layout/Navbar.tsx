@@ -13,7 +13,8 @@ import {
   Bars3Icon,
   XMarkIcon,
   BellIcon,
-  BuildingStorefrontIcon
+  BuildingStorefrontIcon,
+  GiftIcon
 } from '@heroicons/react/24/outline';
 import { NotificationDropdown } from '@/components/notifications';
 
@@ -29,6 +30,7 @@ const navigation: NavigationItem[] = [
   { name: 'Home', href: '/', icon: HomeIcon },
   { name: 'Map', href: '/map', icon: MapPinIcon },
   { name: 'Business', href: '/business', icon: BuildingStorefrontIcon },
+  { name: 'Deals', href: '/deals', icon: GiftIcon },
   { name: 'Events', href: '/events', icon: CalendarIcon },
   { name: 'Marketplace', href: '/marketplace', icon: ShoppingBagIcon },
   { name: 'Community', href: '/community', icon: HeartIcon, verifiedOnly: true },
