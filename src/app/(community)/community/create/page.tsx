@@ -119,8 +119,12 @@ function CreatePostForm() {
         authorName: user.displayName || user.email || 'Anonymous',
         location: formData.location.address ? formData.location : undefined,
         images: imageUrls.length > 0 ? imageUrls : undefined,
-        price: formData.price ? parseFloat(formData.price) : undefined,
-        currency: formData.price ? formData.currency : undefined,
+        price:
+          formData.price && !isNaN(parseFloat(formData.price))
+            ? parseFloat(formData.price)
+            : undefined,
+        currency:
+          formData.price && !isNaN(parseFloat(formData.price)) ? formData.currency : undefined,
         status: 'active',
         visibility: formData.visibility,
         tags: formData.tags

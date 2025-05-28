@@ -233,7 +233,10 @@ export default function EditPostPage() {
         description: formData.description,
         category: formData.category as PostCategory,
         type: formData.type as PostType,
-        price: formData.price ? parseFloat(formData.price) : undefined,
+        price:
+          formData.price && !isNaN(parseFloat(formData.price))
+            ? parseFloat(formData.price)
+            : undefined,
         currency: formData.currency,
         location: formData.location,
         images: allImages,

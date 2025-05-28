@@ -125,8 +125,14 @@ export const getPostById = getPost;
 
 export async function updatePost(id: string, updates: Partial<CommunityPost>) {
   const docRef = doc(db, 'posts', id);
+
+  // Filter out undefined and NaN values to prevent Firestore errors
+  const cleanUpdates = Object.fromEntries(
+    Object.entries(updates).filter(([, value]) => value !== undefined && !Number.isNaN(value))
+  );
+
   const updateData = {
-    ...updates,
+    ...cleanUpdates,
     updatedAt: Timestamp.fromDate(new Date()),
   };
 
@@ -294,8 +300,14 @@ export async function getUserProfile(userId: string) {
 
 export async function updateUserProfile(userId: string, updates: Partial<User>) {
   const docRef = doc(db, 'users', userId);
+
+  // Filter out undefined and NaN values to prevent Firestore errors
+  const cleanUpdates = Object.fromEntries(
+    Object.entries(updates).filter(([, value]) => value !== undefined && !Number.isNaN(value))
+  );
+
   const updateData = {
-    ...updates,
+    ...cleanUpdates,
     lastActive: Timestamp.fromDate(new Date()),
   };
 
