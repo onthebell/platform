@@ -51,12 +51,7 @@ export default function MapContainer({
 
   return (
     <div className={className}>
-      <DynamicMap
-        center={center}
-        zoom={zoom}
-        markers={markers}
-        onMarkerClick={onMarkerClick}
-      />
+      <DynamicMap center={center} zoom={zoom} markers={markers} onMarkerClick={onMarkerClick} />
     </div>
   );
 }

@@ -66,16 +66,14 @@ const categoryIcons: { [key: string]: string } = {
 
 function onEachSuburb(feature: GeoJSON.Feature, layer: L.Layer) {
   if (feature.properties && feature.properties.name) {
-    (layer as L.Layer & { bindTooltip: (content: string, options: object) => void }).bindTooltip(feature.properties.name, { permanent: false, direction: "center" });
+    (layer as L.Layer & { bindTooltip: (content: string, options: object) => void }).bindTooltip(
+      feature.properties.name,
+      { permanent: false, direction: 'center' }
+    );
   }
 }
 
-export default function LeafletMap({
-  center,
-  zoom,
-  markers,
-  onMarkerClick,
-}: LeafletMapProps) {
+export default function LeafletMap({ center, zoom, markers, onMarkerClick }: LeafletMapProps) {
   const createCustomIcon = (category?: string) => {
     // Create a safer SVG that doesn't include the emoji directly
     const svgString = `
@@ -84,12 +82,10 @@ export default function LeafletMap({
         <text x="12.5" y="18" text-anchor="middle" font-size="12" fill="#3B82F6">•</text>
       </svg>
     `;
-    
+
     // Use encodeURIComponent instead of btoa for better compatibility
-    const encodedSvg = encodeURIComponent(svgString)
-      .replace(/'/g, '%27')
-      .replace(/"/g, '%22');
-    
+    const encodedSvg = encodeURIComponent(svgString).replace(/'/g, '%27').replace(/"/g, '%22');
+
     return new Icon({
       iconUrl: `data:image/svg+xml;charset=utf-8,${encodedSvg}`,
       iconSize: [25, 25],
@@ -115,15 +111,15 @@ export default function LeafletMap({
       <GeoJSON
         data={bellarineSuburbs as GeoJSON.FeatureCollection}
         style={(feature?: GeoJSON.Feature) => ({
-          color: "#2563eb",
+          color: '#2563eb',
           weight: 2,
-          fillColor: suburbColors[feature?.properties?.name] || "#e9e9e9",
+          fillColor: suburbColors[feature?.properties?.name] || '#e9e9e9',
           fillOpacity: 0.5,
         })}
         onEachFeature={onEachSuburb}
       />
-      
-      {markers.map((marker) => (
+
+      {markers.map(marker => (
         <Marker
           key={marker.id}
           position={marker.position}
@@ -140,9 +136,7 @@ export default function LeafletMap({
               )}
               {marker.category && (
                 <div className="flex items-center mt-2">
-                  <span className="text-lg mr-1">
-                    {categoryIcons[marker.category] || '📍'}
-                  </span>
+                  <span className="text-lg mr-1">{categoryIcons[marker.category] || '📍'}</span>
                   <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
                     {marker.category.charAt(0).toUpperCase() + marker.category.slice(1)}
                   </span>

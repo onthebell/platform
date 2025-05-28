@@ -9,15 +9,15 @@ import { deleteDoc, doc } from 'firebase/firestore';
 import { CommunityPost } from '@/types';
 import PostCard from '@/components/community/PostCard';
 import { formatDate, toDate } from '@/lib/utils';
-import { 
-  UserIcon, 
-  CogIcon, 
+import {
+  UserIcon,
+  CogIcon,
   PlusIcon,
   PencilIcon,
   TrashIcon,
   MapPinIcon,
   CheckBadgeIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
@@ -30,16 +30,22 @@ export default function ProfilePage() {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error' | null; text: string }>({ type: null, text: '' });
+  const [saveMessage, setSaveMessage] = useState<{
+    type: 'success' | 'error' | null;
+    text: string;
+  }>({ type: null, text: '' });
 
   useEffect(() => {
     const fetchUserPosts = async () => {
       if (!user) return;
-      
+
       try {
-        const posts = await getPosts({
-          authorId: user.id
-        }, 50);
+        const posts = await getPosts(
+          {
+            authorId: user.id,
+          },
+          50
+        );
         setUserPosts(posts);
       } catch (error) {
         console.error('Error fetching user posts:', error);
@@ -70,7 +76,7 @@ export default function ProfilePage() {
 
   const handleDeletePost = async (postId: string) => {
     if (!user || !confirm('Are you sure you want to delete this post?')) return;
-    
+
     setIsDeleting(postId);
     try {
       await deleteDoc(doc(db, 'posts', postId));
@@ -94,17 +100,17 @@ export default function ProfilePage() {
 
   const handleSaveProfile = async () => {
     if (!user) return;
-    
+
     // Clear any previous messages
     setSaveMessage({ type: null, text: '' });
-    
+
     // Check if there are any changes
     const trimmedDisplayName = displayName.trim();
     if (trimmedDisplayName === (user.displayName || '')) {
       setSaveMessage({ type: 'error', text: 'No changes to save.' });
       return;
     }
-    
+
     setIsSaving(true);
     try {
       await updateUserProfile({
@@ -168,7 +174,9 @@ export default function ProfilePage() {
                 {user.address && (
                   <div className="flex items-center mt-2 text-sm text-gray-600">
                     <MapPinIcon className="h-4 w-4 mr-1" />
-                    <span>{user.address.street}, {user.address.suburb}</span>
+                    <span>
+                      {user.address.street}, {user.address.suburb}
+                    </span>
                   </div>
                 )}
               </div>
@@ -221,7 +229,7 @@ export default function ProfilePage() {
               </div>
             ) : userPosts.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {userPosts.map((post) => (
+                {userPosts.map(post => (
                   <div key={post.id} className="relative">
                     <PostCard post={post} />
                     <div className="absolute top-2 right-2 flex space-x-1">
@@ -280,16 +288,14 @@ export default function ProfilePage() {
                   <input
                     type="text"
                     value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
+                    onChange={e => setDisplayName(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black font-medium"
                     placeholder="Enter your display name"
                     style={{ color: 'black', fontWeight: 600 }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                   <input
                     type="email"
                     value={user.email || ''}
@@ -299,20 +305,22 @@ export default function ProfilePage() {
                   />
                   <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
                 </div>
-                
+
                 {/* Save Message */}
                 {saveMessage.type && (
-                  <div className={`p-3 rounded-md ${
-                    saveMessage.type === 'success' 
-                      ? 'bg-green-50 border border-green-200 text-green-800' 
-                      : 'bg-red-50 border border-red-200 text-red-800'
-                  }`}>
+                  <div
+                    className={`p-3 rounded-md ${
+                      saveMessage.type === 'success'
+                        ? 'bg-green-50 border border-green-200 text-green-800'
+                        : 'bg-red-50 border border-red-200 text-red-800'
+                    }`}
+                  >
                     {saveMessage.text}
                   </div>
                 )}
-                
+
                 <div className="pt-4">
-                  <button 
+                  <button
                     onClick={handleSaveProfile}
                     disabled={isSaving}
                     className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -325,9 +333,7 @@ export default function ProfilePage() {
 
             {/* Address Verification */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">
-                Address Verification
-              </h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">Address Verification</h2>
               {user.verificationStatus === 'approved' ? (
                 <div className="flex items-center text-green-600">
                   <CheckBadgeIcon className="h-5 w-5 mr-2" />
@@ -340,13 +346,15 @@ export default function ProfilePage() {
                     <span>Address verification is pending review</span>
                   </div>
                   <p className="text-sm text-gray-600">
-                    Your verification request is being reviewed. You&apos;ll receive an email once it&apos;s processed.
+                    Your verification request is being reviewed. You'll receive an email once it's
+                    processed.
                   </p>
                 </div>
               ) : (
                 <div>
                   <p className="text-gray-600 mb-4">
-                    Verify your Bellarine Peninsula address to access exclusive local content and features.
+                    Verify your Bellarine Peninsula address to access exclusive local content and
+                    features.
                   </p>
                   <Link
                     href="/auth/verify-address"
@@ -360,15 +368,11 @@ export default function ProfilePage() {
 
             {/* Danger Zone */}
             <div className="bg-white rounded-lg shadow-sm border border-red-200 p-6">
-              <h2 className="text-xl font-semibold text-red-900 mb-6">
-                Danger Zone
-              </h2>
+              <h2 className="text-xl font-semibold text-red-900 mb-6">Danger Zone</h2>
               <div className="space-y-4">
                 <div>
                   <h3 className="text-lg font-medium text-gray-900 mb-2">Sign Out</h3>
-                  <p className="text-gray-600 mb-4">
-                    Sign out of your account on this device.
-                  </p>
+                  <p className="text-gray-600 mb-4">Sign out of your account on this device.</p>
                   <button
                     onClick={handleSignOut}
                     className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700"
@@ -379,10 +383,15 @@ export default function ProfilePage() {
                 <div className="border-t border-gray-200 pt-4">
                   <h3 className="text-lg font-medium text-red-900 mb-2">Delete Account</h3>
                   <p className="text-gray-600 mb-4">
-                    Permanently delete your account and all associated data. This action cannot be undone.
+                    Permanently delete your account and all associated data. This action cannot be
+                    undone.
                   </p>
                   <button
-                    onClick={() => alert('Account deletion feature will be implemented with proper confirmation flow')}
+                    onClick={() =>
+                      alert(
+                        'Account deletion feature will be implemented with proper confirmation flow'
+                      )
+                    }
                     className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
                   >
                     Delete Account

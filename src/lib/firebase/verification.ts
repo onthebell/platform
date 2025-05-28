@@ -1,12 +1,12 @@
-import { 
-  collection, 
-  doc, 
-  addDoc, 
-  updateDoc, 
-  query, 
-  where, 
+import {
+  collection,
+  doc,
+  addDoc,
+  updateDoc,
+  query,
+  where,
   getDocs,
-  Timestamp 
+  Timestamp,
 } from 'firebase/firestore';
 import { db } from './config';
 
@@ -32,7 +32,7 @@ export interface AddressVerificationRequest {
 // Define Bellarine Peninsula suburbs for verification
 const BELLARINE_SUBURBS = [
   'Queenscliff',
-  'Point Lonsdale', 
+  'Point Lonsdale',
   'Ocean Grove',
   'Barwon Heads',
   'Batesford',
@@ -54,13 +54,7 @@ const BELLARINE_SUBURBS = [
   'Whittington',
 ];
 
-const BELLARINE_POSTCODES = [
-  '3225',
-  '3226',
-  '3224',
-  '3223',
-  '3222',
-];
+const BELLARINE_POSTCODES = ['3225', '3226', '3224', '3223', '3222'];
 
 /**
  * Submit an address verification request
@@ -81,13 +75,10 @@ export async function submitAddressVerification(
       submittedAt: new Date(),
     };
 
-    const docRef = await addDoc(
-      collection(db, 'verifications'), 
-      {
-        ...verificationData,
-        submittedAt: Timestamp.fromDate(verificationData.submittedAt),
-      }
-    );
+    const docRef = await addDoc(collection(db, 'verifications'), {
+      ...verificationData,
+      submittedAt: Timestamp.fromDate(verificationData.submittedAt),
+    });
 
     return docRef.id;
   } catch (error) {
@@ -105,13 +96,10 @@ export async function getUserVerificationStatus(userId: string): Promise<{
   verificationId?: string;
 }> {
   try {
-    const q = query(
-      collection(db, 'verifications'),
-      where('userId', '==', userId)
-    );
-    
+    const q = query(collection(db, 'verifications'), where('userId', '==', userId));
+
     const querySnapshot = await getDocs(q);
-    
+
     if (querySnapshot.empty) {
       return { hasRequest: false };
     }
@@ -152,9 +140,11 @@ export function validateBellarineAddress(address: {
   }
 
   // Check state
-  if (address.state.toLowerCase() !== 'victoria' && 
-      address.state.toLowerCase() !== 'vic' && 
-      address.state.toLowerCase() !== 'melbourne') {
+  if (
+    address.state.toLowerCase() !== 'victoria' &&
+    address.state.toLowerCase() !== 'vic' &&
+    address.state.toLowerCase() !== 'melbourne'
+  ) {
     return { isValid: false, error: 'Address must be in Victoria' };
   }
 
@@ -165,14 +155,12 @@ export function validateBellarineAddress(address: {
 
   // Check suburb (case insensitive)
   const normalizedSuburb = address.suburb.toLowerCase().trim();
-  const isValidSuburb = BELLARINE_SUBURBS.some(suburb => 
-    suburb.toLowerCase() === normalizedSuburb
-  );
+  const isValidSuburb = BELLARINE_SUBURBS.some(suburb => suburb.toLowerCase() === normalizedSuburb);
 
   if (!isValidSuburb) {
-    return { 
-      isValid: false, 
-      error: `${address.suburb} is not recognized as a Bellarine Peninsula suburb. Valid suburbs include: ${BELLARINE_SUBURBS.join(', ')}` 
+    return {
+      isValid: false,
+      error: `${address.suburb} is not recognized as a Bellarine Peninsula suburb. Valid suburbs include: ${BELLARINE_SUBURBS.join(', ')}`,
     };
   }
 
@@ -204,7 +192,7 @@ export async function updateVerificationStatus(
 ): Promise<void> {
   try {
     const verificationRef = doc(db, 'verifications', verificationId);
-    
+
     await updateDoc(verificationRef, {
       status,
       reviewedAt: Timestamp.fromDate(new Date()),
@@ -226,9 +214,11 @@ export async function updateVerificationStatus(
 /**
  * Parse address string into components
  */
-export function parseAddressString(addressString: string): Partial<AddressVerificationRequest['address']> {
+export function parseAddressString(
+  addressString: string
+): Partial<AddressVerificationRequest['address']> {
   const parts = addressString.split(',').map(part => part.trim());
-  
+
   if (parts.length < 2) {
     return {};
   }
@@ -236,15 +226,15 @@ export function parseAddressString(addressString: string): Partial<AddressVerifi
   // Basic parsing - this could be enhanced with a proper address parsing service
   const lastPart = parts[parts.length - 1];
   const secondLastPart = parts[parts.length - 2];
-  
+
   // Try to extract postcode from last part
   const postcodeMatch = lastPart.match(/(\d{4})/);
   const postcode = postcodeMatch ? postcodeMatch[1] : '';
-  
+
   // Try to extract state
   const stateMatch = lastPart.match(/(VIC|NSW|QLD|SA|WA|TAS|NT|ACT)/i);
   const state = stateMatch ? stateMatch[1].toUpperCase() : 'VIC';
-  
+
   return {
     street: parts.length > 2 ? parts.slice(0, -2).join(', ') : '',
     suburb: secondLastPart || '',

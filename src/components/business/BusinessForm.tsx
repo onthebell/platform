@@ -7,14 +7,14 @@ import { useAuth } from '@/lib/firebase/auth';
 import { createBusiness } from '@/lib/firebase/firestore';
 import { Business } from '@/types';
 import GooglePlacesAutocomplete from '@/components/ui/AddressAutocomplete';
-import { 
+import {
   BuildingStorefrontIcon,
   MapPinIcon,
   PhoneIcon,
   EnvelopeIcon,
   GlobeAltIcon,
   ClockIcon,
-  CameraIcon
+  CameraIcon,
 } from '@heroicons/react/24/outline';
 
 const BUSINESS_CATEGORIES = [
@@ -29,12 +29,10 @@ const BUSINESS_CATEGORIES = [
   'real-estate',
   'professional',
   'entertainment',
-  'other'
+  'other',
 ];
 
-const DAYS_OF_WEEK = [
-  'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
-];
+const DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 interface BusinessFormProps {
   business?: Partial<Business>;
@@ -45,7 +43,7 @@ interface BusinessFormProps {
 export default function BusinessForm({ business, onSubmit, isEditing = false }: BusinessFormProps) {
   const { user } = useAuth();
   const router = useRouter();
-  
+
   const [formData, setFormData] = useState({
     name: business?.name || '',
     description: business?.description || '',
@@ -62,7 +60,7 @@ export default function BusinessForm({ business, onSubmit, isEditing = false }: 
       Thursday: { open: '09:00', close: '17:00', isClosed: false },
       Friday: { open: '09:00', close: '17:00', isClosed: false },
       Saturday: { open: '09:00', close: '17:00', isClosed: false },
-      Sunday: { open: '10:00', close: '16:00', isClosed: true }
+      Sunday: { open: '10:00', close: '16:00', isClosed: true },
     },
     coordinates: business?.coordinates || { lat: 0, lng: 0 },
     isVerified: business?.isVerified || false,
@@ -74,7 +72,7 @@ export default function BusinessForm({ business, onSubmit, isEditing = false }: 
   const handleInputChange = (field: string, value: string | number | boolean | string[]) => {
     setFormData(prev => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -85,9 +83,9 @@ export default function BusinessForm({ business, onSubmit, isEditing = false }: 
         ...prev.hours,
         [day]: {
           ...prev.hours[day],
-          [field]: value
-        }
-      }
+          [field]: value,
+        },
+      },
     }));
   };
 
@@ -95,13 +93,13 @@ export default function BusinessForm({ business, onSubmit, isEditing = false }: 
     setFormData(prev => ({
       ...prev,
       address,
-      coordinates: coordinates || prev.coordinates
+      coordinates: coordinates || prev.coordinates,
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!user) {
       setError('You must be logged in to create a business listing');
       return;
@@ -119,15 +117,18 @@ export default function BusinessForm({ business, onSubmit, isEditing = false }: 
         contact: {
           phone: formData.phone,
           email: formData.email,
-          website: formData.website
+          website: formData.website,
         },
-        images: formData.images.split(',').map((img: string) => img.trim()).filter(Boolean),
+        images: formData.images
+          .split(',')
+          .map((img: string) => img.trim())
+          .filter(Boolean),
         hours: formData.hours,
         coordinates: formData.coordinates,
         ownerId: user.id,
         isVerified: formData.isVerified,
         rating: 0,
-        reviewCount: 0
+        reviewCount: 0,
       };
 
       if (isEditing && onSubmit) {
@@ -158,44 +159,38 @@ export default function BusinessForm({ business, onSubmit, isEditing = false }: 
           <BuildingStorefrontIcon className="h-5 w-5 mr-2" />
           Basic Information
         </h2>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Business Name *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Business Name *</label>
             <input
               type="text"
               required
               value={formData.name}
-              onChange={(e) => handleInputChange('name', e.target.value)}
+              onChange={e => handleInputChange('name', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your business name"
             />
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
             <textarea
               required
               rows={4}
               value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
+              onChange={e => handleInputChange('description', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Describe your business, services, and what makes you unique"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Category *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
             <select
               required
               value={formData.category}
-              onChange={(e) => handleInputChange('category', e.target.value)}
+              onChange={e => handleInputChange('category', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select a category</option>
@@ -215,7 +210,7 @@ export default function BusinessForm({ business, onSubmit, isEditing = false }: 
           <PhoneIcon className="h-5 w-5 mr-2" />
           Contact Information
         </h2>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -238,7 +233,7 @@ export default function BusinessForm({ business, onSubmit, isEditing = false }: 
             <input
               type="tel"
               value={formData.phone}
-              onChange={(e) => handleInputChange('phone', e.target.value)}
+              onChange={e => handleInputChange('phone', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="(03) 1234 5678"
             />
@@ -252,7 +247,7 @@ export default function BusinessForm({ business, onSubmit, isEditing = false }: 
             <input
               type="email"
               value={formData.email}
-              onChange={(e) => handleInputChange('email', e.target.value)}
+              onChange={e => handleInputChange('email', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="contact@yourbusiness.com"
             />
@@ -266,7 +261,7 @@ export default function BusinessForm({ business, onSubmit, isEditing = false }: 
             <input
               type="url"
               value={formData.website}
-              onChange={(e) => handleInputChange('website', e.target.value)}
+              onChange={e => handleInputChange('website', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="https://www.yourbusiness.com"
             />
@@ -280,19 +275,17 @@ export default function BusinessForm({ business, onSubmit, isEditing = false }: 
           <ClockIcon className="h-5 w-5 mr-2" />
           Business Hours
         </h2>
-        
+
         <div className="space-y-4">
           {DAYS_OF_WEEK.map(day => (
             <div key={day} className="flex items-center space-x-4">
-              <div className="w-20 text-sm font-medium text-gray-700">
-                {day}
-              </div>
-              
+              <div className="w-20 text-sm font-medium text-gray-700">{day}</div>
+
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
                   checked={!formData.hours[day]?.isClosed}
-                  onChange={(e) => handleHoursChange(day, 'isClosed', !e.target.checked)}
+                  onChange={e => handleHoursChange(day, 'isClosed', !e.target.checked)}
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span className="text-sm text-gray-600">Open</span>
@@ -303,19 +296,19 @@ export default function BusinessForm({ business, onSubmit, isEditing = false }: 
                   <input
                     type="time"
                     value={formData.hours[day]?.open || '09:00'}
-                    onChange={(e) => handleHoursChange(day, 'open', e.target.value)}
+                    onChange={e => handleHoursChange(day, 'open', e.target.value)}
                     className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   <span className="text-sm text-gray-500">to</span>
                   <input
                     type="time"
                     value={formData.hours[day]?.close || '17:00'}
-                    onChange={(e) => handleHoursChange(day, 'close', e.target.value)}
+                    onChange={e => handleHoursChange(day, 'close', e.target.value)}
                     className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </>
               )}
-              
+
               {formData.hours[day]?.isClosed && (
                 <span className="text-sm text-gray-500">Closed</span>
               )}
@@ -330,22 +323,20 @@ export default function BusinessForm({ business, onSubmit, isEditing = false }: 
           <CameraIcon className="h-5 w-5 mr-2" />
           Business Images
         </h2>
-        
+
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Image URLs
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Image URLs</label>
           <input
             type="text"
             value={formData.images}
-            onChange={(e) => handleInputChange('images', e.target.value)}
+            onChange={e => handleInputChange('images', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
           />
           <p className="text-xs text-gray-500 mt-1">
             Provide URLs to images that represent your business (separate multiple with commas)
           </p>
-          
+
           {formData.images && (
             <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
               {formData.images.split(',').map((imgUrl: string, index: number) => {
@@ -359,7 +350,7 @@ export default function BusinessForm({ business, onSubmit, isEditing = false }: 
                     width={200}
                     height={128}
                     className="w-full h-32 object-cover rounded-lg border"
-                    onError={(e) => {
+                    onError={e => {
                       const target = e.target as HTMLImageElement;
                       target.style.display = 'none';
                     }}

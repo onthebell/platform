@@ -1,19 +1,19 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import MapContainer from '@/components/map/MapContainer';
-import { 
-  CalendarIcon, 
-  MapPinIcon, 
-  ShoppingBagIcon, 
+import {
+  CalendarIcon,
+  MapPinIcon,
+  ShoppingBagIcon,
   HeartIcon,
   UserGroupIcon,
-  GiftIcon
+  GiftIcon,
 } from '@heroicons/react/24/outline';
 
 const features = [
   {
     name: 'Local Events',
-    description: 'Discover what\'s happening in your neighborhood',
+    description: "Discover what's happening in your neighborhood",
     icon: CalendarIcon,
     href: '/events',
   },
@@ -74,23 +74,18 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-              Welcome to{' '}
-              <span className="text-blue-600">OnTheBell</span>
+              Welcome to <span className="text-blue-600">OnTheBell</span>
             </h1>
             <p className="mt-6 text-lg leading-8 text-gray-600">
-              Your Bellarine Peninsula community hub. Connect with neighbors, 
-              discover local events, find great deals, and build stronger community connections.
+              Your Bellarine Peninsula community hub. Connect with neighbors, discover local events,
+              find great deals, and build stronger community connections.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <Button asChild size="lg">
-                <Link href="/auth/signup">
-                  Join the Community
-                </Link>
+                <Link href="/auth/signup">Join the Community</Link>
               </Button>
               <Button variant="outline" asChild size="lg">
-                <Link href="/about">
-                  Learn More
-                </Link>
+                <Link href="/about">Learn More</Link>
               </Button>
             </div>
           </div>
@@ -105,12 +100,13 @@ export default function HomePage() {
               Everything your community needs
             </h2>
             <p className="mt-4 text-lg leading-8 text-gray-600">
-              From local events to neighborhood marketplace, OnTheBell brings the Bellarine Peninsula together.
+              From local events to neighborhood marketplace, OnTheBell brings the Bellarine
+              Peninsula together.
             </p>
           </div>
           <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
             <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
-              {features.map((feature) => (
+              {features.map(feature => (
                 <div key={feature.name} className="flex flex-col">
                   <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-gray-900">
                     <feature.icon className="h-5 w-5 flex-none text-blue-600" aria-hidden="true" />
@@ -119,7 +115,10 @@ export default function HomePage() {
                   <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600">
                     <p className="flex-auto">{feature.description}</p>
                     <p className="mt-6">
-                      <Link href={feature.href} className="text-sm font-semibold leading-6 text-blue-600 hover:text-blue-700">
+                      <Link
+                        href={feature.href}
+                        className="text-sm font-semibold leading-6 text-blue-600 hover:text-blue-700"
+                      >
                         Explore <span aria-hidden="true">→</span>
                       </Link>
                     </p>
@@ -151,9 +150,7 @@ export default function HomePage() {
             />
             <div className="mt-8 text-center">
               <Button asChild>
-                <Link href="/map">
-                  View Full Map
-                </Link>
+                <Link href="/map">View Full Map</Link>
               </Button>
             </div>
           </div>
@@ -171,20 +168,10 @@ export default function HomePage() {
               Get verified as a Bellarine Peninsula resident to access exclusive community features.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
-              <Button 
-                variant="secondary"
-                size="lg"
-                asChild
-              >
-                <Link href="/auth/signup">
-                  Get Started
-                </Link>
+              <Button variant="secondary" size="lg" asChild>
+                <Link href="/auth/signup">Get Started</Link>
               </Button>
-              <Button 
-                variant="link" 
-                className="text-white hover:text-blue-200"
-                asChild
-              >
+              <Button variant="link" className="text-white hover:text-blue-200" asChild>
                 <Link href="/verification">
                   Learn about verification <span aria-hidden="true">→</span>
                 </Link>

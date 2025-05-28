@@ -12,7 +12,7 @@ const BUSINESS_CATEGORIES = [
   'Entertainment',
   'Education',
   'Beauty & Personal Care',
-  'Other'
+  'Other',
 ];
 
 interface BusinessFilterProps {
@@ -32,7 +32,7 @@ export default function BusinessFilter({
   onSearchChange,
   onCategoryChange,
   onVerifiedToggle,
-  resultsCount
+  resultsCount,
 }: BusinessFilterProps) {
   return (
     <div className="bg-white p-6 rounded-lg shadow mb-8">
@@ -40,7 +40,7 @@ export default function BusinessFilter({
         <FunnelIcon className="h-5 w-5 text-gray-400 mr-2" />
         <h3 className="text-lg font-medium text-gray-900">Filter Businesses</h3>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
         {/* Search */}
         <div className="md:col-span-2">
@@ -50,7 +50,7 @@ export default function BusinessFilter({
               type="text"
               placeholder="Search businesses..."
               value={searchTerm}
-              onChange={(e) => onSearchChange(e.target.value)}
+              onChange={e => onSearchChange(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -60,12 +60,14 @@ export default function BusinessFilter({
         <div>
           <select
             value={selectedCategory}
-            onChange={(e) => onCategoryChange(e.target.value)}
+            onChange={e => onCategoryChange(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">All Categories</option>
             {BUSINESS_CATEGORIES.map(category => (
-              <option key={category} value={category}>{category}</option>
+              <option key={category} value={category}>
+                {category}
+              </option>
             ))}
           </select>
         </div>
@@ -76,7 +78,7 @@ export default function BusinessFilter({
             <input
               type="checkbox"
               checked={verifiedOnly}
-              onChange={(e) => onVerifiedToggle(e.target.checked)}
+              onChange={e => onVerifiedToggle(e.target.checked)}
               className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
             <span className="ml-2 text-sm text-gray-700">Verified only</span>

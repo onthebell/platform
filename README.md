@@ -1,23 +1,30 @@
 # OnTheBell - Bellarine Peninsula Community Platform
 
-OnTheBell is an open-source community platform designed specifically for residents of the Bellarine Peninsula in Victoria, Australia. It serves as a central hub for local information, community connections, and services.
+OnTheBell is an open-source community platform designed specifically for
+residents of the Bellarine Peninsula in Victoria, Australia. It serves as a
+central hub for local information, community connections, and services.
 
 ## 🌟 Features
 
 ### Core Community Features
+
 - **Local Events Calendar** - Discover and share community events
-- **Interactive Map** - Find local businesses, events, and community spots using Leaflet
+- **Interactive Map** - Find local businesses, events, and community spots using
+  Leaflet
 - **Marketplace** - Buy, sell, or give away items locally
 - **Community Help Requests** - Ask for help or lend a hand to neighbors
 - **Neighborhood Connections** - Meet and connect with people nearby
 - **Local Deals & Discounts** - Exclusive offers from Bellarine businesses
 
 ### User Authentication & Verification
+
 - **Firebase Authentication** - Secure user management
 - **Address Verification System** - Verify residents for "On the Bell" access
-- **Tiered Access Control** - Different features for verified vs. unverified users
+- **Tiered Access Control** - Different features for verified vs. unverified
+  users
 
 ### Additional Features
+
 - **Video Content** - Mux integration for community videos
 - **Donation System** - Support platform development via Stripe
 - **Mobile-First Design** - Responsive design built with TailwindCSS
@@ -36,6 +43,7 @@ OnTheBell is an open-source community platform designed specifically for residen
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js 18+ and pnpm
 - Firebase account and project
 - Stripe account (for donations)
@@ -44,24 +52,28 @@ OnTheBell is an open-source community platform designed specifically for residen
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/onthebell/platform.git
    cd platform
    ```
 
 2. **Install dependencies**
+
    ```bash
    pnpm install
    ```
 
 3. **Set up environment variables**
+
    ```bash
    cp .env.example .env.local
    ```
-   
+
    Fill in your Firebase, Stripe, and Mux configuration in `.env.local`
 
 4. **Run the development server**
+
    ```bash
    pnpm dev
    ```
@@ -85,7 +97,9 @@ OnTheBell is an open-source community platform designed specifically for residen
 ## 📋 API Keys Configuration
 
 ### Google Maps API
-For the address autocomplete and map features to work properly, you need to set up a Google Maps API key:
+
+For the address autocomplete and map features to work properly, you need to set
+up a Google Maps API key:
 
 1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
 2. Create a new project or select an existing one
@@ -96,7 +110,9 @@ For the address autocomplete and map features to work properly, you need to set 
    - Geocoding API
 5. Create an API key under "APIs & Services" > "Credentials"
 6. Restrict the API key to the following:
-   - HTTP referrers (websites): Add your domain (e.g., localhost:3000 for development)
+
+   - HTTP referrers (websites): Add your domain (e.g., localhost:3000 for
+     development)
    - API restrictions: Restrict to the three APIs mentioned above
 
 7. Add the API key to your `.env.local` file:
@@ -107,24 +123,31 @@ For the address autocomplete and map features to work properly, you need to set 
 ### Troubleshooting API Keys
 
 If you see the error "ApiNotActivatedMapError":
-1. Ensure you've enabled all required APIs (Maps JavaScript API, Places API, Geocoding API)
+
+1. Ensure you've enabled all required APIs (Maps JavaScript API, Places API,
+   Geocoding API)
 2. Check that billing is enabled for your Google Cloud project
 3. Verify that your API key doesn't have overly restrictive usage limits
 4. Make sure your domain is authorized in the API key restrictions
 
 ## 🔥 Firebase Configuration
 
-1. **Firebase Console**: Go to the [Firebase Console](https://console.firebase.google.com/)
+1. **Firebase Console**: Go to the
+   [Firebase Console](https://console.firebase.google.com/)
 2. **Create a Project**: Click on "Add project" and follow the prompts
-3. **Register App**: In your project overview, click on "Add app" and select your platform (Web)
+3. **Register App**: In your project overview, click on "Add app" and select
+   your platform (Web)
 4. **Firebase SDK**: Install Firebase SDK in your project
    ```bash
    pnpm install firebase
    ```
 5. **Initialize Firebase**: Add Firebase initialization code in your project
-6. **Enable Firestore**: In the Firebase Console, navigate to Firestore Database and click "Create database"
-7. **Set Up Authentication**: Go to Authentication > Sign-in method and enable Email/Password
-8. **Configure Storage**: Navigate to Storage and click "Get started" to enable Firebase Storage
+6. **Enable Firestore**: In the Firebase Console, navigate to Firestore Database
+   and click "Create database"
+7. **Set Up Authentication**: Go to Authentication > Sign-in method and enable
+   Email/Password
+8. **Configure Storage**: Navigate to Storage and click "Get started" to enable
+   Firebase Storage
 
 ## 📁 Project Structure
 
@@ -150,7 +173,8 @@ src/
 
 ## 🎯 Community Guidelines
 
-OnTheBell is built for the Bellarine Peninsula community with the following principles:
+OnTheBell is built for the Bellarine Peninsula community with the following
+principles:
 
 1. **Local Focus** - Content should be relevant to Bellarine Peninsula residents
 2. **Community Safety** - Address verification ensures local authenticity
@@ -159,7 +183,8 @@ OnTheBell is built for the Bellarine Peninsula community with the following prin
 
 ## 🤝 Contributing
 
-We welcome contributions from the community! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+We welcome contributions from the community! Please see our
+[Contributing Guidelines](CONTRIBUTING.md) for details.
 
 ### Development Workflow
 
@@ -186,7 +211,8 @@ If you find OnTheBell useful, consider:
 
 - **Website**: [onthebell.com.au](https://onthebell.com.au)
 - **Email**: hello@onthebell.com.au
-- **GitHub**: [github.com/onthebell/platform](https://github.com/onthebell/platform)
+- **GitHub**:
+  [github.com/onthebell/platform](https://github.com/onthebell/platform)
 
 ---
 

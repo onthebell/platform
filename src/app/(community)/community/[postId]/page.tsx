@@ -6,7 +6,13 @@ import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/firebase/auth';
 import { getPostById } from '@/lib/firebase/firestore';
 import { CommunityPost } from '@/types';
-import { MapPinIcon, ClockIcon, TagIcon, UserIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
+import {
+  MapPinIcon,
+  ClockIcon,
+  TagIcon,
+  UserIcon,
+  ArrowLeftIcon,
+} from '@heroicons/react/24/outline';
 import { HeartIcon, ShareIcon } from '@heroicons/react/24/solid';
 
 export default function PostDetailPage() {
@@ -108,7 +114,9 @@ export default function PostDetailPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Post Not Found</h2>
-          <p className="text-gray-600 mb-6">{error || 'The post you\'re looking for doesn\'t exist.'}</p>
+          <p className="text-gray-600 mb-6">
+            {error || "The post you're looking for doesn't exist."}
+          </p>
           <button
             onClick={() => router.push('/community')}
             className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
@@ -145,7 +153,7 @@ export default function PostDetailPage() {
                   className="w-full h-96 object-cover"
                 />
               </div>
-              
+
               {/* Image Navigation */}
               {post.images.length > 1 && (
                 <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
@@ -176,7 +184,9 @@ export default function PostDetailPage() {
             <div className="flex justify-between items-start mb-6">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(post.category)}`}>
+                  <span
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(post.category)}`}
+                  >
                     {post.category.replace('_', ' ')}
                   </span>
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
@@ -190,7 +200,7 @@ export default function PostDetailPage() {
                   </div>
                 )}
               </div>
-              
+
               {/* Action Buttons */}
               <div className="flex space-x-2 ml-4">
                 <button

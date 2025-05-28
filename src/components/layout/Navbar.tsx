@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/firebase/auth';
-import { 
-  HomeIcon, 
-  MapPinIcon, 
-  CalendarIcon, 
+import {
+  HomeIcon,
+  MapPinIcon,
+  CalendarIcon,
   ShoppingBagIcon,
   HeartIcon,
   UserCircleIcon,
@@ -14,7 +14,7 @@ import {
   XMarkIcon,
   BellIcon,
   BuildingStorefrontIcon,
-  GiftIcon
+  GiftIcon,
 } from '@heroicons/react/24/outline';
 import { NotificationDropdown } from '@/components/notifications';
 
@@ -62,10 +62,10 @@ export default function Navbar() {
 
           {/* Desktop navigation */}
           <div className="hidden md:flex md:items-center md:space-x-8">
-            {navigation.map((item) => {
+            {navigation.map(item => {
               const canAccess = !item.requiresAuth || user;
-              const canAccessVerified = !item.verifiedOnly || (user?.isVerified);
-              
+              const canAccessVerified = !item.verifiedOnly || user?.isVerified;
+
               if (!canAccess || !canAccessVerified) return null;
 
               return (
@@ -92,13 +92,15 @@ export default function Navbar() {
                 >
                   <UserCircleIcon className="h-6 w-6 text-gray-600" />
                   <div className="hidden sm:block text-left">
-                    <p className="text-sm font-medium text-gray-900">{user.displayName || 'User'}</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {user.displayName || 'User'}
+                    </p>
                     <p className="text-xs text-gray-500">
                       {user.isVerified ? 'Verified Resident' : 'Unverified User'}
                     </p>
                   </div>
                 </button>
-                
+
                 {/* Dropdown Menu */}
                 {mobileMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
@@ -172,10 +174,10 @@ export default function Navbar() {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-gray-200">
           <div className="px-2 pt-2 pb-3 space-y-1">
-            {navigation.map((item) => {
+            {navigation.map(item => {
               const canAccess = !item.requiresAuth || user;
-              const canAccessVerified = !item.verifiedOnly || (user?.isVerified);
-              
+              const canAccessVerified = !item.verifiedOnly || user?.isVerified;
+
               if (!canAccess || !canAccessVerified) return null;
 
               return (

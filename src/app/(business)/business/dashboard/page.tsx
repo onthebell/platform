@@ -6,13 +6,13 @@ import { useAuth } from '@/lib/firebase/auth';
 import { getBusinesses } from '@/lib/firebase/firestore';
 import { Business } from '@/types';
 import Link from 'next/link';
-import { 
+import {
   BuildingStorefrontIcon,
   PencilIcon,
   EyeIcon,
   ChartBarIcon,
   CheckBadgeIcon,
-  PlusIcon
+  PlusIcon,
 } from '@heroicons/react/24/outline';
 
 export default function BusinessDashboard() {
@@ -24,7 +24,7 @@ export default function BusinessDashboard() {
   useEffect(() => {
     const fetchUserBusinesses = async () => {
       if (!user) return;
-      
+
       try {
         setIsLoading(true);
         // Get all businesses for the current user
@@ -53,7 +53,7 @@ export default function BusinessDashboard() {
         </span>
       );
     }
-    
+
     return (
       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
         Active
@@ -136,7 +136,7 @@ export default function BusinessDashboard() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {businesses.map((business) => (
+            {businesses.map(business => (
               <div key={business.id} className="bg-white overflow-hidden shadow rounded-lg">
                 {business.images && business.images.length > 0 && (
                   <div className="h-48 bg-gray-200">
@@ -149,19 +149,15 @@ export default function BusinessDashboard() {
                     />
                   </div>
                 )}
-                
+
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-lg font-medium text-gray-900 truncate">
-                      {business.name}
-                    </h3>
+                    <h3 className="text-lg font-medium text-gray-900 truncate">{business.name}</h3>
                     {getStatusBadge(business.isVerified)}
                   </div>
-                  
-                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                    {business.description}
-                  </p>
-                  
+
+                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">{business.description}</p>
+
                   <div className="text-sm text-gray-500 mb-4">
                     <p className="capitalize">{business.category.replace('-', ' ')}</p>
                     <p>{business.address}</p>
@@ -171,7 +167,9 @@ export default function BusinessDashboard() {
                   <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
                     <div className="flex items-center">
                       <ChartBarIcon className="h-4 w-4 mr-1" />
-                      <span>{business.rating.toFixed(1)} ({business.reviewCount} reviews)</span>
+                      <span>
+                        {business.rating.toFixed(1)} ({business.reviewCount} reviews)
+                      </span>
                     </div>
                   </div>
 

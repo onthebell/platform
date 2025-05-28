@@ -1,17 +1,17 @@
-import { 
-  collection, 
-  doc, 
-  getDocs, 
-  getDoc, 
-  addDoc, 
-  updateDoc, 
-  query, 
-  where, 
-  orderBy, 
-  limit, 
+import {
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  addDoc,
+  updateDoc,
+  query,
+  where,
+  orderBy,
+  limit,
   startAfter,
   Timestamp,
-  QueryConstraint
+  QueryConstraint,
 } from 'firebase/firestore';
 import { db } from './config';
 import { CommunityPost, Event, Business, User, Notification } from '@/types';
@@ -25,18 +25,18 @@ console.log('Posts collection reference:', postsCollection.path);
 
 export async function createPost(post: Omit<CommunityPost, 'id' | 'createdAt' | 'updatedAt'>) {
   const now = new Date();
-  
+
   // Filter out undefined values to prevent Firestore errors
   const cleanPost = Object.fromEntries(
     Object.entries(post).filter(([, value]) => value !== undefined)
   );
-  
+
   const postData = {
     ...cleanPost,
     createdAt: Timestamp.fromDate(now),
     updatedAt: Timestamp.fromDate(now),
   };
-  
+
   const docRef = await addDoc(postsCollection, postData);
   return docRef.id;
 }
@@ -53,49 +53,51 @@ export async function getPosts(
 ) {
   try {
     const constraints: QueryConstraint[] = [];
-    
+
     if (filters.category) {
       constraints.push(where('category', '==', filters.category));
     }
-    
+
     if (filters.status) {
       constraints.push(where('status', '==', filters.status));
     } else {
       constraints.push(where('status', '==', 'active'));
     }
-    
+
     if (filters.visibility) {
       constraints.push(where('visibility', '==', filters.visibility));
     }
-    
+
     if (filters.authorId) {
       constraints.push(where('authorId', '==', filters.authorId));
     }
 
     constraints.push(orderBy('createdAt', 'desc'));
     constraints.push(limit(limitCount));
-    
+
     if (lastDoc) {
       constraints.push(startAfter(lastDoc));
     }
 
     const q = query(postsCollection, ...constraints);
     const snapshot = await getDocs(q);
-    
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate() || new Date(),
-      updatedAt: doc.data().updatedAt?.toDate() || new Date(),
-    } as CommunityPost));
-    
+
+    return snapshot.docs.map(
+      doc =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate() || new Date(),
+          updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+        }) as CommunityPost
+    );
   } catch (error) {
     console.error('Error in getPosts:', error);
     console.error('Error details:', {
-      name: (error as any)?.name,
-      message: (error as any)?.message,
-      code: (error as any)?.code,
-      stack: (error as any)?.stack
+      name: (error as Error)?.name,
+      message: (error as Error)?.message,
+      code: (error as { code?: string })?.code,
+      stack: (error as Error)?.stack,
     });
     throw error;
   }
@@ -104,7 +106,7 @@ export async function getPosts(
 export async function getPost(id: string) {
   const docRef = doc(db, 'posts', id);
   const docSnap = await getDoc(docRef);
-  
+
   if (docSnap.exists()) {
     const data = docSnap.data();
     return {
@@ -114,7 +116,7 @@ export async function getPost(id: string) {
       updatedAt: data.updatedAt?.toDate() || new Date(),
     } as CommunityPost;
   }
-  
+
   return null;
 }
 
@@ -127,7 +129,7 @@ export async function updatePost(id: string, updates: Partial<CommunityPost>) {
     ...updates,
     updatedAt: Timestamp.fromDate(new Date()),
   };
-  
+
   await updateDoc(docRef, updateData);
 }
 
@@ -152,7 +154,7 @@ export async function createEvent(event: Omit<Event, 'id' | 'createdAt' | 'updat
     createdAt: Timestamp.fromDate(now),
     updatedAt: Timestamp.fromDate(now),
   };
-  
+
   const docRef = await addDoc(eventsCollection, eventData);
   return docRef.id;
 }
@@ -167,21 +169,21 @@ export async function getEvents(
   limitCount: number = 20
 ) {
   const constraints: QueryConstraint[] = [];
-  
+
   if (filters.status) {
     constraints.push(where('status', '==', filters.status));
   } else {
     constraints.push(where('status', '==', 'active'));
   }
-  
+
   if (filters.visibility) {
     constraints.push(where('visibility', '==', filters.visibility));
   }
-  
+
   if (filters.organizerId) {
     constraints.push(where('organizerId', '==', filters.organizerId));
   }
-  
+
   if (filters.category) {
     constraints.push(where('category', '==', filters.category));
   }
@@ -191,15 +193,18 @@ export async function getEvents(
 
   const q = query(eventsCollection, ...constraints);
   const snapshot = await getDocs(q);
-  
-  return snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data(),
-    startDate: doc.data().startDate?.toDate() || new Date(),
-    endDate: doc.data().endDate?.toDate() || new Date(),
-    createdAt: doc.data().createdAt?.toDate() || new Date(),
-    updatedAt: doc.data().updatedAt?.toDate() || new Date(),
-  } as Event));
+
+  return snapshot.docs.map(
+    doc =>
+      ({
+        id: doc.id,
+        ...doc.data(),
+        startDate: doc.data().startDate?.toDate() || new Date(),
+        endDate: doc.data().endDate?.toDate() || new Date(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+        updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+      }) as Event
+  );
 }
 
 // Businesses operations
@@ -212,7 +217,7 @@ export async function createBusiness(business: Omit<Business, 'id' | 'createdAt'
     createdAt: Timestamp.fromDate(now),
     updatedAt: Timestamp.fromDate(now),
   };
-  
+
   const docRef = await addDoc(businessesCollection, businessData);
   return docRef.id;
 }
@@ -226,11 +231,11 @@ export async function getBusinesses(
   limitCount: number = 50
 ) {
   const constraints: QueryConstraint[] = [];
-  
+
   if (filters.category) {
     constraints.push(where('category', '==', filters.category));
   }
-  
+
   if (filters.isVerified !== undefined) {
     constraints.push(where('isVerified', '==', filters.isVerified));
   }
@@ -240,19 +245,22 @@ export async function getBusinesses(
 
   const q = query(businessesCollection, ...constraints);
   const snapshot = await getDocs(q);
-  
-  return snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data(),
-    createdAt: doc.data().createdAt?.toDate() || new Date(),
-    updatedAt: doc.data().updatedAt?.toDate() || new Date(),
-  } as Business));
+
+  return snapshot.docs.map(
+    doc =>
+      ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+        updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+      }) as Business
+  );
 }
 
 export async function getBusiness(id: string) {
   const docRef = doc(db, 'businesses', id);
   const docSnap = await getDoc(docRef);
-  
+
   if (docSnap.exists()) {
     const data = docSnap.data();
     return {
@@ -262,7 +270,7 @@ export async function getBusiness(id: string) {
       updatedAt: data.updatedAt?.toDate() || new Date(),
     } as Business;
   }
-  
+
   return null;
 }
 
@@ -270,7 +278,7 @@ export async function getBusiness(id: string) {
 export async function getUserProfile(userId: string) {
   const docRef = doc(db, 'users', userId);
   const docSnap = await getDoc(docRef);
-  
+
   if (docSnap.exists()) {
     const data = docSnap.data();
     return {
@@ -280,7 +288,7 @@ export async function getUserProfile(userId: string) {
       lastActive: data.lastActive?.toDate() || new Date(),
     } as User;
   }
-  
+
   return null;
 }
 
@@ -290,7 +298,7 @@ export async function updateUserProfile(userId: string, updates: Partial<User>) 
     ...updates,
     lastActive: Timestamp.fromDate(new Date()),
   };
-  
+
   await updateDoc(docRef, updateData);
 }
 
@@ -300,7 +308,7 @@ export async function createNotification(notification: Omit<Notification, 'id' |
     ...notification,
     createdAt: Timestamp.fromDate(new Date()),
   };
-  
+
   const docRef = await addDoc(collection(db, 'notifications'), notificationData);
   return docRef.id;
 }
@@ -312,14 +320,17 @@ export async function getUserNotifications(userId: string, limitCount: number = 
     orderBy('createdAt', 'desc'),
     limit(limitCount)
   );
-  
+
   const snapshot = await getDocs(q);
-  
-  return snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data(),
-    createdAt: doc.data().createdAt?.toDate() || new Date(),
-  } as Notification));
+
+  return snapshot.docs.map(
+    doc =>
+      ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+      }) as Notification
+  );
 }
 
 export async function markNotificationAsRead(notificationId: string) {
@@ -340,7 +351,7 @@ export async function submitAddressVerification(
     status: 'pending',
     submittedAt: Timestamp.fromDate(new Date()),
   };
-  
+
   const docRef = await addDoc(collection(db, 'verifications'), verificationData);
   return docRef.id;
 }
@@ -350,31 +361,35 @@ export async function searchPosts(searchTerm: string, category?: string) {
   const constraints: QueryConstraint[] = [
     where('status', '==', 'active'),
     orderBy('createdAt', 'desc'),
-    limit(20)
+    limit(20),
   ];
-  
+
   if (category) {
     constraints.push(where('category', '==', category));
   }
 
   const q = query(postsCollection, ...constraints);
   const snapshot = await getDocs(q);
-  
-  const posts = snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data(),
-    createdAt: doc.data().createdAt?.toDate() || new Date(),
-    updatedAt: doc.data().updatedAt?.toDate() || new Date(),
-  } as CommunityPost));
+
+  const posts = snapshot.docs.map(
+    doc =>
+      ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+        updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+      }) as CommunityPost
+  );
 
   // Client-side filtering for search term (Firestore doesn't support full-text search)
   if (searchTerm) {
-    return posts.filter(post => 
-      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+    return posts.filter(
+      post =>
+        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        post.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        post.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
     );
   }
-  
+
   return posts;
 }

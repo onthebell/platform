@@ -19,7 +19,6 @@ export default function CommunityPage() {
         // Fetch all community posts
         const postsData = await getPosts({}, 50); // Get up to 50 active posts
         setPosts(postsData);
-
       } catch (err) {
         console.error('Error loading community posts:', err);
         setError('Failed to load community posts. Please try again.');
@@ -38,8 +37,8 @@ export default function CommunityPage() {
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">Community</h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Connect with your Bellarine Peninsula community. Browse local events, marketplace items,
-              and connect with your neighbors.
+              Connect with your Bellarine Peninsula community. Browse local events, marketplace
+              items, and connect with your neighbors.
             </p>
           </div>
 
@@ -66,8 +65,8 @@ export default function CommunityPage() {
         <div className="container mx-auto px-4 py-8">
           <div className="text-center py-12">
             <p className="text-gray-600 mb-4">{error}</p>
-            <button 
-              onClick={() => window.location.reload()} 
+            <button
+              onClick={() => window.location.reload()}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
               Try Again
@@ -90,8 +89,8 @@ export default function CommunityPage() {
           </p>
         </div>
 
-        <PostsGrid 
-          posts={posts} 
+        <PostsGrid
+          posts={posts}
           title="Community Posts"
           showFilters={true}
           showCreateButton={true}

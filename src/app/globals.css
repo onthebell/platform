@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
   --background: #ffffff;
@@ -36,39 +36,61 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 /* Add darker input text */
-input, textarea, select {
-  color: #222 !important; 
+input,
+textarea,
+select {
+  color: #222 !important;
   caret-color: #222; /* Also make the cursor visible */
 }
 
-.dark input, .dark textarea, .dark select {
+.dark input,
+.dark textarea,
+.dark select {
   color: #f3f4f6 !important;
   caret-color: #f3f4f6;
 }
 
 /* Make sure readonly inputs are also visible enough */
-input[readonly], textarea[readonly], select[disabled] {
+input[readonly],
+textarea[readonly],
+select[disabled] {
   color: #222 !important; /* Very dark for readonly inputs too */
 }
 
-.dark input[readonly], .dark textarea[readonly], .dark select[disabled] {
+.dark input[readonly],
+.dark textarea[readonly],
+.dark select[disabled] {
   color: #d1d5db !important;
 }
 
 /* Override any Tailwind text color classes for inputs */
-input.text-gray-100, input.text-gray-200, input.text-gray-300, 
-input.text-gray-400, input.text-gray-500, input.text-gray-600,
-input.text-gray-700, input.text-gray-800, input.text-gray-900 {
+input.text-gray-100,
+input.text-gray-200,
+input.text-gray-300,
+input.text-gray-400,
+input.text-gray-500,
+input.text-gray-600,
+input.text-gray-700,
+input.text-gray-800,
+input.text-gray-900 {
   color: black !important;
 }
 
-.dark input.text-gray-100, .dark input.text-gray-200, .dark input.text-gray-300,
-.dark input.text-gray-400, .dark input.text-gray-500, .dark input.text-gray-600,
-.dark input.text-gray-700, .dark input.text-gray-800, .dark input.text-gray-900 {
+.dark input.text-gray-100,
+.dark input.text-gray-200,
+.dark input.text-gray-300,
+.dark input.text-gray-400,
+.dark input.text-gray-500,
+.dark input.text-gray-600,
+.dark input.text-gray-700,
+.dark input.text-gray-800,
+.dark input.text-gray-900 {
   color: #f3f4f6 !important;
 }
 
@@ -79,12 +101,17 @@ input.text-gray-700, input.text-gray-800, input.text-gray-900 {
 }
 
 /* Add transition effects to elements for smoother dark/light mode switching */
-*, *::before, *::after {
-  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out;
+*,
+*::before,
+*::after {
+  transition:
+    background-color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out,
+    color 0.2s ease-in-out;
 }
 
 /* But disable transitions on elements where it would be distracting */
-.no-transition, 
+.no-transition,
 .no-transition *,
 .no-transition *::before,
 .no-transition *::after {
@@ -99,7 +126,7 @@ button:focus,
 a:focus,
 select,
 textarea,
-[role="dialog"],
+[role='dialog'],
 .transition-none {
   transition: none !important;
 }

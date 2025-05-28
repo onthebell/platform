@@ -34,9 +34,7 @@ export function NotificationDropdown() {
             <Popover.Panel className="absolute right-0 z-50 mt-2 w-80 sm:w-96 bg-white rounded-lg shadow-lg border border-gray-200">
               <div className="p-4 border-b border-gray-200">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Notifications
-                  </h3>
+                  <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
                   {unreadCount > 0 && (
                     <button
                       onClick={markAllAsRead}
@@ -46,7 +44,7 @@ export function NotificationDropdown() {
                     </button>
                   )}
                 </div>
-                
+
                 {unreadCount > 0 && (
                   <p className="text-sm text-gray-600 mt-1">
                     You have {unreadCount} unread notification{unreadCount === 1 ? '' : 's'}
@@ -65,12 +63,12 @@ export function NotificationDropdown() {
                     <BellIcon className="h-12 w-12 text-gray-300 mx-auto mb-2" />
                     <p className="text-sm text-gray-600">No notifications yet</p>
                     <p className="text-xs text-gray-500 mt-1">
-                      You&apos;ll see updates about your posts and community activity here
+                      You'll see updates about your posts and community activity here
                     </p>
                   </div>
                 ) : (
                   <div className="divide-y divide-gray-100">
-                    {notifications.map((notification) => (
+                    {notifications.map(notification => (
                       <NotificationItem
                         key={notification.id}
                         notification={notification}

@@ -44,7 +44,7 @@ export interface CommunityPost {
   tags: string[];
 }
 
-export type PostCategory = 
+export type PostCategory =
   | 'deals'
   | 'events'
   | 'marketplace'
@@ -54,14 +54,7 @@ export type PostCategory =
   | 'food'
   | 'services';
 
-export type PostType =
-  | 'offer'
-  | 'request'
-  | 'announcement'
-  | 'event'
-  | 'sale'
-  | 'free'
-  | 'help';
+export type PostType = 'offer' | 'request' | 'announcement' | 'event' | 'sale' | 'free' | 'help';
 
 export interface Event {
   id: string;

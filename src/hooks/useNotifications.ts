@@ -23,7 +23,7 @@ export function useNotifications() {
       setLoading(true);
       const userNotifications = await getUserNotifications(user.id);
       setNotifications(userNotifications);
-      
+
       const unread = userNotifications.filter(n => !n.isRead).length;
       setUnreadCount(unread);
     } catch (error) {
@@ -36,16 +36,12 @@ export function useNotifications() {
   const markAsRead = async (notificationId: string) => {
     try {
       await markNotificationAsRead(notificationId);
-      
+
       // Update local state
-      setNotifications(prev => 
-        prev.map(n => 
-          n.id === notificationId 
-            ? { ...n, isRead: true }
-            : n
-        )
+      setNotifications(prev =>
+        prev.map(n => (n.id === notificationId ? { ...n, isRead: true } : n))
       );
-      
+
       // Update unread count
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (error) {
@@ -56,17 +52,13 @@ export function useNotifications() {
   const markAllAsRead = async () => {
     try {
       const unreadNotifications = notifications.filter(n => !n.isRead);
-      
+
       // Mark all unread notifications as read
-      await Promise.all(
-        unreadNotifications.map(n => markNotificationAsRead(n.id))
-      );
-      
+      await Promise.all(unreadNotifications.map(n => markNotificationAsRead(n.id)));
+
       // Update local state
-      setNotifications(prev => 
-        prev.map(n => ({ ...n, isRead: true }))
-      );
-      
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+
       setUnreadCount(0);
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
@@ -94,6 +86,6 @@ export function useNotifications() {
     unreadCount,
     markAsRead,
     markAllAsRead,
-    refetch: fetchNotifications
+    refetch: fetchNotifications,
   };
 }

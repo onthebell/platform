@@ -35,12 +35,12 @@ function CreatePostForm() {
   useEffect(() => {
     const category = searchParams.get('category') as PostCategory;
     const type = searchParams.get('type') as PostType;
-    
+
     if (category || type) {
       setFormData(prev => ({
         ...prev,
         ...(category && { category }),
-        ...(type && { type })
+        ...(type && { type }),
       }));
     }
   }, [searchParams]);
@@ -69,7 +69,7 @@ function CreatePostForm() {
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     const validFiles: File[] = [];
-    
+
     for (const file of files) {
       const validation = validateImageFile(file);
       if (validation.isValid) {
@@ -86,7 +86,7 @@ function CreatePostForm() {
         alert(`${file.name}: ${validation.error}`);
       }
     }
-    
+
     setSelectedImages(prev => [...prev, ...validFiles].slice(0, 5)); // Max 5 images
   };
 
@@ -123,14 +123,16 @@ function CreatePostForm() {
         currency: formData.price ? formData.currency : undefined,
         status: 'active',
         visibility: formData.visibility,
-        tags: formData.tags.split(',').map(tag => tag.trim()).filter(Boolean),
+        tags: formData.tags
+          .split(',')
+          .map(tag => tag.trim())
+          .filter(Boolean),
       };
 
       const postId = await createPost(postData);
-      
+
       // Redirect to the new post
       router.push(`/community/${postId}`);
-      
     } catch (error) {
       console.error('Error creating post:', error);
       alert('Failed to create post. Please try again.');
@@ -178,7 +180,7 @@ function CreatePostForm() {
                 id="title"
                 required
                 value={formData.title}
-                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter a clear, descriptive title..."
               />
@@ -194,11 +196,15 @@ function CreatePostForm() {
                   id="category"
                   required
                   value={formData.category}
-                  onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value as PostCategory }))}
+                  onChange={e =>
+                    setFormData(prev => ({ ...prev, category: e.target.value as PostCategory }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {categories.map(cat => (
-                    <option key={cat.value} value={cat.value}>{cat.label}</option>
+                    <option key={cat.value} value={cat.value}>
+                      {cat.label}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -211,11 +217,15 @@ function CreatePostForm() {
                   id="type"
                   required
                   value={formData.type}
-                  onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as PostType }))}
+                  onChange={e =>
+                    setFormData(prev => ({ ...prev, type: e.target.value as PostType }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {types.map(type => (
-                    <option key={type.value} value={type.value}>{type.label}</option>
+                    <option key={type.value} value={type.value}>
+                      {type.label}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -231,7 +241,7 @@ function CreatePostForm() {
                 required
                 rows={4}
                 value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Provide details about your post..."
               />
@@ -250,19 +260,22 @@ function CreatePostForm() {
                     step="0.01"
                     min="0"
                     value={formData.price}
-                    onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value }))}
+                    onChange={e => setFormData(prev => ({ ...prev, price: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="0.00"
                   />
                 </div>
                 <div>
-                  <label htmlFor="currency" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="currency"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Currency
                   </label>
                   <select
                     id="currency"
                     value={formData.currency}
-                    onChange={(e) => setFormData(prev => ({ ...prev, currency: e.target.value }))}
+                    onChange={e => setFormData(prev => ({ ...prev, currency: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="AUD">AUD</option>
@@ -282,10 +295,12 @@ function CreatePostForm() {
                   type="text"
                   id="location"
                   value={formData.location.address}
-                  onChange={(e) => setFormData(prev => ({ 
-                    ...prev, 
-                    location: { ...prev.location, address: e.target.value }
-                  }))}
+                  onChange={e =>
+                    setFormData(prev => ({
+                      ...prev,
+                      location: { ...prev.location, address: e.target.value },
+                    }))
+                  }
                   className="w-full pl-10 pr-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter address or suburb..."
                 />
@@ -295,9 +310,7 @@ function CreatePostForm() {
 
             {/* Images */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Images (Max 5)
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Images (Max 5)</label>
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
                 <div className="text-center">
                   <PhotoIcon className="mx-auto h-12 w-12 text-gray-400" />
@@ -353,7 +366,7 @@ function CreatePostForm() {
                 type="text"
                 id="tags"
                 value={formData.tags}
-                onChange={(e) => setFormData(prev => ({ ...prev, tags: e.target.value }))}
+                onChange={e => setFormData(prev => ({ ...prev, tags: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter tags separated by commas..."
               />
@@ -364,16 +377,16 @@ function CreatePostForm() {
 
             {/* Visibility */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Visibility
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Visibility</label>
               <div className="space-y-2">
                 <label className="flex items-center">
                   <input
                     type="radio"
                     value="public"
                     checked={formData.visibility === 'public'}
-                    onChange={(e) => setFormData(prev => ({ ...prev, visibility: e.target.value as 'public' }))}
+                    onChange={e =>
+                      setFormData(prev => ({ ...prev, visibility: e.target.value as 'public' }))
+                    }
                     className="mr-2"
                   />
                   <span className="text-sm">Public - Visible to everyone</span>
@@ -383,7 +396,12 @@ function CreatePostForm() {
                     type="radio"
                     value="verified_only"
                     checked={formData.visibility === 'verified_only'}
-                    onChange={(e) => setFormData(prev => ({ ...prev, visibility: e.target.value as 'verified_only' }))}
+                    onChange={e =>
+                      setFormData(prev => ({
+                        ...prev,
+                        visibility: e.target.value as 'verified_only',
+                      }))
+                    }
                     className="mr-2"
                   />
                   <span className="text-sm">Verified Residents Only</span>

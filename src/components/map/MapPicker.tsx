@@ -21,7 +21,7 @@ export default function MapPicker({ onLocationSelect }: MapPickerProps) {
         onLocationSelect({
           lat,
           lng,
-          address: selectedLocation
+          address: selectedLocation,
         });
       }
     }
@@ -37,7 +37,7 @@ export default function MapPicker({ onLocationSelect }: MapPickerProps) {
         <input
           type="text"
           value={selectedLocation}
-          onChange={(e) => setSelectedLocation(e.target.value)}
+          onChange={e => setSelectedLocation(e.target.value)}
           placeholder="-38.2353, 144.6502"
           className="w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md mb-4"
         />

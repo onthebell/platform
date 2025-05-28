@@ -1,10 +1,10 @@
 // Community Guidelines page for OnTheBell
 import { Metadata } from 'next';
-import { 
-  HeartIcon, 
-  ShieldCheckIcon, 
+import {
+  HeartIcon,
+  ShieldCheckIcon,
   ExclamationTriangleIcon,
-  HandRaisedIcon
+  HandRaisedIcon,
 } from '@heroicons/react/24/outline';
 
 export const metadata: Metadata = {
@@ -21,7 +21,8 @@ export default function CommunityGuidelinesPage() {
             <HeartIcon className="h-16 w-16 text-blue-600 mx-auto mb-4" />
             <h1 className="text-3xl font-bold text-gray-900 mb-4">Community Guidelines</h1>
             <p className="text-lg text-gray-700">
-              Creating a safe, welcoming, and respectful community for all Bellarine Peninsula residents
+              Creating a safe, welcoming, and respectful community for all Bellarine Peninsula
+              residents
             </p>
           </div>
 
@@ -31,9 +32,9 @@ export default function CommunityGuidelinesPage() {
               Our Community Values
             </h2>
             <p className="text-gray-700 mb-6">
-              OnTheBell is built on the principle that strong communities are founded on mutual respect, 
-              kindness, and support. We expect all members to contribute to a positive environment where 
-              everyone feels welcome and valued.
+              OnTheBell is built on the principle that strong communities are founded on mutual
+              respect, kindness, and support. We expect all members to contribute to a positive
+              environment where everyone feels welcome and valued.
             </p>
 
             <h2 className="text-2xl font-semibold text-gray-900 mb-4 flex items-center">
@@ -90,7 +91,10 @@ export default function CommunityGuidelinesPage() {
               <ul className="list-disc pl-6 text-red-800 space-y-2">
                 <li>Adult content or sexually explicit material</li>
                 <li>Content promoting violence or illegal activities</li>
-                <li>Discriminatory content based on race, religion, gender, or other protected characteristics</li>
+                <li>
+                  Discriminatory content based on race, religion, gender, or other protected
+                  characteristics
+                </li>
                 <li>Personal attacks, doxxing, or privacy violations</li>
                 <li>Misinformation or deliberately false content</li>
                 <li>Commercial spam or unauthorized advertising</li>
@@ -106,8 +110,9 @@ export default function CommunityGuidelinesPage() {
 
             <h3 className="text-xl font-medium text-gray-900 mt-6 mb-3">How to Report</h3>
             <p className="text-gray-700 mb-4">
-              If you see content that violates these guidelines, please report it using the report button 
-              available on all posts and comments. You can also contact our moderation team directly.
+              If you see content that violates these guidelines, please report it using the report
+              button available on all posts and comments. You can also contact our moderation team
+              directly.
             </p>
 
             <h3 className="text-xl font-medium text-gray-900 mt-6 mb-3">Moderation Process</h3>
@@ -135,9 +140,7 @@ export default function CommunityGuidelinesPage() {
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">
               Business and Commercial Activity
             </h2>
-            <p className="text-gray-700 mb-4">
-              Local businesses are welcome on OnTheBell and can:
-            </p>
+            <p className="text-gray-700 mb-4">Local businesses are welcome on OnTheBell and can:</p>
             <ul className="list-disc pl-6 text-gray-700 mb-6 space-y-2">
               <li>Create business profiles with contact information</li>
               <li>Share updates and announcements</li>
@@ -145,13 +148,12 @@ export default function CommunityGuidelinesPage() {
               <li>Participate in community discussions as community members</li>
             </ul>
             <p className="text-gray-700 mb-6">
-              However, excessive promotional posting or spam-like behavior will be moderated. 
-              Businesses should focus on providing value to the community rather than purely promotional content.
+              However, excessive promotional posting or spam-like behavior will be moderated.
+              Businesses should focus on providing value to the community rather than purely
+              promotional content.
             </p>
 
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-              Privacy and Safety
-            </h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Privacy and Safety</h2>
             <ul className="list-disc pl-6 text-gray-700 mb-6 space-y-2">
               <li>Never share your full address publicly</li>
               <li>Use caution when meeting people from online interactions</li>
@@ -165,15 +167,16 @@ export default function CommunityGuidelinesPage() {
                 Questions About These Guidelines?
               </h3>
               <p className="text-blue-800">
-                If you have questions about our community guidelines or need clarification about 
-                what's acceptable, please don't hesitate to contact our moderation team. We're 
-                here to help ensure OnTheBell remains a positive space for everyone.
+                If you have questions about our community guidelines or need clarification about
+                what's acceptable, please don't hesitate to contact our moderation team. We're here
+                to help ensure OnTheBell remains a positive space for everyone.
               </p>
             </div>
 
             <div className="text-center mt-8">
               <p className="text-sm text-gray-600">
-                These guidelines may be updated periodically. We'll notify the community of any significant changes.
+                These guidelines may be updated periodically. We'll notify the community of any
+                significant changes.
                 <br />
                 Last updated: May 28, 2025
               </p>

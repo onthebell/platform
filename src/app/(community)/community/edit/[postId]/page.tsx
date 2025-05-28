@@ -173,7 +173,7 @@ export default function EditPostPage() {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    
+
     // Validate each file
     const validFiles = files.filter(file => {
       const validation = validateImageFile(file);
@@ -198,7 +198,7 @@ export default function EditPostPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!user || !post) return;
 
     setIsSubmitting(true);
@@ -238,12 +238,15 @@ export default function EditPostPage() {
         location: formData.location,
         images: allImages,
         visibility: formData.visibility,
-        tags: formData.tags.split(',').map((tag: string) => tag.trim()).filter(Boolean),
+        tags: formData.tags
+          .split(',')
+          .map((tag: string) => tag.trim())
+          .filter(Boolean),
         updatedAt: new Date(),
       };
 
       await updatePost(postId, updatedData);
-      
+
       alert('Post updated successfully!');
       router.push(`/community/${postId}`);
     } catch (error) {
@@ -297,7 +300,7 @@ export default function EditPostPage() {
                 id="title"
                 required
                 value={formData.title}
-                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="What would you like to share?"
               />
@@ -313,12 +316,12 @@ export default function EditPostPage() {
                   id="category"
                   required
                   value={formData.category}
-                  onChange={(e) => {
+                  onChange={e => {
                     const newCategory = e.target.value;
-                    setFormData(prev => ({ 
-                      ...prev, 
+                    setFormData(prev => ({
+                      ...prev,
                       category: newCategory,
-                      type: '' // Reset type when category changes
+                      type: '', // Reset type when category changes
                     }));
                   }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -340,22 +343,25 @@ export default function EditPostPage() {
                   id="type"
                   required
                   value={formData.type}
-                  onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
+                  onChange={e => setFormData(prev => ({ ...prev, type: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   disabled={!formData.category}
                 >
                   <option value="">Select a type</option>
-                  {formData.category && getTypesForCategory(formData.category).map(type => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
+                  {formData.category &&
+                    getTypesForCategory(formData.category).map(type => (
+                      <option key={type.value} value={type.value}>
+                        {type.label}
+                      </option>
+                    ))}
                 </select>
               </div>
             </div>
 
             {/* Price (for marketplace items) */}
-            {(formData.category === 'marketplace' || formData.category === 'deals' || formData.category === 'events') && (
+            {(formData.category === 'marketplace' ||
+              formData.category === 'deals' ||
+              formData.category === 'events') && (
               <div className="grid grid-cols-3 gap-4">
                 <div className="col-span-2">
                   <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
@@ -367,19 +373,22 @@ export default function EditPostPage() {
                     step="0.01"
                     min="0"
                     value={formData.price || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value }))}
+                    onChange={e => setFormData(prev => ({ ...prev, price: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="0.00"
                   />
                 </div>
                 <div>
-                  <label htmlFor="currency" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="currency"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Currency
                   </label>
                   <select
                     id="currency"
                     value={formData.currency}
-                    onChange={(e) => setFormData(prev => ({ ...prev, currency: e.target.value }))}
+                    onChange={e => setFormData(prev => ({ ...prev, currency: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="AUD">AUD</option>
@@ -399,7 +408,7 @@ export default function EditPostPage() {
                 required
                 rows={4}
                 value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Provide details about your post..."
               />
@@ -407,17 +416,17 @@ export default function EditPostPage() {
 
             {/* Location */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Location
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
               <div className="space-y-4">
                 <input
                   type="text"
                   value={formData.location.address}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    location: { ...prev.location, address: e.target.value }
-                  }))}
+                  onChange={e =>
+                    setFormData(prev => ({
+                      ...prev,
+                      location: { ...prev.location, address: e.target.value },
+                    }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter address"
                 />
@@ -432,9 +441,7 @@ export default function EditPostPage() {
 
             {/* Images */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Images
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Images</label>
               <div className="space-y-4">
                 {/* Existing Images */}
                 {existingImages.length > 0 && (
@@ -525,7 +532,7 @@ export default function EditPostPage() {
                 type="text"
                 id="tags"
                 value={formData.tags}
-                onChange={(e) => setFormData(prev => ({ ...prev, tags: e.target.value }))}
+                onChange={e => setFormData(prev => ({ ...prev, tags: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g., vintage, furniture, urgent"
               />
@@ -536,9 +543,7 @@ export default function EditPostPage() {
 
             {/* Visibility */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Visibility
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Visibility</label>
               <div className="space-y-2">
                 <div className="flex items-center">
                   <input
@@ -547,7 +552,12 @@ export default function EditPostPage() {
                     name="visibility"
                     value="public"
                     checked={formData.visibility === 'public'}
-                    onChange={(e) => setFormData(prev => ({ ...prev, visibility: e.target.value as 'public' | 'verified_only' }))}
+                    onChange={e =>
+                      setFormData(prev => ({
+                        ...prev,
+                        visibility: e.target.value as 'public' | 'verified_only',
+                      }))
+                    }
                     className="mr-2"
                   />
                   <label htmlFor="public" className="text-sm">
@@ -561,7 +571,12 @@ export default function EditPostPage() {
                     name="visibility"
                     value="verified_only"
                     checked={formData.visibility === 'verified_only'}
-                    onChange={(e) => setFormData(prev => ({ ...prev, visibility: e.target.value as 'public' | 'verified_only' }))}
+                    onChange={e =>
+                      setFormData(prev => ({
+                        ...prev,
+                        visibility: e.target.value as 'public' | 'verified_only',
+                      }))
+                    }
                     className="mr-2"
                   />
                   <label htmlFor="verified_only" className="text-sm">

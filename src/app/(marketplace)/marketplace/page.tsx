@@ -26,7 +26,6 @@ export default function MarketplacePage() {
         // Fetch free items
         const freeData = await getPosts({ category: 'free_items' }, 50);
         setFreePosts(freeData);
-
       } catch (err) {
         console.error('Error loading marketplace data:', err);
         setError('Failed to load marketplace data. Please try again.');
@@ -48,7 +47,7 @@ export default function MarketplacePage() {
               Buy, sell, and trade with your Bellarine Peninsula neighbors
             </p>
           </div>
-          
+
           <div className="animate-pulse space-y-6">
             <div className="flex justify-center mb-8">
               <div className="bg-gray-200 rounded-lg h-12 w-64"></div>
@@ -74,8 +73,8 @@ export default function MarketplacePage() {
         <div className="container mx-auto px-4 py-8">
           <div className="text-center py-12">
             <p className="text-gray-600 mb-4">{error}</p>
-            <button 
-              onClick={() => window.location.reload()} 
+            <button
+              onClick={() => window.location.reload()}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
               Try Again
@@ -93,7 +92,7 @@ export default function MarketplacePage() {
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Marketplace</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Buy, sell, and trade with your Bellarine Peninsula neighbors. From furniture to 
+            Buy, sell, and trade with your Bellarine Peninsula neighbors. From furniture to
             electronics, find great deals or list your own items.
           </p>
         </div>
@@ -126,7 +125,7 @@ export default function MarketplacePage() {
 
         {/* Content */}
         {activeTab === 'for-sale' && (
-          <PostsGrid 
+          <PostsGrid
             posts={marketplacePosts}
             title="Items for Sale"
             showFilters={false}
@@ -136,7 +135,7 @@ export default function MarketplacePage() {
         )}
 
         {activeTab === 'free' && (
-          <PostsGrid 
+          <PostsGrid
             posts={freePosts}
             title="Free Items"
             showFilters={false}
@@ -151,17 +150,17 @@ export default function MarketplacePage() {
             Got something to sell or give away?
           </h2>
           <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-            Join the Bellarine community marketplace. List your items for sale or offer them for free 
-            to help reduce waste and build community connections.
+            Join the Bellarine community marketplace. List your items for sale or offer them for
+            free to help reduce waste and build community connections.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
+            <Link
               href="/community/create?category=marketplace&type=sale"
               className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
             >
               List an Item for Sale
             </Link>
-            <Link 
+            <Link
               href="/community/create?category=free_items&type=free"
               className="inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
             >

@@ -35,11 +35,11 @@ export default function EditBusinessPage({ params }: EditBusinessPageProps) {
   useEffect(() => {
     const fetchBusiness = async () => {
       if (!businessId) return;
-      
+
       try {
         setIsLoading(true);
         const businessData = await getBusiness(businessId);
-        
+
         if (!businessData) {
           setError('Business not found');
           return;
@@ -74,7 +74,7 @@ export default function EditBusinessPage({ params }: EditBusinessPageProps) {
         ...updatedBusiness,
         updatedAt: Timestamp.fromDate(new Date()),
       });
-      
+
       router.push('/business/dashboard?success=updated');
     } catch (err) {
       console.error('Error updating business:', err);
@@ -122,11 +122,7 @@ export default function EditBusinessPage({ params }: EditBusinessPageProps) {
           </p>
         </div>
 
-        <BusinessForm 
-          business={business} 
-          onSubmit={handleUpdateBusiness}
-          isEditing={true}
-        />
+        <BusinessForm business={business} onSubmit={handleUpdateBusiness} isEditing={true} />
       </div>
     </div>
   );

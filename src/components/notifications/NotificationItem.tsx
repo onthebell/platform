@@ -51,24 +51,24 @@ export function NotificationItem({ notification, onMarkAsRead }: NotificationIte
       <div className={cn('flex-shrink-0 mt-0.5', iconColor)}>
         <Icon className="h-5 w-5" />
       </div>
-      
+
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <p className={cn(
-              'text-sm font-medium text-gray-900',
-              !notification.isRead && 'font-semibold'
-            )}>
+            <p
+              className={cn(
+                'text-sm font-medium text-gray-900',
+                !notification.isRead && 'font-semibold'
+              )}
+            >
               {notification.title}
             </p>
-            <p className="text-sm text-gray-600 mt-1">
-              {notification.message}
-            </p>
+            <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
             <p className="text-xs text-gray-500 mt-2">
               {formatDistanceToNow(notification.createdAt, { addSuffix: true })}
             </p>
           </div>
-          
+
           {!notification.isRead && (
             <div className="ml-2">
               <div className="w-2 h-2 bg-blue-600 rounded-full"></div>

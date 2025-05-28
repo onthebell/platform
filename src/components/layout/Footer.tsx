@@ -13,8 +13,8 @@ export default function Footer() {
               <span className="text-xl font-bold text-gray-900">OnTheBell</span>
             </div>
             <p className="text-gray-600 mb-4">
-              Connecting the Bellarine Peninsula community. Find local deals, events, 
-              marketplace items, and connect with your neighbors.
+              Connecting the Bellarine Peninsula community. Find local deals, events, marketplace
+              items, and connect with your neighbors.
             </p>
             <div className="flex items-center space-x-1 text-sm text-gray-500">
               <span>Made with</span>
@@ -35,17 +35,26 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/how-it-works" className="text-gray-600 hover:text-blue-600 transition-colors">
+                <Link
+                  href="/how-it-works"
+                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                >
                   How It Works
                 </Link>
               </li>
               <li>
-                <Link href="/verification" className="text-gray-600 hover:text-blue-600 transition-colors">
+                <Link
+                  href="/verification"
+                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                >
                   Address Verification
                 </Link>
               </li>
               <li>
-                <Link href="/donate" className="text-gray-600 hover:text-blue-600 transition-colors">
+                <Link
+                  href="/donate"
+                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                >
                   Support Development
                 </Link>
               </li>
@@ -59,12 +68,18 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/community-guidelines" className="text-gray-600 hover:text-blue-600 transition-colors">
+                <Link
+                  href="/community-guidelines"
+                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                >
                   Community Guidelines
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="text-gray-600 hover:text-blue-600 transition-colors">
+                <Link
+                  href="/privacy"
+                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                >
                   Privacy Policy
                 </Link>
               </li>
@@ -74,7 +89,10 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-gray-600 hover:text-blue-600 transition-colors">
+                <Link
+                  href="/contact"
+                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                >
                   Contact Us
                 </Link>
               </li>
@@ -88,8 +106,8 @@ export default function Footer() {
               © {new Date().getFullYear()} OnTheBell. Open source community platform.
             </p>
             <div className="mt-4 md:mt-0">
-              <Link 
-                href="https://github.com/onthebell/platform" 
+              <Link
+                href="https://github.com/onthebell/platform"
                 className="text-gray-500 hover:text-gray-700 text-sm transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"

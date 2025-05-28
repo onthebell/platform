@@ -1,19 +1,20 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { AuthProvider } from "@/lib/firebase/auth";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import { AuthProvider } from '@/lib/firebase/auth';
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
 
 const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
+  subsets: ['latin'],
+  variable: '--font-inter',
 });
 
 export const metadata: Metadata = {
-  title: "OnTheBell - Bellarine Peninsula Community",
-  description: "Connect with your Bellarine Peninsula community. Find local deals, events, marketplace items, and neighbors.",
-  keywords: ["Bellarine Peninsula", "community", "local", "events", "marketplace", "Geelong"],
+  title: 'OnTheBell - Bellarine Peninsula Community',
+  description:
+    'Connect with your Bellarine Peninsula community. Find local deals, events, marketplace items, and neighbors.',
+  keywords: ['Bellarine Peninsula', 'community', 'local', 'events', 'marketplace', 'Geelong'],
 };
 
 export default function RootLayout({
@@ -27,9 +28,7 @@ export default function RootLayout({
         <AuthProvider>
           <div className="min-h-screen flex flex-col bg-white">
             <Navbar />
-            <main className="flex-1">
-              {children}
-            </main>
+            <main className="flex-1">{children}</main>
             <Footer />
           </div>
         </AuthProvider>

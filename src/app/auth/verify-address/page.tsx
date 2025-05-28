@@ -3,16 +3,22 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/firebase/auth';
-import { 
-  submitAddressVerification, 
+import {
+  submitAddressVerification,
   getUserVerificationStatus,
   validateBellarineAddress,
   getBellarineSuburbs,
   getBellarinePostcodes,
-  parseAddressString
+  parseAddressString,
 } from '@/lib/firebase/verification';
 import { uploadImage, validateImageFile } from '@/lib/firebase/storage';
-import { DocumentIcon, MapPinIcon, CheckCircleIcon, ClockIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import {
+  DocumentIcon,
+  MapPinIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  XCircleIcon,
+} from '@heroicons/react/24/outline';
 
 export default function VerifyAddressPage() {
   const { user } = useAuth();
@@ -38,7 +44,7 @@ export default function VerifyAddressPage() {
 
   const checkVerificationStatus = useCallback(async () => {
     if (!user) return;
-    
+
     try {
       const status = await getUserVerificationStatus(user.id);
       setVerificationStatus(status);
@@ -55,7 +61,7 @@ export default function VerifyAddressPage() {
 
   const handleAddressStringChange = (addressString: string) => {
     setFormData(prev => ({ ...prev, addressString }));
-    
+
     if (addressString.length > 10) {
       const parsed = parseAddressString(addressString);
       setFormData(prev => ({
@@ -122,11 +128,12 @@ export default function VerifyAddressPage() {
         proofDocumentUrl
       );
 
-      alert('Address verification request submitted successfully! We&apos;ll review it within 2-3 business days.');
-      
+      alert(
+        "Address verification request submitted successfully! We'll review it within 2-3 business days."
+      );
+
       // Refresh verification status
       await checkVerificationStatus();
-      
     } catch (error) {
       console.error('Error submitting verification:', error);
       alert('Failed to submit verification request. Please try again.');
@@ -162,17 +169,22 @@ export default function VerifyAddressPage() {
               <h1 className="text-2xl font-bold text-gray-900">Address Verification</h1>
             </div>
             <p className="text-gray-600">
-              Verify your Bellarine Peninsula address to access verified resident features and connect with your local community.
+              Verify your Bellarine Peninsula address to access verified resident features and
+              connect with your local community.
             </p>
           </div>
 
           {/* Verification Status */}
           {verificationStatus.hasRequest && (
-            <div className={`mb-8 p-4 rounded-lg border ${
-              verificationStatus.status === 'approved' ? 'bg-green-50 border-green-200' :
-              verificationStatus.status === 'pending' ? 'bg-yellow-50 border-yellow-200' :
-              'bg-red-50 border-red-200'
-            }`}>
+            <div
+              className={`mb-8 p-4 rounded-lg border ${
+                verificationStatus.status === 'approved'
+                  ? 'bg-green-50 border-green-200'
+                  : verificationStatus.status === 'pending'
+                    ? 'bg-yellow-50 border-yellow-200'
+                    : 'bg-red-50 border-red-200'
+              }`}
+            >
               <div className="flex items-center">
                 {verificationStatus.status === 'approved' && (
                   <>
@@ -194,9 +206,12 @@ export default function VerifyAddressPage() {
                 )}
               </div>
               <p className="mt-2 text-sm text-gray-600">
-                {verificationStatus.status === 'approved' && 'Your address has been verified. You now have access to all verified resident features.'}
-                {verificationStatus.status === 'pending' && 'We\'re reviewing your address verification. This usually takes 2-3 business days.'}
-                {verificationStatus.status === 'rejected' && 'Your verification was rejected. Please check your address details and try again with valid proof of residence.'}
+                {verificationStatus.status === 'approved' &&
+                  'Your address has been verified. You now have access to all verified resident features.'}
+                {verificationStatus.status === 'pending' &&
+                  "We're reviewing your address verification. This usually takes 2-3 business days."}
+                {verificationStatus.status === 'rejected' &&
+                  'Your verification was rejected. Please check your address details and try again with valid proof of residence.'}
               </p>
             </div>
           )}
@@ -206,19 +221,22 @@ export default function VerifyAddressPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Address String Input */}
               <div>
-                <label htmlFor="addressString" className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="addressString"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
                   Full Address
                 </label>
                 <textarea
                   id="addressString"
                   rows={3}
                   value={formData.addressString}
-                  onChange={(e) => handleAddressStringChange(e.target.value)}
+                  onChange={e => handleAddressStringChange(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter your full address (e.g., 123 Main Street, Ocean Grove, VIC 3226)"
                 />
                 <p className="mt-1 text-sm text-gray-500">
-                  Enter your complete address and we&apos;ll help parse it into the fields below.
+                  Enter your complete address and we'll help parse it into the fields below.
                 </p>
               </div>
 
@@ -233,7 +251,7 @@ export default function VerifyAddressPage() {
                     id="street"
                     required
                     value={formData.street}
-                    onChange={(e) => setFormData(prev => ({ ...prev, street: e.target.value }))}
+                    onChange={e => setFormData(prev => ({ ...prev, street: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="123 Main Street"
                   />
@@ -247,30 +265,37 @@ export default function VerifyAddressPage() {
                     id="suburb"
                     required
                     value={formData.suburb}
-                    onChange={(e) => setFormData(prev => ({ ...prev, suburb: e.target.value }))}
+                    onChange={e => setFormData(prev => ({ ...prev, suburb: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select a suburb</option>
                     {suburbs.map(suburb => (
-                      <option key={suburb} value={suburb}>{suburb}</option>
+                      <option key={suburb} value={suburb}>
+                        {suburb}
+                      </option>
                     ))}
                   </select>
                 </div>
 
                 <div>
-                  <label htmlFor="postcode" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="postcode"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Postcode *
                   </label>
                   <select
                     id="postcode"
                     required
                     value={formData.postcode}
-                    onChange={(e) => setFormData(prev => ({ ...prev, postcode: e.target.value }))}
+                    onChange={e => setFormData(prev => ({ ...prev, postcode: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select postcode</option>
                     {postcodes.map(postcode => (
-                      <option key={postcode} value={postcode}>{postcode}</option>
+                      <option key={postcode} value={postcode}>
+                        {postcode}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -284,7 +309,7 @@ export default function VerifyAddressPage() {
                     id="state"
                     required
                     value={formData.state}
-                    onChange={(e) => setFormData(prev => ({ ...prev, state: e.target.value }))}
+                    onChange={e => setFormData(prev => ({ ...prev, state: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="VIC"
                   />
@@ -299,7 +324,7 @@ export default function VerifyAddressPage() {
                     id="country"
                     required
                     value={formData.country}
-                    onChange={(e) => setFormData(prev => ({ ...prev, country: e.target.value }))}
+                    onChange={e => setFormData(prev => ({ ...prev, country: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Australia"
                   />
@@ -376,9 +401,7 @@ export default function VerifyAddressPage() {
 
           {/* Benefits Section */}
           <div className="mt-8 pt-8 border-t border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Verified Resident Benefits
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Verified Resident Benefits</h3>
             <ul className="space-y-2 text-sm text-gray-600">
               <li className="flex items-center">
                 <CheckCircleIcon className="h-4 w-4 text-green-600 mr-2" />

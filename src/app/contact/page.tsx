@@ -1,17 +1,17 @@
-import { Metadata } from 'next'
-import { 
-  EnvelopeIcon, 
-  MapPinIcon, 
+import { Metadata } from 'next';
+import {
+  EnvelopeIcon,
+  MapPinIcon,
   ClockIcon,
   ChatBubbleLeftRightIcon,
   ExclamationTriangleIcon,
-  QuestionMarkCircleIcon
-} from '@heroicons/react/24/outline'
+  QuestionMarkCircleIcon,
+} from '@heroicons/react/24/outline';
 
 export const metadata: Metadata = {
   title: 'Contact Us | OnTheBell',
   description: 'Get in touch with the OnTheBell team for support, feedback, or inquiries',
-}
+};
 
 export default function ContactPage() {
   return (
@@ -20,8 +20,8 @@ export default function ContactPage() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Contact OnTheBell</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            We're here to help! Whether you have questions, feedback, or need support, 
-            we'd love to hear from you.
+            We're here to help! Whether you have questions, feedback, or need support, we'd love to
+            hear from you.
           </p>
         </div>
 
@@ -36,7 +36,10 @@ export default function ContactPage() {
             <form className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="firstName"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     First Name *
                   </label>
                   <input
@@ -48,7 +51,10 @@ export default function ContactPage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="lastName"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Last Name *
                   </label>
                   <input
@@ -133,8 +139,9 @@ export default function ContactPage() {
 
             <div className="mt-6 p-4 bg-blue-50 rounded-lg">
               <p className="text-sm text-blue-800">
-                <strong>Note:</strong> We typically respond within 24-48 hours during business days. 
-                For urgent technical issues, please include your account email and a detailed description.
+                <strong>Note:</strong> We typically respond within 24-48 hours during business days.
+                For urgent technical issues, please include your account email and a detailed
+                description.
               </p>
             </div>
           </div>
@@ -144,16 +151,14 @@ export default function ContactPage() {
             {/* Contact Details */}
             <div className="bg-white rounded-lg shadow-lg p-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-6">Contact Information</h2>
-              
+
               <div className="space-y-6">
                 <div className="flex items-start">
                   <EnvelopeIcon className="h-6 w-6 text-blue-600 mr-3 mt-1" />
                   <div>
                     <h3 className="font-medium text-gray-900">Email</h3>
                     <p className="text-gray-600">hello@onthebell.com.au</p>
-                    <p className="text-sm text-gray-500 mt-1">
-                      For general inquiries and support
-                    </p>
+                    <p className="text-sm text-gray-500 mt-1">For general inquiries and support</p>
                   </div>
                 </div>
 
@@ -173,9 +178,7 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-medium text-gray-900">Response Time</h3>
                     <p className="text-gray-600">24-48 hours</p>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Monday to Friday, business hours
-                    </p>
+                    <p className="text-sm text-gray-500 mt-1">Monday to Friday, business hours</p>
                   </div>
                 </div>
               </div>
@@ -192,9 +195,26 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-medium text-gray-900 mb-2">Before contacting us:</h3>
                   <ul className="text-sm text-gray-600 space-y-1">
-                    <li>• Check our <a href="/how-it-works" className="text-blue-600 hover:text-blue-800">How it Works</a> guide</li>
-                    <li>• Review our <a href="/community-guidelines" className="text-blue-600 hover:text-blue-800">Community Guidelines</a></li>
-                    <li>• Visit the <a href="/verification" className="text-blue-600 hover:text-blue-800">Verification</a> page for address issues</li>
+                    <li>
+                      • Check our{' '}
+                      <a href="/how-it-works" className="text-blue-600 hover:text-blue-800">
+                        How it Works
+                      </a>{' '}
+                      guide
+                    </li>
+                    <li>
+                      • Review our{' '}
+                      <a href="/community-guidelines" className="text-blue-600 hover:text-blue-800">
+                        Community Guidelines
+                      </a>
+                    </li>
+                    <li>
+                      • Visit the{' '}
+                      <a href="/verification" className="text-blue-600 hover:text-blue-800">
+                        Verification
+                      </a>{' '}
+                      page for address issues
+                    </li>
                   </ul>
                 </div>
 
@@ -220,9 +240,15 @@ export default function ContactPage() {
                     OnTheBell is not an emergency service. For emergencies, please contact:
                   </p>
                   <ul className="text-sm text-red-700 mt-2">
-                    <li>• Emergency Services: <strong>000</strong></li>
-                    <li>• Police Non-Emergency: <strong>131 444</strong></li>
-                    <li>• City of Greater Geelong: <strong>(03) 5272 5272</strong></li>
+                    <li>
+                      • Emergency Services: <strong>000</strong>
+                    </li>
+                    <li>
+                      • Police Non-Emergency: <strong>131 444</strong>
+                    </li>
+                    <li>
+                      • City of Greater Geelong: <strong>(03) 5272 5272</strong>
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -235,13 +261,13 @@ export default function ContactPage() {
           <div className="bg-white rounded-lg shadow-lg p-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Community Driven</h2>
             <p className="text-gray-600 max-w-3xl mx-auto">
-              OnTheBell is built by and for the Bellarine Peninsula community. Your feedback helps us 
-              improve the platform and better serve our local area. We appreciate your patience as we 
-              continue to grow and enhance the platform together.
+              OnTheBell is built by and for the Bellarine Peninsula community. Your feedback helps
+              us improve the platform and better serve our local area. We appreciate your patience
+              as we continue to grow and enhance the platform together.
             </p>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

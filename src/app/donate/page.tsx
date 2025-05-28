@@ -10,7 +10,8 @@ export const metadata: Metadata = {
 const benefits = [
   {
     title: 'Keep OnTheBell Free',
-    description: 'Your donations help us maintain free access for all Bellarine Peninsula residents.',
+    description:
+      'Your donations help us maintain free access for all Bellarine Peninsula residents.',
     icon: HeartIcon,
   },
   {
@@ -25,7 +26,8 @@ const benefits = [
   },
   {
     title: 'Platform Maintenance',
-    description: 'Cover hosting costs and technical infrastructure to keep OnTheBell running smoothly.',
+    description:
+      'Cover hosting costs and technical infrastructure to keep OnTheBell running smoothly.',
     icon: GlobeAltIcon,
   },
 ];
@@ -39,12 +41,13 @@ export default function DonatePage() {
           <HeartIcon className="h-16 w-16 mx-auto mb-6 text-pink-200" />
           <h1 className="text-4xl font-bold mb-4">Support OnTheBell</h1>
           <p className="text-xl text-blue-100 mb-8">
-            Help us keep our community platform free and thriving for all Bellarine Peninsula residents
+            Help us keep our community platform free and thriving for all Bellarine Peninsula
+            residents
           </p>
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 max-w-2xl mx-auto">
             <p className="text-lg">
-              OnTheBell is built by the community, for the community. Your voluntary donations 
-              help us maintain and improve this platform for everyone.
+              OnTheBell is built by the community, for the community. Your voluntary donations help
+              us maintain and improve this platform for everyone.
             </p>
           </div>
         </div>
@@ -56,9 +59,9 @@ export default function DonatePage() {
           <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
             How Your Donation Helps
           </h2>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {benefits.map((benefit) => (
+            {benefits.map(benefit => (
               <div key={benefit.title} className="text-center">
                 <div className="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                   <benefit.icon className="h-8 w-8 text-blue-600" />
@@ -75,15 +78,13 @@ export default function DonatePage() {
       <div className="bg-white py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Make a Donation
-            </h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Make a Donation</h2>
             <p className="text-lg text-gray-700">
-              Choose an amount that feels right for you. Every contribution, no matter the size, 
+              Choose an amount that feels right for you. Every contribution, no matter the size,
               makes a difference in keeping OnTheBell available for our community.
             </p>
           </div>
-          
+
           <div className="bg-gray-50 rounded-lg p-8">
             <div className="grid md:grid-cols-3 gap-6 mb-8">
               <div className="bg-white p-6 rounded-lg shadow text-center">
@@ -102,24 +103,24 @@ export default function DonatePage() {
                 <div className="text-sm text-gray-500 mt-2">Helps fund new features</div>
               </div>
             </div>
-            
+
             <div className="text-center">
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
                 <h3 className="font-semibold text-blue-900 mb-2">🚧 Donation System Coming Soon</h3>
                 <p className="text-blue-800">
-                  We're currently setting up our secure donation system. Check back soon, 
-                  or contact us if you'd like to support OnTheBell in the meantime.
+                  We're currently setting up our secure donation system. Check back soon, or contact
+                  us if you'd like to support OnTheBell in the meantime.
                 </p>
               </div>
-              
+
               <div className="space-y-3">
-                <button 
+                <button
                   disabled
                   className="bg-gray-300 text-gray-500 px-8 py-3 rounded-md cursor-not-allowed w-full max-w-sm"
                 >
                   Donate with Card (Coming Soon)
                 </button>
-                <button 
+                <button
                   disabled
                   className="bg-gray-300 text-gray-500 px-8 py-3 rounded-md cursor-not-allowed w-full max-w-sm"
                 >
@@ -137,7 +138,7 @@ export default function DonatePage() {
           <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">
             Transparency & Accountability
           </h2>
-          
+
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-white p-6 rounded-lg shadow">
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Where Your Money Goes</h3>
@@ -149,7 +150,7 @@ export default function DonatePage() {
                 <li>• Regular backups and data protection</li>
               </ul>
             </div>
-            
+
             <div className="bg-white p-6 rounded-lg shadow">
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Our Commitment</h3>
               <ul className="space-y-2 text-gray-700">
@@ -161,11 +162,13 @@ export default function DonatePage() {
               </ul>
             </div>
           </div>
-          
+
           <div className="text-center mt-8">
             <p className="text-gray-600">
-              Questions about donations or how funds are used? 
-              <a href="/contact" className="text-blue-600 hover:underline ml-1">Contact us</a> 
+              Questions about donations or how funds are used?
+              <a href="/contact" className="text-blue-600 hover:underline ml-1">
+                Contact us
+              </a>
               for more information.
             </p>
           </div>
@@ -175,10 +178,8 @@ export default function DonatePage() {
       {/* Alternative Ways to Help */}
       <div className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">
-            Other Ways to Support OnTheBell
-          </h2>
-          
+          <h2 className="text-3xl font-bold text-gray-900 mb-8">Other Ways to Support OnTheBell</h2>
+
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white p-6 rounded-lg shadow">
               <h3 className="font-semibold text-gray-900 mb-2">Spread the Word</h3>

@@ -1,15 +1,15 @@
-'use client'
+'use client';
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function LoginRedirectPage() {
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     // Redirect to the proper authentication page
-    router.replace('/auth/signin')
-  }, [router])
+    router.replace('/auth/signin');
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -18,5 +18,5 @@ export default function LoginRedirectPage() {
         <p className="text-gray-600">Redirecting to sign in...</p>
       </div>
     </div>
-  )
+  );
 }

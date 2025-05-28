@@ -13,8 +13,8 @@ export default function AddBusinessPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Add Your Business</h1>
           <p className="mt-2 text-gray-600">
-            Join the Bellarine Peninsula business directory and connect with local customers.
-            Your listing will be reviewed before going live.
+            Join the Bellarine Peninsula business directory and connect with local customers. Your
+            listing will be reviewed before going live.
           </p>
         </div>
 

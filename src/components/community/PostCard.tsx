@@ -8,16 +8,16 @@ import { formatRelativeTime, formatShortDate } from '@/lib/utils';
 import { CommunityPost } from '@/types';
 import { useAuth } from '@/lib/firebase/auth';
 import { deletePost } from '@/lib/firebase/firestore';
-import { 
-  MapPinIcon, 
-  CalendarIcon, 
+import {
+  MapPinIcon,
+  CalendarIcon,
   TagIcon,
   HeartIcon,
   ChatBubbleLeftIcon,
   ShareIcon,
   PencilIcon,
   TrashIcon,
-  EllipsisVerticalIcon
+  EllipsisVerticalIcon,
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 
@@ -70,7 +70,7 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
 
   const handleDelete = async () => {
     if (!confirm('Are you sure you want to delete this post?')) return;
-    
+
     setIsDeleting(true);
     setShowOptions(false);
     try {
@@ -86,9 +86,8 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
   };
 
   const postDate = new Date(post.createdAt);
-  const imageUrl = post.images && post.images.length > 0 
-    ? post.images[0] 
-    : '/placeholder-image.jpg';
+  const imageUrl =
+    post.images && post.images.length > 0 ? post.images[0] : '/placeholder-image.jpg';
 
   if (isCompact) {
     return (
@@ -156,12 +155,7 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
         <Link href={`/community/${post.id}`} className="block">
           {post.images && post.images.length > 0 && (
             <div className="relative h-48 w-full">
-              <Image
-                src={imageUrl}
-                alt={post.title}
-                fill
-                className="object-cover"
-              />
+              <Image src={imageUrl} alt={post.title} fill className="object-cover" />
               {post.category && (
                 <span className="absolute top-2 right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
                   {post.category}
@@ -175,7 +169,7 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
               <span className="text-xs text-gray-500">{formatRelativeTime(postDate)}</span>
             </div>
             <p className="text-sm text-gray-600 mt-2 line-clamp-3">{post.description}</p>
-            
+
             <div className="flex items-center mt-4 text-xs text-gray-500">
               {post.location && (
                 <span className="flex items-center mr-3">
@@ -188,11 +182,14 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
                 {formatShortDate(postDate)}
               </span>
             </div>
-            
+
             {post.tags && post.tags.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-3">
                 {post.tags.slice(0, 3).map(tag => (
-                  <span key={tag} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                  <span
+                    key={tag}
+                    className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800"
+                  >
                     {tag}
                   </span>
                 ))}
@@ -205,7 +202,7 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
             )}
           </div>
         </Link>
-        
+
         {isOwner && (
           <div className="absolute top-2 left-2">
             <div className="relative">
@@ -239,7 +236,7 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
           </div>
         )}
       </div>
-      
+
       <div className="px-4 py-3 border-t border-gray-100 flex justify-between items-center">
         <div className="flex items-center text-sm text-gray-500">
           <button
@@ -253,7 +250,10 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
             )}
             <span>{likeCount}</span>
           </button>
-          <Link href={`/community/${post.id}#comments`} className="flex items-center mr-4 hover:text-blue-500">
+          <Link
+            href={`/community/${post.id}#comments`}
+            className="flex items-center mr-4 hover:text-blue-500"
+          >
             <ChatBubbleLeftIcon className="h-5 w-5 mr-1" />
             <span>0</span>
           </Link>

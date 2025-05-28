@@ -6,10 +6,7 @@ import { getBusinesses } from '@/lib/firebase/firestore';
 import { Business } from '@/types';
 import BusinessCard from '@/components/business/BusinessCard';
 import BusinessFilter from '@/components/business/BusinessFilter';
-import { 
-  PlusIcon, 
-  BuildingStorefrontIcon 
-} from '@heroicons/react/24/outline';
+import { PlusIcon, BuildingStorefrontIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
 export default function BusinessDirectoryPage() {
@@ -38,10 +35,11 @@ export default function BusinessDirectoryPage() {
 
     // Search filter
     if (searchTerm) {
-      filtered = filtered.filter(business =>
-        business.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        business.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        business.address.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        business =>
+          business.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          business.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          business.address.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -114,7 +112,7 @@ export default function BusinessDirectoryPage() {
               Discover local businesses on the Bellarine Peninsula
             </p>
           </div>
-          
+
           {user?.isVerified && (
             <Link
               href="/business/add"
@@ -140,7 +138,7 @@ export default function BusinessDirectoryPage() {
         {/* Business Grid */}
         {filteredBusinesses.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredBusinesses.map((business) => (
+            {filteredBusinesses.map(business => (
               <BusinessCard key={business.id} business={business} />
             ))}
           </div>

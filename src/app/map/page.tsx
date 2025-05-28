@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import MapContainer from '@/components/map/MapContainer';
 import { useState } from 'react';
@@ -10,28 +10,28 @@ const demoMarkers: {
   description: string;
   category: string;
 }[] = [
-    {
-      id: '1',
-      position: [-38.2654963, 144.6630563], // Queenscliff
-      title: 'Queenscliff Market',
-      description: 'Local produce and crafts every Sunday.',
-      category: 'market',
-    },
-    {
-      id: '2',
-      position: [-38.2734406,144.5150634], // Ocean Grove
-      title: 'Ocean Grove Beach',
-      description: 'Surf, swim, and relax!',
-      category: 'event',
-    },
-    {
-      id: '3',
-      position: [-38.2858445, 144.6145088], // Point Lonsdale
-      title: 'Free BBQ',
-      description: 'Community BBQ this Saturday.',
-      category: 'free',
-    },
-  ];
+  {
+    id: '1',
+    position: [-38.2654963, 144.6630563], // Queenscliff
+    title: 'Queenscliff Market',
+    description: 'Local produce and crafts every Sunday.',
+    category: 'market',
+  },
+  {
+    id: '2',
+    position: [-38.2734406, 144.5150634], // Ocean Grove
+    title: 'Ocean Grove Beach',
+    description: 'Surf, swim, and relax!',
+    category: 'event',
+  },
+  {
+    id: '3',
+    position: [-38.2858445, 144.6145088], // Point Lonsdale
+    title: 'Free BBQ',
+    description: 'Community BBQ this Saturday.',
+    category: 'free',
+  },
+];
 
 export default function MapPage() {
   const [selectedMarker, setSelectedMarker] = useState<string | null>(null);
