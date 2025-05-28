@@ -55,11 +55,11 @@ const BELLARINE_SUBURBS = [
 ];
 
 const BELLARINE_POSTCODES = [
-  '3225', // Queenscliff, Point Lonsdale
-  '3226', // Ocean Grove, Barwon Heads
-  '3227', // Leopold, Moolap, Newcomb
-  '3228', // Clifton Springs, Drysdale, Portarlington, St Leonards
-  '3220', // Parts of Geelong area on Peninsula
+  '3225',
+  '3226',
+  '3224',
+  '3223',
+  '3222',
 ];
 
 /**

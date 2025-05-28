@@ -122,7 +122,7 @@ export default function Navbar() {
                       >
                         Create Post
                       </Link>
-                      <hr className="my-1" />
+                      <hr className="my-1 border-gray-200" />
                       <button
                         onClick={handleSignOut}
                         className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50"

@@ -53,7 +53,7 @@ export default function BusinessCard({ business }: BusinessCardProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden">
+    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden border border-gray-200">
       {/* Business Image */}
       <div className="relative h-48 bg-gray-200">
         {business.images.length > 0 && !imageError ? (

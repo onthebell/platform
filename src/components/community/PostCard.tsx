@@ -97,7 +97,7 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
           <Link href={`/community/${post.id}`} className="block flex-1">
             <div className="p-4">
               <div className="flex justify-between items-start">
-                <h3 className="text-base font-semibold line-clamp-1">{post.title}</h3>
+                <h3 className="text-base font-semibold text-gray-900 line-clamp-1">{post.title}</h3>
                 <span className="text-xs text-gray-500">{formatRelativeTime(postDate)}</span>
               </div>
               <p className="text-sm text-gray-600 mt-1 line-clamp-2">{post.description}</p>
@@ -151,7 +151,7 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-200 hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
       <div className="relative">
         <Link href={`/community/${post.id}`} className="block">
           {post.images && post.images.length > 0 && (
@@ -171,7 +171,7 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
           )}
           <div className="p-4">
             <div className="flex justify-between items-start">
-              <h3 className="text-lg font-semibold">{post.title}</h3>
+              <h3 className="text-lg font-semibold text-gray-900">{post.title}</h3>
               <span className="text-xs text-gray-500">{formatRelativeTime(postDate)}</span>
             </div>
             <p className="text-sm text-gray-600 mt-2 line-clamp-3">{post.description}</p>

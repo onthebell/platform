@@ -8,7 +8,7 @@ import { db } from '@/lib/firebase/config';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { CommunityPost } from '@/types';
 import PostCard from '@/components/community/PostCard';
-import { formatDate } from '@/lib/utils';
+import { formatDate, toDate } from '@/lib/utils';
 import { 
   UserIcon, 
   CogIcon, 
@@ -22,12 +22,15 @@ import {
 import Link from 'next/link';
 
 export default function ProfilePage() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, updateUserProfile } = useAuth();
   const router = useRouter();
   const [userPosts, setUserPosts] = useState<CommunityPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'posts' | 'settings'>('posts');
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [displayName, setDisplayName] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error' | null; text: string }>({ type: null, text: '' });
 
   useEffect(() => {
     const fetchUserPosts = async () => {
@@ -47,6 +50,23 @@ export default function ProfilePage() {
 
     fetchUserPosts();
   }, [user]);
+
+  // Initialize display name when user data loads
+  useEffect(() => {
+    if (user) {
+      setDisplayName(user.displayName || '');
+    }
+  }, [user]);
+
+  // Clear save message after 5 seconds
+  useEffect(() => {
+    if (saveMessage.type) {
+      const timer = setTimeout(() => {
+        setSaveMessage({ type: null, text: '' });
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [saveMessage]);
 
   const handleDeletePost = async (postId: string) => {
     if (!user || !confirm('Are you sure you want to delete this post?')) return;
@@ -69,6 +89,33 @@ export default function ProfilePage() {
       router.push('/');
     } catch (error) {
       console.error('Error signing out:', error);
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+    
+    // Clear any previous messages
+    setSaveMessage({ type: null, text: '' });
+    
+    // Check if there are any changes
+    const trimmedDisplayName = displayName.trim();
+    if (trimmedDisplayName === (user.displayName || '')) {
+      setSaveMessage({ type: 'error', text: 'No changes to save.' });
+      return;
+    }
+    
+    setIsSaving(true);
+    try {
+      await updateUserProfile({
+        displayName: trimmedDisplayName || null,
+      });
+      setSaveMessage({ type: 'success', text: 'Profile updated successfully!' });
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      setSaveMessage({ type: 'error', text: 'Failed to update profile. Please try again.' });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -104,7 +151,7 @@ export default function ProfilePage() {
                   {user.displayName || user.email}
                 </h1>
                 <div className="flex items-center space-x-4 text-sm text-gray-600">
-                  <span>Member since {formatDate(new Date(user.joinedAt || Date.now()))}</span>
+                  <span>Member since {formatDate(toDate(user.joinedAt))}</span>
                   {user.verificationStatus === 'approved' && (
                     <div className="flex items-center text-green-600">
                       <CheckBadgeIcon className="h-4 w-4 mr-1" />
@@ -232,9 +279,11 @@ export default function ProfilePage() {
                   </label>
                   <input
                     type="text"
-                    value={user.displayName || ''}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black font-medium"
                     placeholder="Enter your display name"
+                    style={{ color: 'black', fontWeight: 600 }}
                   />
                 </div>
                 <div>
@@ -244,14 +293,31 @@ export default function ProfilePage() {
                   <input
                     type="email"
                     value={user.email || ''}
-                    disabled
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
+                    readOnly
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-900 font-medium"
+                    style={{ color: '#222', fontWeight: 500 }}
                   />
                   <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
                 </div>
+                
+                {/* Save Message */}
+                {saveMessage.type && (
+                  <div className={`p-3 rounded-md ${
+                    saveMessage.type === 'success' 
+                      ? 'bg-green-50 border border-green-200 text-green-800' 
+                      : 'bg-red-50 border border-red-200 text-red-800'
+                  }`}>
+                    {saveMessage.text}
+                  </div>
+                )}
+                
                 <div className="pt-4">
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-                    Save Changes
+                  <button 
+                    onClick={handleSaveProfile}
+                    disabled={isSaving}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSaving ? 'Saving...' : 'Save Changes'}
                   </button>
                 </div>
               </div>

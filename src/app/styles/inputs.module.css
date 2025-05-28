@@ -1,0 +1,23 @@
+/* This module provides styles to ensure all form inputs have dark, readable text */
+
+.darkText {
+  color: black !important;
+}
+
+.readonlyText {
+  color: #222 !important;
+}
+
+/* This class can be added to any form or container to ensure dark text in all inputs */
+.darkInputForm input,
+.darkInputForm textarea,
+.darkInputForm select {
+  color: black !important;
+}
+
+/* Style for placeholders */
+.darkInputForm input::placeholder,
+.darkInputForm textarea::placeholder {
+  color: #555 !important;
+  opacity: 1 !important;
+}

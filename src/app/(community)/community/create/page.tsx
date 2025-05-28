@@ -179,7 +179,7 @@ function CreatePostForm() {
                 required
                 value={formData.title}
                 onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter a clear, descriptive title..."
               />
             </div>
@@ -195,7 +195,7 @@ function CreatePostForm() {
                   required
                   value={formData.category}
                   onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value as PostCategory }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {categories.map(cat => (
                     <option key={cat.value} value={cat.value}>{cat.label}</option>
@@ -212,7 +212,7 @@ function CreatePostForm() {
                   required
                   value={formData.type}
                   onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as PostType }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {types.map(type => (
                     <option key={type.value} value={type.value}>{type.label}</option>
@@ -232,7 +232,7 @@ function CreatePostForm() {
                 rows={4}
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Provide details about your post..."
               />
             </div>
@@ -251,7 +251,7 @@ function CreatePostForm() {
                     min="0"
                     value={formData.price}
                     onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="0.00"
                   />
                 </div>
@@ -263,7 +263,7 @@ function CreatePostForm() {
                     id="currency"
                     value={formData.currency}
                     onChange={(e) => setFormData(prev => ({ ...prev, currency: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="AUD">AUD</option>
                     <option value="USD">USD</option>
@@ -286,7 +286,7 @@ function CreatePostForm() {
                     ...prev, 
                     location: { ...prev.location, address: e.target.value }
                   }))}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter address or suburb..."
                 />
                 <MapIcon className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
@@ -354,7 +354,7 @@ function CreatePostForm() {
                 id="tags"
                 value={formData.tags}
                 onChange={(e) => setFormData(prev => ({ ...prev, tags: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter tags separated by commas..."
               />
               <p className="mt-1 text-sm text-gray-500">

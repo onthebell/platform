@@ -82,6 +82,50 @@ OnTheBell is an open-source community platform designed specifically for residen
 2. Get your publishable and secret keys
 3. Add them to `.env.local`
 
+## 📋 API Keys Configuration
+
+### Google Maps API
+For the address autocomplete and map features to work properly, you need to set up a Google Maps API key:
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select an existing one
+3. Navigate to "APIs & Services" > "Library"
+4. Enable the following APIs:
+   - Maps JavaScript API
+   - Places API
+   - Geocoding API
+5. Create an API key under "APIs & Services" > "Credentials"
+6. Restrict the API key to the following:
+   - HTTP referrers (websites): Add your domain (e.g., localhost:3000 for development)
+   - API restrictions: Restrict to the three APIs mentioned above
+
+7. Add the API key to your `.env.local` file:
+   ```
+   NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+   ```
+
+### Troubleshooting API Keys
+
+If you see the error "ApiNotActivatedMapError":
+1. Ensure you've enabled all required APIs (Maps JavaScript API, Places API, Geocoding API)
+2. Check that billing is enabled for your Google Cloud project
+3. Verify that your API key doesn't have overly restrictive usage limits
+4. Make sure your domain is authorized in the API key restrictions
+
+## 🔥 Firebase Configuration
+
+1. **Firebase Console**: Go to the [Firebase Console](https://console.firebase.google.com/)
+2. **Create a Project**: Click on "Add project" and follow the prompts
+3. **Register App**: In your project overview, click on "Add app" and select your platform (Web)
+4. **Firebase SDK**: Install Firebase SDK in your project
+   ```bash
+   pnpm install firebase
+   ```
+5. **Initialize Firebase**: Add Firebase initialization code in your project
+6. **Enable Firestore**: In the Firebase Console, navigate to Firestore Database and click "Create database"
+7. **Set Up Authentication**: Go to Authentication > Sign-in method and enable Email/Password
+8. **Configure Storage**: Navigate to Storage and click "Get started" to enable Firebase Storage
+
 ## 📁 Project Structure
 
 ```

@@ -46,11 +46,18 @@ export default function GooglePlacesAutocomplete({
             setIsLoaded(true);
         };
 
-        // Load the Google Maps JavaScript API
+        // Load the Google Maps JavaScript API with error handling
         const script = document.createElement('script');
         script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&callback=initGooglePlaces`;
         script.async = true;
         script.defer = true;
+        
+        // Add error handling for API load failures
+        script.onerror = () => {
+            console.error('Google Maps API failed to load. Please check your API key configuration.');
+            // Don't set isLoaded to true so we'll use the fallback input
+        };
+        
         document.head.appendChild(script);
 
         return () => {
@@ -140,21 +147,29 @@ export default function GooglePlacesAutocomplete({
 
     return (
         <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <MapPinIcon className="h-4 w-4 text-gray-400" />
+            <div className="flex items-center">
+                <MapPinIcon className="absolute left-3 h-5 w-5 text-gray-400" />
+                <input
+                    ref={inputRef}
+                    type="text"
+                    value={inputValue}
+                    onChange={(e) => {
+                        setInputValue(e.target.value);
+                        // Only directly update in non-autocomplete mode
+                        if (!isLoaded) {
+                            onChange(e.target.value);
+                        }
+                    }}
+                    placeholder={!isLoaded ? `${placeholder} (Manual Entry)` : placeholder}
+                    required={required}
+                    className={`${className} pl-10 w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6`}
+                />
             </div>
-            <input
-                ref={inputRef}
-                type="text"
-                required={required}
-                value={inputValue}
-                onChange={handleInputChange}
-                placeholder={placeholder}
-                className={`w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`}
-            />
+            
             {!isLoaded && (
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                <div className="mt-2 text-xs text-yellow-600">
+                    <p>Google Maps API not loaded. Manual address entry enabled.</p>
+                    <p className="mt-1">Please include a complete address with postcode.</p>
                 </div>
             )}
         </div>

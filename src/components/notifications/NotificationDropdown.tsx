@@ -1,7 +1,7 @@
 'use client';
 
 import { Fragment } from 'react';
-import { Popover, Transition } from '@headlessui/react';
+import { Popover, PopoverButton, Transition } from '@headlessui/react';
 import { BellIcon } from '@heroicons/react/24/outline';
 import { useNotifications } from '@/hooks/useNotifications';
 import { NotificationItem } from './NotificationItem';
@@ -13,14 +13,14 @@ export function NotificationDropdown() {
     <Popover className="relative">
       {() => (
         <>
-          <Popover.Button className="relative p-2 rounded-md text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-colors">
+          <PopoverButton className="relative p-2 rounded-md text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-colors">
             <BellIcon className="h-6 w-6" />
             {unreadCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
                 {unreadCount > 99 ? '99+' : unreadCount}
               </span>
             )}
-          </Popover.Button>
+          </PopoverButton>
 
           <Transition
             as={Fragment}
