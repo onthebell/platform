@@ -262,10 +262,10 @@ export default function EditPostPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading post...</p>
+          <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-3 sm:mt-4 text-sm sm:text-base text-gray-600">Loading post...</p>
         </div>
       </div>
     );
@@ -273,26 +273,26 @@ export default function EditPostPage() {
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="text-center">
-          <p className="text-gray-600">Post not found.</p>
+          <p className="text-sm sm:text-base text-gray-600">Post not found.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-lg shadow px-6 py-8">
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-gray-900">Edit Post</h1>
-            <p className="mt-2 text-gray-600">
+    <div className="min-h-screen bg-gray-50 py-4 sm:py-8 lg:py-12">
+      <div className="max-w-2xl mx-auto px-3 sm:px-4 lg:px-6">
+        <div className="bg-white rounded-lg shadow-sm sm:shadow px-4 py-6 sm:px-6 sm:py-8">
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Edit Post</h1>
+            <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600">
               Update your post with the Bellarine Peninsula community
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {/* Title */}
             <div>
               <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
@@ -304,13 +304,13 @@ export default function EditPostPage() {
                 required
                 value={formData.title}
                 onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="What would you like to share?"
               />
             </div>
 
             {/* Category and Type */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
                   Category *
@@ -327,7 +327,7 @@ export default function EditPostPage() {
                       type: '', // Reset type when category changes
                     }));
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select a category</option>
                   {categories.map(cat => (
@@ -347,7 +347,7 @@ export default function EditPostPage() {
                   required
                   value={formData.type}
                   onChange={e => setFormData(prev => ({ ...prev, type: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   disabled={!formData.category}
                 >
                   <option value="">Select a type</option>
@@ -365,8 +365,8 @@ export default function EditPostPage() {
             {(formData.category === 'marketplace' ||
               formData.category === 'deals' ||
               formData.category === 'events') && (
-              <div className="grid grid-cols-3 gap-4">
-                <div className="col-span-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="sm:col-span-2">
                   <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
                     Price {formData.category === 'events' ? '(optional)' : ''}
                   </label>
@@ -377,7 +377,7 @@ export default function EditPostPage() {
                     min="0"
                     value={formData.price || ''}
                     onChange={e => setFormData(prev => ({ ...prev, price: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="0.00"
                   />
                 </div>
@@ -392,7 +392,7 @@ export default function EditPostPage() {
                     id="currency"
                     value={formData.currency}
                     onChange={e => setFormData(prev => ({ ...prev, currency: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="AUD">AUD</option>
                     <option value="USD">USD</option>
@@ -412,7 +412,7 @@ export default function EditPostPage() {
                 rows={4}
                 value={formData.description}
                 onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
                 placeholder="Provide details about your post..."
               />
             </div>
@@ -420,7 +420,7 @@ export default function EditPostPage() {
             {/* Location */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <input
                   type="text"
                   value={formData.location.address}
@@ -430,10 +430,10 @@ export default function EditPostPage() {
                       location: { ...prev.location, address: e.target.value },
                     }))
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter address"
                 />
-                <div className="h-64 rounded-md border">
+                <div className="h-48 sm:h-64 rounded-md border overflow-hidden">
                   <MapPicker
                     initialLocation={formData.location}
                     onLocationSelect={handleLocationSelect}
@@ -445,12 +445,12 @@ export default function EditPostPage() {
             {/* Images */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Images</label>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {/* Existing Images */}
                 {existingImages.length > 0 && (
                   <div>
-                    <p className="text-sm text-gray-600 mb-2">Current images:</p>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <p className="text-xs sm:text-sm text-gray-600 mb-2">Current images:</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-4">
                       {existingImages.map((imageUrl, index) => (
                         <div key={index} className="relative">
                           <Image
@@ -458,14 +458,14 @@ export default function EditPostPage() {
                             alt={`Existing ${index + 1}`}
                             width={100}
                             height={96}
-                            className="w-full h-24 object-cover rounded-md"
+                            className="w-full h-20 sm:h-24 object-cover rounded-md"
                           />
                           <button
                             type="button"
                             onClick={() => removeExistingImage(imageUrl)}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                            className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
                           >
-                            <XMarkIcon className="h-4 w-4" />
+                            <XMarkIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                           </button>
                         </div>
                       ))}
@@ -476,8 +476,8 @@ export default function EditPostPage() {
                 {/* New Images */}
                 {selectedImages.length > 0 && (
                   <div>
-                    <p className="text-sm text-gray-600 mb-2">New images to add:</p>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <p className="text-xs sm:text-sm text-gray-600 mb-2">New images to add:</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-4">
                       {selectedImages.map((image, index) => (
                         <div key={index} className="relative">
                           <Image
@@ -485,14 +485,14 @@ export default function EditPostPage() {
                             alt={`New ${index + 1}`}
                             width={100}
                             height={96}
-                            className="w-full h-24 object-cover rounded-md"
+                            className="w-full h-20 sm:h-24 object-cover rounded-md"
                           />
                           <button
                             type="button"
                             onClick={() => removeSelectedImage(index)}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                            className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
                           >
-                            <XMarkIcon className="h-4 w-4" />
+                            <XMarkIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                           </button>
                         </div>
                       ))}
@@ -501,10 +501,10 @@ export default function EditPostPage() {
                 )}
 
                 {/* Upload Button */}
-                <div className="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                <div className="flex justify-center px-4 py-4 sm:px-6 sm:pt-5 sm:pb-6 border-2 border-gray-300 border-dashed rounded-md">
                   <div className="space-y-1 text-center">
-                    <PhotoIcon className="mx-auto h-12 w-12 text-gray-400" />
-                    <div className="flex text-sm text-gray-600">
+                    <PhotoIcon className="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-gray-400" />
+                    <div className="flex text-xs sm:text-sm text-gray-600">
                       <label
                         htmlFor="file-upload"
                         className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
@@ -519,6 +519,7 @@ export default function EditPostPage() {
                           onChange={handleImageChange}
                           className="sr-only"
                         />
+                        <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
                       </label>
                     </div>
                   </div>
@@ -536,10 +537,10 @@ export default function EditPostPage() {
                 id="tags"
                 value={formData.tags}
                 onChange={e => setFormData(prev => ({ ...prev, tags: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g., vintage, furniture, urgent"
               />
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-xs sm:text-sm text-gray-500">
                 Add tags to help people find your post (e.g., vintage, furniture, urgent)
               </p>
             </div>
@@ -547,8 +548,8 @@ export default function EditPostPage() {
             {/* Visibility */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Visibility</label>
-              <div className="space-y-2">
-                <div className="flex items-center">
+              <div className="space-y-2 sm:space-y-3">
+                <div className="flex items-start sm:items-center">
                   <input
                     type="radio"
                     id="public"
@@ -561,13 +562,16 @@ export default function EditPostPage() {
                         visibility: e.target.value as 'public' | 'verified_only',
                       }))
                     }
-                    className="mr-2"
+                    className="mt-0.5 sm:mt-0 mr-2 sm:mr-3"
                   />
-                  <label htmlFor="public" className="text-sm">
+                  <label
+                    htmlFor="public"
+                    className="text-xs sm:text-sm leading-tight sm:leading-normal"
+                  >
                     Public - Visible to everyone
                   </label>
                 </div>
-                <div className="flex items-center">
+                <div className="flex items-start sm:items-center">
                   <input
                     type="radio"
                     id="verified_only"
@@ -580,9 +584,12 @@ export default function EditPostPage() {
                         visibility: e.target.value as 'public' | 'verified_only',
                       }))
                     }
-                    className="mr-2"
+                    className="mt-0.5 sm:mt-0 mr-2 sm:mr-3"
                   />
-                  <label htmlFor="verified_only" className="text-sm">
+                  <label
+                    htmlFor="verified_only"
+                    className="text-xs sm:text-sm leading-tight sm:leading-normal"
+                  >
                     Verified Only - Only visible to verified Bellarine residents
                   </label>
                 </div>
@@ -590,11 +597,11 @@ export default function EditPostPage() {
             </div>
 
             {/* Submit Button */}
-            <div className="pt-4">
+            <div className="pt-4 sm:pt-6">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-blue-600 text-white py-3 sm:py-2 px-4 text-sm sm:text-base font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isSubmitting ? 'Updating Post...' : 'Update Post'}
               </button>

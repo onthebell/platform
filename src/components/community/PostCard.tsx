@@ -94,40 +94,49 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
         <div className="flex">
           <Link href={`/community/${post.id}`} className="block flex-1">
-            <div className="p-4">
+            <div className="p-3 sm:p-4">
               <div className="flex justify-between items-start">
-                <h3 className="text-base font-semibold text-gray-900 line-clamp-1">{post.title}</h3>
-                <span className="text-xs text-gray-500">{formatRelativeTime(postDate)}</span>
+                <h3 className="text-sm sm:text-base font-semibold text-gray-900 line-clamp-1 flex-1 mr-2">
+                  {post.title}
+                </h3>
+                <span className="text-xs text-gray-500 whitespace-nowrap">
+                  {formatRelativeTime(postDate)}
+                </span>
               </div>
-              <p className="text-sm text-gray-600 mt-1 line-clamp-2">{post.description}</p>
-              <div className="flex items-center mt-3 text-xs text-gray-500">
+              <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">
+                {post.description}
+              </p>
+              <div className="flex flex-col sm:flex-row sm:items-center mt-2 sm:mt-3 text-xs text-gray-500 space-y-1 sm:space-y-0">
                 <span className="flex items-center">
                   <TagIcon className="h-3 w-3 mr-1" />
                   {post.category}
                 </span>
                 {post.location && (
-                  <span className="flex items-center ml-3">
+                  <span className="flex items-center sm:ml-3">
                     <MapPinIcon className="h-3 w-3 mr-1" />
-                    {post.location.address.split(',')[0]}
+                    <span className="truncate">{post.location.address.split(',')[0]}</span>
                   </span>
                 )}
               </div>
             </div>
           </Link>
           {isOwner && (
-            <div className="relative p-2">
+            <div className="relative p-1 sm:p-2">
               <button
                 onClick={() => setShowOptions(!showOptions)}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+                className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
                 disabled={isDeleting}
               >
                 <EllipsisVerticalIcon className="h-4 w-4" />
               </button>
               {showOptions && (
-                <div className="absolute right-2 top-8 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-10 min-w-[120px]">
+                <div
+                  ref={optionsRef}
+                  className="absolute right-1 sm:right-2 top-8 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-10 min-w-[120px]"
+                >
                   <button
                     onClick={handleEdit}
-                    className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                   >
                     <PencilIcon className="h-4 w-4 mr-2" />
                     Edit
@@ -135,7 +144,7 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
                   <button
                     onClick={handleDelete}
                     disabled={isDeleting}
-                    className="flex items-center w-full px-3 py-2 text-sm text-red-600 hover:bg-gray-100 disabled:opacity-50"
+                    className="flex items-center w-full px-3 py-2 text-sm text-red-600 hover:bg-gray-100 disabled:opacity-50 transition-colors"
                   >
                     <TrashIcon className="h-4 w-4 mr-2" />
                     {isDeleting ? 'Deleting...' : 'Delete'}
@@ -154,7 +163,7 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
       <div className="relative">
         <Link href={`/community/${post.id}`} className="block">
           {post.images && post.images.length > 0 && (
-            <div className="relative h-48 w-full">
+            <div className="relative h-40 sm:h-48 w-full">
               <Image src={imageUrl} alt={post.title} fill className="object-cover" />
               {post.category && (
                 <span className="absolute top-2 right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
@@ -163,18 +172,22 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
               )}
             </div>
           )}
-          <div className="p-4">
+          <div className="p-3 sm:p-4">
             <div className="flex justify-between items-start">
-              <h3 className="text-lg font-semibold text-gray-900">{post.title}</h3>
-              <span className="text-xs text-gray-500">{formatRelativeTime(postDate)}</span>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 flex-1 mr-2">
+                {post.title}
+              </h3>
+              <span className="text-xs text-gray-500 whitespace-nowrap">
+                {formatRelativeTime(postDate)}
+              </span>
             </div>
             <p className="text-sm text-gray-600 mt-2 line-clamp-3">{post.description}</p>
 
-            <div className="flex items-center mt-4 text-xs text-gray-500">
+            <div className="flex flex-col sm:flex-row sm:items-center mt-3 sm:mt-4 text-xs text-gray-500 space-y-1 sm:space-y-0">
               {post.location && (
-                <span className="flex items-center mr-3">
+                <span className="flex items-center sm:mr-3">
                   <MapPinIcon className="h-3.5 w-3.5 mr-1" />
-                  {post.location.address.split(',')[0]}
+                  <span className="truncate">{post.location.address.split(',')[0]}</span>
                 </span>
               )}
               <span className="flex items-center">
@@ -208,16 +221,19 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
             <div className="relative">
               <button
                 onClick={() => setShowOptions(!showOptions)}
-                className="p-2 bg-white/80 backdrop-blur-sm text-gray-600 hover:text-gray-800 rounded-full hover:bg-white/90 shadow-sm"
+                className="p-1.5 sm:p-2 bg-white/80 backdrop-blur-sm text-gray-600 hover:text-gray-800 rounded-full hover:bg-white/90 shadow-sm transition-colors"
                 disabled={isDeleting}
               >
                 <EllipsisVerticalIcon className="h-4 w-4" />
               </button>
               {showOptions && (
-                <div className="absolute left-0 top-10 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-10 min-w-[120px]">
+                <div
+                  ref={optionsRef}
+                  className="absolute left-0 top-8 sm:top-10 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-10 min-w-[120px]"
+                >
                   <button
                     onClick={handleEdit}
-                    className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                   >
                     <PencilIcon className="h-4 w-4 mr-2" />
                     Edit
@@ -225,7 +241,7 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
                   <button
                     onClick={handleDelete}
                     disabled={isDeleting}
-                    className="flex items-center w-full px-3 py-2 text-sm text-red-600 hover:bg-gray-100 disabled:opacity-50"
+                    className="flex items-center w-full px-3 py-2 text-sm text-red-600 hover:bg-gray-100 disabled:opacity-50 transition-colors"
                   >
                     <TrashIcon className="h-4 w-4 mr-2" />
                     {isDeleting ? 'Deleting...' : 'Delete'}
@@ -237,33 +253,36 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
         )}
       </div>
 
-      <div className="px-4 py-3 border-t border-gray-100 flex justify-between items-center">
+      <div className="px-3 sm:px-4 py-2 sm:py-3 border-t border-gray-100 flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
         <div className="flex items-center text-sm text-gray-500">
           <button
             onClick={handleLike}
-            className="flex items-center mr-4 text-gray-500 hover:text-red-500 focus:outline-none"
+            className="flex items-center mr-4 text-gray-500 hover:text-red-500 focus:outline-none transition-colors"
           >
             {liked ? (
-              <HeartIconSolid className="h-5 w-5 text-red-500 mr-1" />
+              <HeartIconSolid className="h-4 w-4 sm:h-5 sm:w-5 text-red-500 mr-1" />
             ) : (
-              <HeartIcon className="h-5 w-5 mr-1" />
+              <HeartIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1" />
             )}
-            <span>{likeCount}</span>
+            <span className="text-xs sm:text-sm">{likeCount}</span>
           </button>
           <Link
             href={`/community/${post.id}#comments`}
-            className="flex items-center mr-4 hover:text-blue-500"
+            className="flex items-center mr-4 hover:text-blue-500 transition-colors"
           >
-            <ChatBubbleLeftIcon className="h-5 w-5 mr-1" />
-            <span>0</span>
+            <ChatBubbleLeftIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1" />
+            <span className="text-xs sm:text-sm">0</span>
           </Link>
-          <button className="flex items-center hover:text-blue-500 focus:outline-none">
-            <ShareIcon className="h-5 w-5" />
+          <button className="flex items-center hover:text-blue-500 focus:outline-none transition-colors">
+            <ShareIcon className="h-4 w-4 sm:h-5 sm:w-5" />
           </button>
         </div>
         <div className="text-sm font-medium">
-          <Link href={`/profile/${post.authorId}`} className="text-blue-600 hover:underline">
-            {post.authorName}
+          <Link
+            href={`/profile/${post.authorId}`}
+            className="text-blue-600 hover:underline transition-colors"
+          >
+            <span className="truncate">{post.authorName}</span>
           </Link>
         </div>
       </div>

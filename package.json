@@ -11,7 +11,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "format:staged": "prettier --write",
-    "deploy": "git push personal",
+    "push": "git push && git push personal",
     "prepare": "husky"
   },
   "dependencies": {

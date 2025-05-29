@@ -100,10 +100,10 @@ export default function PostDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-3 sm:px-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading post...</p>
+          <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-sm sm:text-base text-gray-600">Loading post...</p>
         </div>
       </div>
     );
@@ -111,15 +111,15 @@ export default function PostDetailPage() {
 
   if (error || !post) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-3 sm:px-4">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Post Not Found</h2>
-          <p className="text-gray-600 mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Post Not Found</h2>
+          <p className="text-sm sm:text-base text-gray-600 mb-6">
             {error || "The post you're looking for doesn't exist."}
           </p>
           <button
             onClick={() => router.push('/community')}
-            className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
+            className="bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-md hover:bg-blue-700 text-sm sm:text-base w-full sm:w-auto"
           >
             Back to Community
           </button>
@@ -130,14 +130,14 @@ export default function PostDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 py-4 sm:py-6 lg:py-8">
         {/* Back Button */}
         <button
           onClick={() => router.back()}
-          className="flex items-center text-blue-600 hover:text-blue-700 mb-6"
+          className="flex items-center text-blue-600 hover:text-blue-700 mb-4 sm:mb-6 p-2 sm:p-0 -ml-2 sm:ml-0"
         >
-          <ArrowLeftIcon className="h-5 w-5 mr-2" />
-          Back
+          <ArrowLeftIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
+          <span className="text-sm sm:text-base">Back</span>
         </button>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
@@ -150,18 +150,18 @@ export default function PostDetailPage() {
                   alt={post.title}
                   width={800}
                   height={384}
-                  className="w-full h-96 object-cover"
+                  className="w-full h-48 sm:h-64 lg:h-96 object-cover"
                 />
               </div>
 
               {/* Image Navigation */}
               {post.images.length > 1 && (
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                <div className="absolute bottom-2 sm:bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-1 sm:space-x-2">
                   {post.images.map((_, index) => (
                     <button
                       key={index}
                       onClick={() => setCurrentImageIndex(index)}
-                      className={`w-3 h-3 rounded-full ${
+                      className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full touch-target ${
                         index === currentImageIndex ? 'bg-white' : 'bg-white/50'
                       }`}
                     />
@@ -171,7 +171,7 @@ export default function PostDetailPage() {
 
               {/* Image Counter */}
               {post.images.length > 1 && (
-                <div className="absolute top-4 right-4 bg-black/50 text-white px-2 py-1 rounded text-sm">
+                <div className="absolute top-2 sm:top-4 right-2 sm:right-4 bg-black/50 text-white px-2 py-1 rounded text-xs sm:text-sm">
                   {currentImageIndex + 1} / {post.images.length}
                 </div>
               )}
@@ -179,80 +179,86 @@ export default function PostDetailPage() {
           )}
 
           {/* Content */}
-          <div className="p-8">
+          <div className="p-4 sm:p-6 lg:p-8">
             {/* Header */}
-            <div className="flex justify-between items-start mb-6">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 sm:mb-6 space-y-4 sm:space-y-0">
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex flex-wrap items-center gap-2 mb-2">
                   <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(post.category)}`}
+                    className={`inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(post.category)}`}
                   >
                     {post.category.replace('_', ' ')}
                   </span>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                  <span className="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                     {post.type}
                   </span>
                 </div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">{post.title}</h1>
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2 leading-tight">
+                  {post.title}
+                </h1>
                 {post.price && (
-                  <div className="text-2xl font-bold text-green-600 mb-2">
+                  <div className="text-xl sm:text-2xl font-bold text-green-600 mb-2">
                     ${post.price.toLocaleString()} {post.currency}
                   </div>
                 )}
               </div>
 
               {/* Action Buttons */}
-              <div className="flex space-x-2 ml-4">
+              <div className="flex space-x-2 sm:ml-4">
                 <button
                   onClick={handleShare}
-                  className="p-2 text-gray-400 hover:text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  className="p-2 sm:p-2.5 text-gray-400 hover:text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 touch-target"
                 >
-                  <ShareIcon className="h-5 w-5" />
+                  <ShareIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                 </button>
-                <button className="p-2 text-gray-400 hover:text-red-500 border border-gray-300 rounded-lg hover:bg-gray-50">
-                  <HeartIcon className="h-5 w-5" />
+                <button className="p-2 sm:p-2.5 text-gray-400 hover:text-red-500 border border-gray-300 rounded-lg hover:bg-gray-50 touch-target">
+                  <HeartIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                 </button>
               </div>
             </div>
 
             {/* Author and Date */}
-            <div className="flex items-center text-sm text-gray-500 mb-6">
-              <UserIcon className="h-4 w-4 mr-1" />
-              <span className="mr-4">{post.authorName}</span>
-              <ClockIcon className="h-4 w-4 mr-1" />
-              <span>{formatDate(post.createdAt)}</span>
+            <div className="flex flex-wrap items-center text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6 gap-3 sm:gap-4">
+              <div className="flex items-center">
+                <UserIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                <span>{post.authorName}</span>
+              </div>
+              <div className="flex items-center">
+                <ClockIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                <span>{formatDate(post.createdAt)}</span>
+              </div>
             </div>
 
             {/* Description */}
-            <div className="prose max-w-none mb-8">
-              <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-wrap">
+            <div className="prose max-w-none mb-6 sm:mb-8">
+              <p className="text-gray-700 text-sm sm:text-base lg:text-lg leading-relaxed whitespace-pre-wrap">
                 {post.description}
               </p>
             </div>
 
             {/* Location */}
             {post.location && (
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                  <MapPinIcon className="h-5 w-5 mr-2" />
+              <div className="mb-6 sm:mb-8">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
+                  <MapPinIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                   Location
                 </h3>
-                <p className="text-gray-600 mb-4">{post.location.address}</p>
+                <p className="text-sm sm:text-base text-gray-600 mb-4">{post.location.address}</p>
               </div>
             )}
 
             {/* Tags */}
             {post.tags && post.tags.length > 0 && (
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                  <TagIcon className="h-5 w-5 mr-2" />
+              <div className="mb-6 sm:mb-8">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
+                  <TagIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                   Tags
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {post.tags.map((tag, index) => (
                     <span
                       key={index}
-                      className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
+                      className="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-blue-100 text-blue-800"
                     >
                       {tag}
                     </span>
@@ -263,17 +269,17 @@ export default function PostDetailPage() {
 
             {/* Contact Section */}
             {(post.category === 'marketplace' || post.category === 'free_items') && (
-              <div className="border-t border-gray-200 pt-8">
-                <div className="bg-blue-50 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              <div className="border-t border-gray-200 pt-6 sm:pt-8">
+                <div className="bg-blue-50 rounded-lg p-4 sm:p-6">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
                     Interested in this item?
                   </h3>
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-sm sm:text-base text-gray-600 mb-4">
                     Contact {post.authorName} to arrange pickup or ask questions.
                   </p>
                   <button
                     onClick={handleContactSeller}
-                    className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium"
+                    className="bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:bg-blue-700 font-medium text-sm sm:text-base w-full sm:w-auto"
                   >
                     Contact Seller
                   </button>

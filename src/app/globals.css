@@ -1,5 +1,11 @@
 @import 'tailwindcss';
 
+/* Mobile-first responsive utilities */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
