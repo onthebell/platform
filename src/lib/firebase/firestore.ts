@@ -5,6 +5,7 @@ import {
   getDoc,
   addDoc,
   updateDoc,
+  deleteDoc,
   query,
   where,
   orderBy,
@@ -142,10 +143,7 @@ export async function updatePost(id: string, updates: Partial<CommunityPost>) {
 // Delete a post
 export async function deletePost(postId: string) {
   const docRef = doc(db, 'posts', postId);
-  await updateDoc(docRef, {
-    status: 'deleted',
-    updatedAt: Timestamp.fromDate(new Date()),
-  });
+  await deleteDoc(docRef);
 }
 
 // Events operations

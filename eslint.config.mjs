@@ -22,6 +22,12 @@ const eslintConfig = [
     },
   },
   {
+    files: ['jest.config.js', 'jest.setup.js'],
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
+  {
     plugins: {
       prettier: (await import('eslint-plugin-prettier')).default,
     },

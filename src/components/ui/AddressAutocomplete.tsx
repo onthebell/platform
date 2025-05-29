@@ -9,6 +9,7 @@ interface GooglePlacesAutocompleteProps {
   placeholder?: string;
   required?: boolean;
   className?: string;
+  forceManualMode?: boolean; // For testing purposes
 }
 
 declare global {
@@ -27,6 +28,7 @@ export default function GooglePlacesAutocomplete({
   placeholder = 'Enter your business address',
   required = false,
   className = '',
+  forceManualMode = false,
 }: GooglePlacesAutocompleteProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -34,10 +36,22 @@ export default function GooglePlacesAutocomplete({
   const [isLoaded, setIsLoaded] = useState(false);
   const [inputValue, setInputValue] = useState(value);
 
+  // Check Google Maps availability on every render (important for tests)
+  const checkGoogleMaps = () => {
+    if (forceManualMode) return false;
+    if (typeof window === 'undefined') return false;
+    return !!(window.google && window.google.maps && window.google.maps.places);
+  };
+  const isGoogleAvailable = checkGoogleMaps();
+
+  // Update loaded state when Google availability changes
+  useEffect(() => {
+    setIsLoaded(isGoogleAvailable);
+  }, [isGoogleAvailable]);
+
   // Load Google Places API
   useEffect(() => {
-    if (window.google && window.google.maps && window.google.maps.places) {
-      setIsLoaded(true);
+    if (isGoogleAvailable) {
       return;
     }
 
@@ -68,11 +82,11 @@ export default function GooglePlacesAutocomplete({
       // @ts-expect-error Allow delete global function
       delete window.initGooglePlaces;
     };
-  }, []);
+  }, [isGoogleAvailable]);
 
   // Initialize autocomplete when loaded
   useEffect(() => {
-    if (!isLoaded || !inputRef.current || autocompleteRef.current) return;
+    if (!isLoaded || !isGoogleAvailable || !inputRef.current || autocompleteRef.current) return;
 
     const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, {
       componentRestrictions: { country: 'AU' }, // Restrict to Australia
@@ -130,7 +144,7 @@ export default function GooglePlacesAutocomplete({
     });
 
     autocompleteRef.current = autocomplete;
-  }, [isLoaded, onChange]);
+  }, [isLoaded, isGoogleAvailable, onChange]);
 
   // Update input value when prop changes
   useEffect(() => {
@@ -147,18 +161,16 @@ export default function GooglePlacesAutocomplete({
           value={inputValue}
           onChange={e => {
             setInputValue(e.target.value);
-            // Only directly update in non-autocomplete mode
-            if (!isLoaded) {
-              onChange(e.target.value);
-            }
+            // Always call onChange to allow manual entry mode
+            onChange(e.target.value);
           }}
-          placeholder={!isLoaded ? `${placeholder} (Manual Entry)` : placeholder}
+          placeholder={!isGoogleAvailable ? `${placeholder} (Manual Entry)` : placeholder}
           required={required}
           className={`${className} pl-10 w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6`}
         />
       </div>
 
-      {!isLoaded && (
+      {!isGoogleAvailable && (
         <div className="mt-2 text-xs text-yellow-600">
           <p>Google Maps API not loaded. Manual address entry enabled.</p>
           <p className="mt-1">Please include a complete address with postcode.</p>

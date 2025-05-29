@@ -42,35 +42,38 @@ export function NotificationItem({ notification, onMarkAsRead }: NotificationIte
 
   const content = (
     <div
+      data-testid="notification-item"
       className={cn(
-        'flex items-start space-x-3 p-3 hover:bg-gray-50 transition-colors cursor-pointer',
+        'flex items-start space-x-2 sm:space-x-3 p-3 sm:p-4 hover:bg-gray-50 transition-colors cursor-pointer touch-target',
         !notification.isRead && 'bg-blue-50'
       )}
       onClick={handleClick}
     >
       <div className={cn('flex-shrink-0 mt-0.5', iconColor)}>
-        <Icon className="h-5 w-5" />
+        <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
       </div>
 
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between">
-          <div className="flex-1">
+          <div className="flex-1 pr-2">
             <p
               className={cn(
-                'text-sm font-medium text-gray-900',
+                'text-xs sm:text-sm font-medium text-gray-900 leading-relaxed',
                 !notification.isRead && 'font-semibold'
               )}
             >
               {notification.title}
             </p>
-            <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
+            <p className="text-xs sm:text-sm text-gray-600 mt-1 leading-relaxed">
+              {notification.message}
+            </p>
             <p className="text-xs text-gray-500 mt-2">
               {formatDistanceToNow(notification.createdAt, { addSuffix: true })}
             </p>
           </div>
 
           {!notification.isRead && (
-            <div className="ml-2">
+            <div className="ml-1 sm:ml-2 flex-shrink-0">
               <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
             </div>
           )}

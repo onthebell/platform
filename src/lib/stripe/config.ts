@@ -15,3 +15,13 @@ export const formatCurrency = (amount: number, currency: string = 'AUD') => {
     currency,
   }).format(amount / 100);
 };
+
+// Add a default export for test compatibility
+const config = {
+  getStripe,
+  formatCurrency,
+  DONATION_AMOUNTS: [5, 10, 25, 50, 100],
+  CURRENCY: 'AUD',
+};
+
+export default config;

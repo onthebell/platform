@@ -10,8 +10,8 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase/config';
-import { User } from '@/types';
+import { auth, db } from './config';
+import { User } from '../../types';
 
 interface AuthContextType {
   user: User | null;

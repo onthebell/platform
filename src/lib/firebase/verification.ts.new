@@ -1,0 +1,142 @@
+import {
+  collection,
+  doc,
+  addDoc,
+  updateDoc,
+  query,
+  where,
+  getDocs,
+  Timestamp,
+  setDoc,
+} from 'firebase/firestore';
+import { db } from './config';
+
+export interface AddressVerificationRequest {
+  id?: string;
+  userId: string;
+  userEmail: string;
+  address: {
+    street: string;
+    suburb: string;
+    postcode: string;
+    state: string;
+    country: string;
+  };
+  proofDocument?: string; // URL to uploaded proof document
+  status: 'pending' | 'approved' | 'rejected';
+  submittedAt: Date;
+  reviewedAt?: Date;
+  reviewedBy?: string;
+  reviewNotes?: string;
+}
+
+// Define Bellarine Peninsula suburbs for verification
+const BELLARINE_SUBURBS = [
+  'Queenscliff',
+  'Point Lonsdale',
+  'Ocean Grove',
+  'Barwon Heads',
+  'Batesford',
+  'Bellarine',
+  'Clifton Springs',
+  'Curlewis',
+  'Drysdale',
+  'Indented Head',
+  'Leopold',
+  'Mannerim',
+  'Marcus Hill',
+  'Portarlington',
+  'St Leonards',
+  'Swan Bay',
+  'Wallington',
+  'Connewarre',
+];
+
+/**
+ * Verify a user's address
+ */
+export async function verifyAddress(userId: string): Promise<void> {
+  const userDoc = doc(db, 'users', userId);
+  await updateDoc(userDoc, {
+    isVerified: true,
+    verifiedAt: Timestamp.fromDate(new Date()),
+  });
+}
+
+/**
+ * Request address verification
+ */
+export async function requestVerification(userId: string, address: any): Promise<void> {
+  const userDoc = doc(db, 'users', userId);
+  await updateDoc(userDoc, {
+    pendingVerification: true,
+    address,
+    verificationRequestedAt: Timestamp.fromDate(new Date()),
+  });
+}
+
+/**
+ * Check if an address is in the Bellarine Peninsula
+ */
+export async function isAddressInBellarine(address: {
+  street: string;
+  suburb: string;
+  postcode: string;
+  state: string;
+}): Promise<boolean> {
+  // Check if the suburb is in the Bellarine Peninsula
+  const isInBellarine = BELLARINE_SUBURBS.some(
+    s => s.toLowerCase() === address.suburb.toLowerCase()
+  );
+  
+  // Basic verification
+  return isInBellarine && address.state === 'VIC' && address.postcode.startsWith('32');
+}
+
+/**
+ * Submit a full verification request
+ */
+export async function submitVerificationRequest(request: Omit<AddressVerificationRequest, 'id' | 'submittedAt' | 'status'>): Promise<string> {
+  const verificationRequest: Omit<AddressVerificationRequest, 'id'> = {
+    ...request,
+    status: 'pending',
+    submittedAt: new Date(),
+  };
+  
+  const docRef = await addDoc(collection(db, 'addressVerifications'), verificationRequest);
+  return docRef.id;
+}
+
+/**
+ * Review a verification request
+ */
+export async function reviewVerificationRequest(
+  requestId: string,
+  status: 'approved' | 'rejected',
+  reviewNotes?: string,
+  reviewerId?: string
+): Promise<void> {
+  const requestDoc = doc(db, 'addressVerifications', requestId);
+  await updateDoc(requestDoc, {
+    status,
+    reviewNotes,
+    reviewedBy: reviewerId,
+    reviewedAt: Timestamp.fromDate(new Date()),
+  });
+  
+  // If approved, update the user's verification status
+  if (status === 'approved') {
+    const requestSnapshot = await getDocs(
+      query(collection(db, 'addressVerifications'), where('id', '==', requestId))
+    );
+    
+    if (!requestSnapshot.empty) {
+      const requestData = requestSnapshot.docs[0].data() as AddressVerificationRequest;
+      const userDoc = doc(db, 'users', requestData.userId);
+      await updateDoc(userDoc, {
+        isVerified: true,
+        verifiedAt: Timestamp.fromDate(new Date()),
+      });
+    }
+  }
+}

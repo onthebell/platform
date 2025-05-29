@@ -8,8 +8,8 @@ import { LatLngExpression } from 'leaflet';
 const DynamicMap = dynamic(() => import('./LeafletMap'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-      <div className="text-gray-500">Loading map...</div>
+    <div className="w-full h-64 sm:h-80 md:h-96 bg-gray-100 flex items-center justify-center rounded-lg">
+      <div className="text-gray-500 text-sm sm:text-base">Loading map...</div>
     </div>
   ),
 });
@@ -31,7 +31,7 @@ interface MapContainerProps {
 export default function MapContainer({
   center = [-38.1599, 144.3617], // Geelong coordinates
   zoom = 11,
-  className = 'w-full h-96',
+  className = 'w-full h-64 sm:h-80 md:h-96',
   markers = [],
   onMarkerClick,
 }: MapContainerProps) {
@@ -43,8 +43,8 @@ export default function MapContainer({
 
   if (!mounted) {
     return (
-      <div className={`${className} bg-gray-100 flex items-center justify-center`}>
-        <div className="text-gray-500">Loading map...</div>
+      <div className={`${className} bg-gray-100 flex items-center justify-center rounded-lg`}>
+        <div className="text-gray-500 text-sm sm:text-base">Loading map...</div>
       </div>
     );
   }

@@ -99,6 +99,7 @@ export default function PostsGrid({
                 onChange={e =>
                   setSelectedCategory(e.target.value === 'all' ? null : e.target.value)
                 }
+                aria-label="Filter by category"
               >
                 {categories.map(category => (
                   <option key={category} value={category}>
@@ -122,6 +123,7 @@ export default function PostsGrid({
               ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6'
               : 'space-y-4 sm:space-y-6'
           }
+          data-testid="posts-grid"
         >
           {filteredPosts.map(post => (
             <PostCard key={post.id} post={post} isCompact={layout === 'list'} />

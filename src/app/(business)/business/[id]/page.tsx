@@ -110,15 +110,15 @@ export default function BusinessDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-300 rounded w-1/4 mb-4"></div>
-            <div className="h-64 bg-gray-300 rounded mb-6"></div>
-            <div className="space-y-4">
-              <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-              <div className="h-4 bg-gray-300 rounded w-1/2"></div>
-              <div className="h-4 bg-gray-300 rounded w-2/3"></div>
+            <div className="h-6 sm:h-8 bg-gray-300 rounded w-1/4 mb-3 sm:mb-4"></div>
+            <div className="h-48 sm:h-64 bg-gray-300 rounded mb-4 sm:mb-6"></div>
+            <div className="space-y-3 sm:space-y-4">
+              <div className="h-3 sm:h-4 bg-gray-300 rounded w-3/4"></div>
+              <div className="h-3 sm:h-4 bg-gray-300 rounded w-1/2"></div>
+              <div className="h-3 sm:h-4 bg-gray-300 rounded w-2/3"></div>
             </div>
           </div>
         </div>
@@ -128,11 +128,14 @@ export default function BusinessDetailPage() {
 
   if (!business) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Business not found</h1>
-            <Link href="/business" className="text-blue-600 hover:text-blue-800 underline">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Business not found</h1>
+            <Link
+              href="/business"
+              className="text-blue-600 hover:text-blue-800 underline text-sm sm:text-base"
+            >
               Back to Business Directory
             </Link>
           </div>
@@ -142,66 +145,74 @@ export default function BusinessDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
         {/* Back button */}
         <button
           onClick={() => router.back()}
-          className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
+          className="flex items-center text-gray-600 hover:text-gray-900 mb-4 sm:mb-6 touch-target"
         >
-          <ArrowLeftIcon className="h-5 w-5 mr-2" />
-          Back
+          <ArrowLeftIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+          <span className="text-sm sm:text-base">Back</span>
         </button>
 
         {/* Business Header */}
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-6 sm:mb-8">
           {/* Business Image */}
           {business.images && business.images.length > 0 && (
-            <div className="relative h-64 w-full">
+            <div className="relative h-48 sm:h-64 w-full">
               <Image src={business.images[0]} alt={business.name} fill className="object-cover" />
             </div>
           )}
 
-          <div className="p-6">
-            <div className="flex items-start justify-between">
+          <div className="p-4 sm:p-6">
+            <div className="flex items-start justify-between flex-col sm:flex-row gap-4">
               <div className="flex-1">
-                <div className="flex items-center mb-2">
-                  <h1 className="text-3xl font-bold text-gray-900 mr-3">{business.name}</h1>
+                <div className="flex items-center mb-2 flex-wrap">
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mr-3">
+                    {business.name}
+                  </h1>
                   {business.isVerified && (
-                    <ShieldCheckIcon className="h-6 w-6 text-blue-600" title="Verified Business" />
+                    <ShieldCheckIcon
+                      className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600"
+                      title="Verified Business"
+                    />
                   )}
                 </div>
 
-                <div className="flex items-center mb-4">
-                  <div className="flex items-center mr-4">
+                <div className="flex items-center mb-4 flex-wrap gap-2">
+                  <div className="flex items-center">
                     {renderStars(business.rating || 0)}
-                    <span className="ml-2 text-sm text-gray-600">
+                    <span className="ml-2 text-xs sm:text-sm text-gray-600">
                       {business.rating
                         ? `${business.rating} (${business.reviewCount || 0} reviews)`
                         : 'No reviews yet'}
                     </span>
                   </div>
 
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  <span className="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                     {business.category}
                   </span>
                 </div>
 
-                <p className="text-gray-600 mb-4">{business.description}</p>
+                <p className="text-sm sm:text-base text-gray-600 mb-4">{business.description}</p>
 
                 {/* Contact Information */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="grid grid-cols-1 gap-3 sm:gap-4 mb-6">
                   {business.address && (
-                    <div className="flex items-center text-gray-600">
-                      <MapPinIcon className="h-5 w-5 mr-2 flex-shrink-0" />
-                      <span>{business.address}</span>
+                    <div className="flex items-start text-gray-600">
+                      <MapPinIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2 flex-shrink-0 mt-0.5" />
+                      <span className="text-sm sm:text-base">{business.address}</span>
                     </div>
                   )}
 
                   {business.contact?.phone && (
                     <div className="flex items-center text-gray-600">
-                      <PhoneIcon className="h-5 w-5 mr-2 flex-shrink-0" />
-                      <a href={`tel:${business.contact.phone}`} className="hover:text-blue-600">
+                      <PhoneIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2 flex-shrink-0" />
+                      <a
+                        href={`tel:${business.contact.phone}`}
+                        className="hover:text-blue-600 text-sm sm:text-base touch-target"
+                      >
                         {business.contact.phone}
                       </a>
                     </div>
@@ -209,8 +220,11 @@ export default function BusinessDetailPage() {
 
                   {business.contact?.email && (
                     <div className="flex items-center text-gray-600">
-                      <EnvelopeIcon className="h-5 w-5 mr-2 flex-shrink-0" />
-                      <a href={`mailto:${business.contact.email}`} className="hover:text-blue-600">
+                      <EnvelopeIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2 flex-shrink-0" />
+                      <a
+                        href={`mailto:${business.contact.email}`}
+                        className="hover:text-blue-600 text-sm sm:text-base touch-target break-all"
+                      >
                         {business.contact.email}
                       </a>
                     </div>
@@ -218,7 +232,7 @@ export default function BusinessDetailPage() {
 
                   {business.contact?.website && (
                     <div className="flex items-center text-gray-600">
-                      <GlobeAltIcon className="h-5 w-5 mr-2 flex-shrink-0" />
+                      <GlobeAltIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2 flex-shrink-0" />
                       <a
                         href={
                           business.contact.website.startsWith('http')
@@ -227,7 +241,7 @@ export default function BusinessDetailPage() {
                         }
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="hover:text-blue-600"
+                        className="hover:text-blue-600 text-sm sm:text-base touch-target break-all"
                       >
                         {business.contact.website}
                       </a>
@@ -238,11 +252,11 @@ export default function BusinessDetailPage() {
                 {/* Business Hours */}
                 {business.hours && (
                   <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                      <ClockIcon className="h-5 w-5 mr-2" />
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                      <ClockIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                       Business Hours
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                    <div className="space-y-1 sm:space-y-2">
                       {DAY_NAMES.map((day, index) => {
                         const hours = business.hours?.[day];
                         const isToday = new Date().getDay() === (index === 6 ? 0 : index + 1);
@@ -250,7 +264,7 @@ export default function BusinessDetailPage() {
                         return (
                           <div
                             key={day}
-                            className={`flex justify-between py-1 ${isToday ? 'font-semibold text-blue-600' : 'text-gray-600'}`}
+                            className={`flex justify-between py-1 text-sm sm:text-base ${isToday ? 'font-semibold text-blue-600' : 'text-gray-600'}`}
                           >
                             <span>{day}:</span>
                             <span>
@@ -265,25 +279,25 @@ export default function BusinessDetailPage() {
               </div>
 
               {/* Action buttons */}
-              <div className="flex flex-col space-y-2 ml-6">
+              <div className="flex flex-row sm:flex-col space-x-2 sm:space-x-0 sm:space-y-2 mt-4 sm:mt-0 sm:ml-6">
                 <button
                   onClick={handleShare}
-                  className="p-2 text-gray-400 hover:text-gray-600 border border-gray-300 rounded-md"
+                  className="p-2 sm:p-3 text-gray-400 hover:text-gray-600 border border-gray-300 rounded-md touch-target"
                   title="Share"
                 >
-                  <ShareIcon className="h-5 w-5" />
+                  <ShareIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                 </button>
 
                 {user && (
                   <button
                     onClick={toggleFavorite}
-                    className="p-2 text-gray-400 hover:text-red-600 border border-gray-300 rounded-md"
+                    className="p-2 sm:p-3 text-gray-400 hover:text-red-600 border border-gray-300 rounded-md touch-target"
                     title={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
                   >
                     {isFavorited ? (
-                      <HeartIconSolid className="h-5 w-5 text-red-600" />
+                      <HeartIconSolid className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
                     ) : (
-                      <HeartIcon className="h-5 w-5" />
+                      <HeartIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                     )}
                   </button>
                 )}
@@ -293,12 +307,12 @@ export default function BusinessDetailPage() {
         </div>
 
         {/* Additional Sections */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-6 sm:space-y-8">
             {/* About Section */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">About</h2>
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">About</h2>
               <p className="text-gray-600 whitespace-pre-wrap">{business.description}</p>
             </div>
 

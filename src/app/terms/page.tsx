@@ -12,42 +12,50 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <div className="flex items-center mb-8">
-            <DocumentTextIcon className="h-8 w-8 text-blue-600 mr-3" />
-            <h1 className="text-3xl font-bold text-gray-900">Terms of Service</h1>
+    <div className="min-h-screen bg-gray-50 py-4 sm:py-8 lg:py-12">
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
+        <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:p-8">
+          <div className="flex items-center mb-6 sm:mb-8">
+            <DocumentTextIcon className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 mr-2 sm:mr-3 flex-shrink-0" />
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+              Terms of Service
+            </h1>
           </div>
 
-          <div className="prose max-w-none">
-            <p className="text-lg text-gray-600 mb-8">Last updated: May 28, 2025</p>
+          <div className="prose prose-sm sm:prose-base lg:prose-lg max-w-none">
+            <p className="text-sm sm:text-base lg:text-lg text-gray-600 mb-6 sm:mb-8">
+              Last updated: May 28, 2025
+            </p>
 
-            <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-8">
+            <div className="bg-blue-50 border-l-4 border-blue-400 p-3 sm:p-4 mb-6 sm:mb-8">
               <div className="flex">
-                <ShieldCheckIcon className="h-5 w-5 text-blue-400 mr-2 mt-0.5" />
-                <p className="text-blue-700">
+                <ShieldCheckIcon className="h-4 w-4 sm:h-5 sm:w-5 text-blue-400 mr-2 mt-0.5 flex-shrink-0" />
+                <p className="text-sm sm:text-base text-blue-700 leading-relaxed">
                   By using OnTheBell, you agree to these terms. Please read them carefully.
                 </p>
               </div>
             </div>
 
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Acceptance of Terms</h2>
-              <p className="text-gray-700 mb-4">
+            <section className="mb-6 sm:mb-8">
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-3 sm:mb-4">
+                1. Acceptance of Terms
+              </h2>
+              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4 leading-relaxed">
                 By accessing or using OnTheBell ("the Platform"), you agree to be bound by these
                 Terms of Service and all applicable laws and regulations. If you do not agree with
                 any of these terms, you are prohibited from using or accessing this site.
               </p>
             </section>
 
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. Platform Description</h2>
-              <p className="text-gray-700 mb-4">
+            <section className="mb-6 sm:mb-8">
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-3 sm:mb-4">
+                2. Platform Description
+              </h2>
+              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4 leading-relaxed">
                 OnTheBell is a community platform designed specifically for residents of the
                 Bellarine Peninsula, Victoria, Australia. The platform provides:
               </p>
-              <ul className="list-disc pl-6 text-gray-700 mb-4">
+              <ul className="list-disc pl-4 sm:pl-6 text-sm sm:text-base text-gray-700 mb-3 sm:mb-4 space-y-1">
                 <li>Local business directory and deals</li>
                 <li>Community events calendar</li>
                 <li>Marketplace for buying, selling, and sharing items</li>
@@ -56,30 +64,30 @@ export default function TermsPage() {
               </ul>
             </section>
 
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+            <section className="mb-6 sm:mb-8">
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-3 sm:mb-4">
                 3. User Eligibility and Verification
               </h2>
-              <p className="text-gray-700 mb-4">
+              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4 leading-relaxed">
                 To access full platform features ("On the Bell" status), users must:
               </p>
-              <ul className="list-disc pl-6 text-gray-700 mb-4">
+              <ul className="list-disc pl-4 sm:pl-6 text-sm sm:text-base text-gray-700 mb-3 sm:mb-4 space-y-1">
                 <li>Be 18 years of age or older</li>
                 <li>Provide a valid street address within the Bellarine Peninsula</li>
                 <li>Complete our address verification process</li>
                 <li>Maintain accurate and up-to-date account information</li>
               </ul>
-              <p className="text-gray-700 mb-4">
+              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4 leading-relaxed">
                 General access is available to all users, with limited functionality for
                 non-verified accounts.
               </p>
             </section>
 
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+            <section className="mb-6 sm:mb-8">
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-3 sm:mb-4">
                 4. User Conduct and Community Guidelines
               </h2>
-              <p className="text-gray-700 mb-4">
+              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4 leading-relaxed">
                 Users agree to conduct themselves in accordance with our
                 <a href="/community-guidelines" className="text-blue-600 hover:text-blue-800">
                   {' '}
@@ -87,7 +95,7 @@ export default function TermsPage() {
                 </a>
                 . Prohibited activities include:
               </p>
-              <ul className="list-disc pl-6 text-gray-700 mb-4">
+              <ul className="list-disc pl-4 sm:pl-6 text-sm sm:text-base text-gray-700 mb-3 sm:mb-4 space-y-1">
                 <li>Posting false, misleading, or fraudulent content</li>
                 <li>Harassment, bullying, or discriminatory behavior</li>
                 <li>Spam, excessive self-promotion, or commercial solicitation</li>
@@ -97,16 +105,16 @@ export default function TermsPage() {
               </ul>
             </section>
 
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+            <section className="mb-6 sm:mb-8">
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-3 sm:mb-4">
                 5. Content and Intellectual Property
               </h2>
-              <p className="text-gray-700 mb-4">
+              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4 leading-relaxed">
                 Users retain ownership of content they post but grant OnTheBell a non-exclusive,
                 worldwide, royalty-free license to use, display, and distribute such content on the
                 platform.
               </p>
-              <p className="text-gray-700 mb-4">
+              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4 leading-relaxed">
                 OnTheBell respects intellectual property rights and will respond to valid copyright
                 infringement notices in accordance with applicable law.
               </p>

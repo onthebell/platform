@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/firebase/auth';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 import {
   HomeIcon,
   MapPinIcon,
@@ -39,6 +41,8 @@ const navigation: NavigationItem[] = [
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
 
   const handleSignOut = async () => {
     try {
@@ -48,8 +52,12 @@ export default function Navbar() {
     }
   };
 
+  const handleNavigation = (href: string) => {
+    router.push(href);
+  };
+
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200">
+    <nav className="bg-white shadow-sm border-b border-gray-200" role="navigation">
       <div className="mx-auto max-w-7xl px-3 sm:px-4 lg:px-6 xl:px-8">
         <div className="flex justify-between h-14 sm:h-16">
           {/* Logo and brand */}
@@ -65,24 +73,30 @@ export default function Navbar() {
             {navigation.map(item => {
               const canAccess = !item.requiresAuth || user;
               const canAccessVerified = !item.verifiedOnly || user?.isVerified;
+              const isActive = pathname === item.href;
 
               if (!canAccess || !canAccessVerified) return null;
 
               return (
-                <Link
+                <button
                   key={item.name}
-                  href={item.href}
-                  className="flex items-center space-x-1 px-2 lg:px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors"
+                  onClick={() => handleNavigation(item.href)}
+                  className={`flex items-center space-x-1 px-2 lg:px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'text-blue-600 bg-blue-50'
+                      : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                  }`}
                 >
                   <item.icon className="h-4 w-4" />
                   <span>{item.name}</span>
-                </Link>
+                </button>
               );
             })}
           </div>
 
           {/* User menu */}
           <div className="flex items-center space-x-2 sm:space-x-3 lg:space-x-4">
+            <ThemeToggle />
             {user && <NotificationDropdown />}
             {user ? (
               <div className="relative">
@@ -131,7 +145,7 @@ export default function Navbar() {
                         onClick={handleSignOut}
                         className="block w-full text-left px-3 sm:px-4 py-2 text-xs sm:text-sm text-red-600 hover:bg-gray-50 transition-colors"
                       >
-                        Sign out
+                        Sign Out
                       </button>
                     </div>
                   </div>
@@ -143,7 +157,7 @@ export default function Navbar() {
                   href="/auth/signin"
                   className="text-xs sm:text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors px-1 sm:px-0"
                 >
-                  Sign in
+                  Sign In
                 </Link>
                 <Link
                   href="/auth/signup"
@@ -160,6 +174,8 @@ export default function Navbar() {
               type="button"
               className="md:hidden inline-flex items-center justify-center p-1.5 sm:p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-expanded={mobileMenuOpen}
+              aria-label={mobileMenuOpen ? 'Close main menu' : 'Open main menu'}
             >
               {mobileMenuOpen ? (
                 <XMarkIcon className="h-5 w-5 sm:h-6 sm:w-6" />
@@ -178,19 +194,26 @@ export default function Navbar() {
             {navigation.map(item => {
               const canAccess = !item.requiresAuth || user;
               const canAccessVerified = !item.verifiedOnly || user?.isVerified;
+              const isActive = pathname === item.href;
 
               if (!canAccess || !canAccessVerified) return null;
 
               return (
-                <Link
+                <button
                   key={item.name}
-                  href={item.href}
-                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={() => {
+                    handleNavigation(item.href);
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium w-full text-left transition-colors ${
+                    isActive
+                      ? 'text-blue-600 bg-blue-50'
+                      : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                  }`}
                 >
                   <item.icon className="h-5 w-5" />
                   <span>{item.name}</span>
-                </Link>
+                </button>
               );
             })}
           </div>

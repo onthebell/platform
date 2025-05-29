@@ -51,6 +51,39 @@ export async function uploadImages(
 }
 
 /**
+ * Upload a file to Firebase Storage
+ * Generic file upload function for tests
+ */
+export async function uploadFile(
+  file: File,
+  path: string,
+  metadata?: Record<string, string>
+): Promise<string> {
+  try {
+    const storageRef = ref(storage, path);
+    const snapshot = await uploadBytes(storageRef, file, metadata);
+    const downloadURL = await getDownloadURL(snapshot.ref);
+    return downloadURL;
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    throw new Error('Failed to upload file');
+  }
+}
+
+/**
+ * Get a download URL for a file in Firebase Storage
+ */
+export async function getFileUrl(path: string): Promise<string> {
+  try {
+    const storageRef = ref(storage, path);
+    return await getDownloadURL(storageRef);
+  } catch (error) {
+    console.error('Error getting file URL:', error);
+    throw new Error('Failed to get file URL');
+  }
+}
+
+/**
  * Delete an image from Firebase Storage
  */
 export async function deleteImage(imageUrl: string): Promise<void> {
@@ -72,6 +105,19 @@ export async function deleteImage(imageUrl: string): Promise<void> {
   } catch (error) {
     console.error('Error deleting image:', error);
     // Don't throw here - image deletion failure shouldn't break other operations
+  }
+}
+
+/**
+ * Delete a file from Firebase Storage
+ */
+export async function deleteFile(path: string): Promise<void> {
+  try {
+    const storageRef = ref(storage, path);
+    await deleteObject(storageRef);
+  } catch (error) {
+    console.error('Error deleting file:', error);
+    throw new Error('Failed to delete file');
   }
 }
 

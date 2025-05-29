@@ -63,6 +63,24 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
     setLiked(!liked);
   };
 
+  const handleCardClick = () => {
+    router.push(`/community/${post.id}`);
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: post.title,
+          text: post.description,
+          url: `${window.location.origin}/community/${post.id}`,
+        });
+      } catch (error) {
+        console.error('Error sharing post:', error);
+      }
+    }
+  };
+
   const handleEdit = () => {
     router.push(`/community/edit/${post.id}`);
     setShowOptions(false);
@@ -94,7 +112,7 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
         <div className="flex">
           <Link href={`/community/${post.id}`} className="block flex-1">
-            <div className="p-3 sm:p-4">
+            <div className="p-3 sm:p-4" onClick={handleCardClick}>
               <div className="flex justify-between items-start">
                 <h3 className="text-sm sm:text-base font-semibold text-gray-900 line-clamp-1 flex-1 mr-2">
                   {post.title}
@@ -111,10 +129,22 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
                   <TagIcon className="h-3 w-3 mr-1" />
                   {post.category}
                 </span>
+                {post.type && (
+                  <span className="flex items-center sm:ml-3">
+                    <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs">
+                      {post.type}
+                    </span>
+                  </span>
+                )}
                 {post.location && (
                   <span className="flex items-center sm:ml-3">
                     <MapPinIcon className="h-3 w-3 mr-1" />
-                    <span className="truncate">{post.location.address.split(',')[0]}</span>
+                    <span className="truncate">{post.location.address}</span>
+                  </span>
+                )}
+                {post.price && (
+                  <span className="flex items-center sm:ml-3 font-medium text-green-600">
+                    ${post.price} {post.currency || 'AUD'}
                   </span>
                 )}
               </div>
@@ -126,6 +156,7 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
                 onClick={() => setShowOptions(!showOptions)}
                 className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
                 disabled={isDeleting}
+                aria-label="Post options"
               >
                 <EllipsisVerticalIcon className="h-4 w-4" />
               </button>
@@ -163,16 +194,23 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
       <div className="relative">
         <Link href={`/community/${post.id}`} className="block">
           {post.images && post.images.length > 0 && (
-            <div className="relative h-40 sm:h-48 w-full">
+            <div className="relative h-40 sm:h-48 w-full" onClick={handleCardClick}>
               <Image src={imageUrl} alt={post.title} fill className="object-cover" />
-              {post.category && (
-                <span className="absolute top-2 right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
-                  {post.category}
-                </span>
-              )}
+              <div className="absolute top-2 right-2 flex gap-2">
+                {post.category && (
+                  <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                    {post.category}
+                  </span>
+                )}
+                {post.type && (
+                  <span className="bg-green-600 text-white text-xs px-2 py-1 rounded">
+                    {post.type}
+                  </span>
+                )}
+              </div>
             </div>
           )}
-          <div className="p-3 sm:p-4">
+          <div className="p-3 sm:p-4" onClick={handleCardClick}>
             <div className="flex justify-between items-start">
               <h3 className="text-base sm:text-lg font-semibold text-gray-900 flex-1 mr-2">
                 {post.title}
@@ -183,11 +221,19 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
             </div>
             <p className="text-sm text-gray-600 mt-2 line-clamp-3">{post.description}</p>
 
+            {post.price && (
+              <div className="mt-3">
+                <span className="text-lg font-bold text-green-600">
+                  ${post.price} {post.currency || 'AUD'}
+                </span>
+              </div>
+            )}
+
             <div className="flex flex-col sm:flex-row sm:items-center mt-3 sm:mt-4 text-xs text-gray-500 space-y-1 sm:space-y-0">
               {post.location && (
                 <span className="flex items-center sm:mr-3">
                   <MapPinIcon className="h-3.5 w-3.5 mr-1" />
-                  <span className="truncate">{post.location.address.split(',')[0]}</span>
+                  <span className="truncate">{post.location.address}</span>
                 </span>
               )}
               <span className="flex items-center">
@@ -223,6 +269,7 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
                 onClick={() => setShowOptions(!showOptions)}
                 className="p-1.5 sm:p-2 bg-white/80 backdrop-blur-sm text-gray-600 hover:text-gray-800 rounded-full hover:bg-white/90 shadow-sm transition-colors"
                 disabled={isDeleting}
+                aria-label="Post options"
               >
                 <EllipsisVerticalIcon className="h-4 w-4" />
               </button>
@@ -258,6 +305,7 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
           <button
             onClick={handleLike}
             className="flex items-center mr-4 text-gray-500 hover:text-red-500 focus:outline-none transition-colors"
+            aria-label="Like post"
           >
             {liked ? (
               <HeartIconSolid className="h-4 w-4 sm:h-5 sm:w-5 text-red-500 mr-1" />
@@ -273,7 +321,11 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
             <ChatBubbleLeftIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1" />
             <span className="text-xs sm:text-sm">0</span>
           </Link>
-          <button className="flex items-center hover:text-blue-500 focus:outline-none transition-colors">
+          <button
+            onClick={handleShare}
+            className="flex items-center hover:text-blue-500 focus:outline-none transition-colors"
+            aria-label="Share post"
+          >
             <ShareIcon className="h-4 w-4 sm:h-5 sm:w-5" />
           </button>
         </div>

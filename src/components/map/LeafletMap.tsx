@@ -101,7 +101,7 @@ export default function LeafletMap({ center, zoom, markers, onMarkerClick }: Lea
       zoom={zoom}
       minZoom={11}
       scrollWheelZoom={true}
-      className="w-full h-full rounded-lg"
+      className="w-full h-64 sm:h-80 md:h-96 lg:h-full rounded-lg"
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -128,15 +128,17 @@ export default function LeafletMap({ center, zoom, markers, onMarkerClick }: Lea
             click: () => onMarkerClick?.(marker.id),
           }}
         >
-          <Popup>
-            <div className="p-2">
-              <h3 className="font-semibold text-base">{marker.title}</h3>
+          <Popup className="custom-popup">
+            <div className="p-2 sm:p-3">
+              <h3 className="font-semibold text-sm sm:text-base">{marker.title}</h3>
               {marker.description && (
-                <p className="text-sm text-gray-600 mt-1">{marker.description}</p>
+                <p className="text-xs sm:text-sm text-gray-600 mt-1">{marker.description}</p>
               )}
               {marker.category && (
                 <div className="flex items-center mt-2">
-                  <span className="text-lg mr-1">{categoryIcons[marker.category] || '📍'}</span>
+                  <span className="text-base sm:text-lg mr-1">
+                    {categoryIcons[marker.category] || '📍'}
+                  </span>
                   <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
                     {marker.category.charAt(0).toUpperCase() + marker.category.slice(1)}
                   </span>

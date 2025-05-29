@@ -78,16 +78,16 @@ export default function BusinessDirectoryPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 py-6 sm:py-8">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="h-6 sm:h-8 bg-gray-200 rounded w-1/2 sm:w-1/4 mb-4 sm:mb-6"></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="bg-white p-6 rounded-lg shadow">
+                <div key={i} className="bg-white p-3 sm:p-4 lg:p-6 rounded-lg shadow">
                   <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
                   <div className="h-3 bg-gray-200 rounded w-1/2 mb-4"></div>
-                  <div className="h-20 bg-gray-200 rounded mb-4"></div>
+                  <div className="h-16 sm:h-20 bg-gray-200 rounded mb-4"></div>
                   <div className="h-3 bg-gray-200 rounded w-full"></div>
                 </div>
               ))}
@@ -99,16 +99,16 @@ export default function BusinessDirectoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-6 sm:py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+        <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-              <BuildingStorefrontIcon className="h-8 w-8 text-blue-600 mr-2" />
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center">
+              <BuildingStorefrontIcon className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 mr-2" />
               Business Directory
             </h1>
-            <p className="mt-2 text-gray-600">
+            <p className="mt-2 text-sm sm:text-base text-gray-600">
               Discover local businesses on the Bellarine Peninsula
             </p>
           </div>
@@ -116,7 +116,7 @@ export default function BusinessDirectoryPage() {
           {user?.isVerified && (
             <Link
               href="/business/add"
-              className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 sm:py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 touch-target"
             >
               <PlusIcon className="h-4 w-4 mr-2" />
               List Your Business
