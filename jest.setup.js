@@ -52,6 +52,10 @@ jest.mock('@/lib/firebase/firestore', () => ({
   deletePost: jest.fn(() => Promise.resolve()),
 }));
 
+// Firebase Comments mocks are handled in individual test files to avoid conflicts
+
+// Comment hook mocks are handled in individual test files to avoid conflicts
+
 // Mock Leaflet and React Leaflet
 jest.mock('react-leaflet', () => ({
   MapContainer: ({ children }) => <div data-testid="map-container">{children}</div>,
@@ -107,3 +111,56 @@ global.ResizeObserver = class ResizeObserver {
     return null;
   }
 };
+
+// Mock window.confirm
+global.confirm = jest.fn(() => true);
+
+// Mock Firebase Config
+jest.mock('@/lib/firebase/config', () => {
+  // Create mock instances for Firebase services
+  const mockAuth = {
+    currentUser: null,
+    onAuthStateChanged: jest.fn(),
+    signInWithEmailAndPassword: jest.fn(),
+    createUserWithEmailAndPassword: jest.fn(),
+    signOut: jest.fn(),
+  };
+
+  const mockFirestore = {
+    collection: jest.fn(() => ({
+      doc: jest.fn(() => ({
+        get: jest.fn(),
+        set: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
+      })),
+      where: jest.fn(() => ({
+        get: jest.fn(),
+        onSnapshot: jest.fn(),
+      })),
+      orderBy: jest.fn(() => ({
+        get: jest.fn(),
+        onSnapshot: jest.fn(),
+      })),
+      limit: jest.fn(() => ({
+        get: jest.fn(),
+        onSnapshot: jest.fn(),
+      })),
+    })),
+  };
+
+  const mockStorage = {
+    ref: jest.fn(() => ({
+      put: jest.fn(),
+      getDownloadURL: jest.fn(),
+      delete: jest.fn(),
+    })),
+  };
+
+  return {
+    auth: mockAuth,
+    db: mockFirestore,
+    storage: mockStorage,
+    default: {},
+  };
+});

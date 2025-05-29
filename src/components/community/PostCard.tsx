@@ -8,6 +8,7 @@ import { formatRelativeTime, formatShortDate } from '@/lib/utils';
 import { CommunityPost } from '@/types';
 import { useAuth } from '@/lib/firebase/auth';
 import { deletePost } from '@/lib/firebase/firestore';
+import { useCommentCount } from '@/hooks/useCommentCount';
 import {
   MapPinIcon,
   CalendarIcon,
@@ -20,6 +21,13 @@ import {
   EllipsisVerticalIcon,
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
+
+// For testing purposes
+export const __internal = {
+  reloadPage: () => {
+    window.location.reload();
+  },
+};
 
 interface PostCardProps {
   post: CommunityPost;
@@ -34,6 +42,7 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
   const [showOptions, setShowOptions] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const optionsRef = useRef<HTMLDivElement>(null);
+  const { count: commentCount } = useCommentCount(post.id);
 
   const isOwner = user && user.id === post.authorId;
 
@@ -93,8 +102,8 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
     setShowOptions(false);
     try {
       await deletePost(post.id);
-      // Optionally trigger a refresh or update parent component
-      window.location.reload();
+      // Instead of directly reloading, use the function which can be mocked in tests
+      __internal.reloadPage();
     } catch (error) {
       console.error('Error deleting post:', error);
       alert('Failed to delete post. Please try again.');
@@ -319,7 +328,7 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
             className="flex items-center mr-4 hover:text-blue-500 transition-colors"
           >
             <ChatBubbleLeftIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1" />
-            <span className="text-xs sm:text-sm">0</span>
+            <span className="text-xs sm:text-sm">{commentCount}</span>
           </Link>
           <button
             onClick={handleShare}

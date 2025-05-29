@@ -1,0 +1,89 @@
+'use client';
+
+import { useState } from 'react';
+import { useAuth } from '@/lib/firebase/auth';
+
+interface CommentFormProps {
+  onSubmit: (content: string) => Promise<void>;
+  placeholder?: string;
+}
+
+export function CommentForm({ onSubmit, placeholder = 'Write your comment...' }: CommentFormProps) {
+  const { user } = useAuth();
+  const [content, setContent] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Only verified users can comment
+  const canComment = user?.isVerified;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!content.trim() || !canComment) return;
+
+    try {
+      setIsSubmitting(true);
+      await onSubmit(content);
+      setContent('');
+    } catch (error) {
+      console.error('Failed to submit comment:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (!user) {
+    return (
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
+        <p className="text-gray-600">
+          <span className="font-medium">Sign in</span> to join the conversation
+        </p>
+      </div>
+    );
+  }
+
+  if (!canComment) {
+    return (
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
+        <p className="text-yellow-800">
+          Only <span className="font-medium">verified residents</span> can comment on posts.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-3">
+      <div className="flex space-x-3">
+        {/* User avatar */}
+        <div className="flex-shrink-0">
+          <div className="w-8 h-8 bg-brand-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+            {user.displayName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
+          </div>
+        </div>
+
+        {/* Comment input */}
+        <div className="flex-1">
+          <textarea
+            value={content}
+            onChange={e => setContent(e.target.value)}
+            placeholder={placeholder}
+            rows={3}
+            className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-brand-500 focus:border-transparent placeholder-gray-400"
+            disabled={isSubmitting}
+          />
+        </div>
+      </div>
+
+      {/* Submit button */}
+      <div className="flex justify-end">
+        <button
+          type="submit"
+          disabled={isSubmitting || !content.trim()}
+          className="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          {isSubmitting ? 'Posting...' : 'Post Comment'}
+        </button>
+      </div>
+    </form>
+  );
+}

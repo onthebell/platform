@@ -129,6 +129,17 @@ export interface Donation {
   createdAt: Date;
 }
 
+export interface Comment {
+  id: string;
+  postId: string;
+  authorId: string;
+  authorName: string;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+  isEdited: boolean;
+}
+
 export interface Notification {
   id: string;
   userId: string;

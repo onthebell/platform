@@ -3,6 +3,26 @@ import userEvent from '@testing-library/user-event';
 import PostsGrid from '../PostsGrid';
 import { CommunityPost } from '@/types';
 
+// Mock heroicons components
+jest.mock('@heroicons/react/24/outline', () => ({
+  MapPinIcon: () => <svg data-testid="map-pin-icon" />,
+  CalendarIcon: () => <svg data-testid="calendar-icon" />,
+  TagIcon: () => <svg data-testid="tag-icon" />,
+  HeartIcon: () => <svg data-testid="heart-icon" />,
+  ChatBubbleLeftIcon: () => <svg data-testid="chat-bubble-icon" />,
+  ShareIcon: () => <svg data-testid="share-icon" />,
+  PencilIcon: () => <svg data-testid="pencil-icon" />,
+  TrashIcon: () => <svg data-testid="trash-icon" />,
+  EllipsisVerticalIcon: () => <svg data-testid="ellipsis-icon" />,
+  AdjustmentsHorizontalIcon: () => <svg data-testid="adjustments-icon" />,
+  MagnifyingGlassIcon: () => <svg data-testid="magnifying-glass-icon" />,
+  PlusIcon: () => <svg data-testid="plus-icon" />,
+}));
+
+jest.mock('@heroicons/react/24/solid', () => ({
+  HeartIcon: () => <svg data-testid="heart-solid-icon" />,
+}));
+
 // Mock router
 const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({
@@ -43,8 +63,96 @@ jest.mock('next/link', () => {
 jest.mock('@/lib/firebase/auth', () => ({
   useAuth: () => ({
     user: { id: 'user-123', email: 'test@example.com' },
+    firebaseUser: { uid: 'user-123', email: 'test@example.com' },
+    loading: false,
+    signIn: jest.fn(),
+    signUp: jest.fn(),
+    signOut: jest.fn(),
+    updateUserProfile: jest.fn(),
   }),
 }));
+
+// Mock Firebase comments module
+jest.mock('@/lib/firebase/comments', () => ({
+  getPostCommentCount: jest.fn().mockResolvedValue(5),
+  getPostComments: jest.fn().mockResolvedValue([]),
+  addComment: jest.fn().mockResolvedValue('new-comment-id'),
+  updateComment: jest.fn().mockResolvedValue(undefined),
+  deleteComment: jest.fn().mockResolvedValue(undefined),
+  getComment: jest.fn().mockResolvedValue(null),
+}));
+
+// Mock useCommentCount hook to avoid React act() warnings
+jest.mock('@/hooks/useCommentCount', () => ({
+  useCommentCount: () => ({ count: 5, loading: false }),
+}));
+
+// Mock firebase config to prevent auth/invalid-api-key errors
+jest.mock('@/lib/firebase/config', () => {
+  // Create mock instances for Firebase services
+  const mockAuth = {
+    currentUser: { uid: 'user-123', email: 'test@example.com' },
+    onAuthStateChanged: jest.fn(callback => {
+      callback({ uid: 'user-123', email: 'test@example.com' });
+      return jest.fn();
+    }),
+    signInWithEmailAndPassword: jest.fn(),
+    createUserWithEmailAndPassword: jest.fn(),
+    signOut: jest.fn(),
+  };
+
+  const mockFirestore = {
+    collection: jest.fn(path => {
+      return {
+        doc: jest.fn(() => ({
+          get: jest.fn().mockResolvedValue({
+            exists: true,
+            data: () => ({}),
+            id: 'test-id',
+          }),
+          set: jest.fn(),
+          update: jest.fn(),
+          delete: jest.fn(),
+        })),
+        where: jest.fn(() => ({
+          get: jest.fn().mockResolvedValue({
+            docs: [],
+            forEach: jest.fn(),
+            size: 0,
+          }),
+          onSnapshot: jest.fn(callback => {
+            callback({
+              docs: [],
+              forEach: jest.fn(),
+              size: 0,
+            });
+            return jest.fn();
+          }),
+        })),
+        get: jest.fn().mockResolvedValue({
+          docs: [],
+          forEach: jest.fn(),
+          size: 0,
+        }),
+      };
+    }),
+  };
+
+  const mockStorage = {
+    ref: jest.fn(() => ({
+      put: jest.fn(),
+      getDownloadURL: jest.fn(),
+      delete: jest.fn(),
+    })),
+  };
+
+  return {
+    auth: mockAuth,
+    db: mockFirestore,
+    storage: mockStorage,
+    default: {},
+  };
+});
 
 describe('PostsGrid Component', () => {
   const mockPosts: CommunityPost[] = [

@@ -14,6 +14,7 @@ import {
   ArrowLeftIcon,
 } from '@heroicons/react/24/outline';
 import { HeartIcon, ShareIcon } from '@heroicons/react/24/solid';
+import { CommentsSection } from '@/components/community/CommentsSection';
 
 export default function PostDetailPage() {
   const params = useParams();
@@ -286,6 +287,11 @@ export default function PostDetailPage() {
                 </div>
               </div>
             )}
+
+            {/* Comments Section */}
+            <div className="border-t border-gray-200 pt-6 sm:pt-8">
+              <CommentsSection postId={post.id} />
+            </div>
           </div>
         </div>
       </div>
