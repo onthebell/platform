@@ -109,7 +109,7 @@ export function Comment({ comment, onUpdate, onDelete }: CommentProps) {
               <button
                 onClick={handleSaveEdit}
                 disabled={isUpdating || !editContent.trim()}
-                className="px-3 py-1 bg-brand-600 text-white rounded-md text-sm hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-1 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isUpdating ? 'Saving...' : 'Save'}
               </button>

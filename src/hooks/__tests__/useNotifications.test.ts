@@ -166,7 +166,7 @@ describe('useNotifications', () => {
         userId: 'user123',
         title: 'New Notification',
         message: 'A new notification',
-        type: 'message',
+        type: 'info',
         isRead: false,
         createdAt: new Date(),
       },

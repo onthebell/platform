@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Comment } from '@/types';
 import {
   getPostComments,
@@ -27,7 +27,7 @@ export function useComments(postId: string): UseCommentsReturn {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadComments = async () => {
+  const loadComments = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -43,7 +43,7 @@ export function useComments(postId: string): UseCommentsReturn {
     } finally {
       setLoading(false);
     }
-  };
+  }, [postId]);
 
   const addComment = async (content: string, authorId: string, authorName: string) => {
     try {
@@ -114,7 +114,7 @@ export function useComments(postId: string): UseCommentsReturn {
     if (postId) {
       loadComments();
     }
-  }, [postId]);
+  }, [postId, loadComments]);
 
   return {
     comments,

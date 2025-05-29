@@ -50,6 +50,7 @@ describe('NotificationDropdown', () => {
       unreadCount: 0,
       markAsRead: mockMarkAsRead,
       markAllAsRead: mockMarkAllAsRead,
+      refetch: jest.fn().mockResolvedValue(undefined),
     });
 
     render(<NotificationDropdown />);
@@ -88,6 +89,7 @@ describe('NotificationDropdown', () => {
       unreadCount: 1,
       markAsRead: mockMarkAsRead,
       markAllAsRead: mockMarkAllAsRead,
+      refetch: jest.fn().mockResolvedValue(undefined),
     });
 
     render(<NotificationDropdown />);
@@ -105,6 +107,7 @@ describe('NotificationDropdown', () => {
       unreadCount: 5,
       markAsRead: mockMarkAsRead,
       markAllAsRead: mockMarkAllAsRead,
+      refetch: jest.fn().mockResolvedValue(undefined),
     });
 
     render(<NotificationDropdown />);
@@ -120,6 +123,7 @@ describe('NotificationDropdown', () => {
       unreadCount: 150,
       markAsRead: mockMarkAsRead,
       markAllAsRead: mockMarkAllAsRead,
+      refetch: jest.fn().mockResolvedValue(undefined),
     });
 
     render(<NotificationDropdown />);
@@ -137,6 +141,7 @@ describe('NotificationDropdown', () => {
       unreadCount: 3,
       markAsRead: mockMarkAsRead,
       markAllAsRead: mockMarkAllAsRead,
+      refetch: jest.fn().mockResolvedValue(undefined),
     });
 
     render(<NotificationDropdown />);
@@ -154,6 +159,7 @@ describe('NotificationDropdown', () => {
       unreadCount: 0,
       markAsRead: mockMarkAsRead,
       markAllAsRead: mockMarkAllAsRead,
+      refetch: jest.fn().mockResolvedValue(undefined),
     });
 
     render(<NotificationDropdown />);
@@ -168,6 +174,7 @@ describe('NotificationDropdown', () => {
       unreadCount: 2,
       markAsRead: mockMarkAsRead,
       markAllAsRead: mockMarkAllAsRead,
+      refetch: jest.fn().mockResolvedValue(undefined),
     });
 
     render(<NotificationDropdown />);
@@ -182,6 +189,7 @@ describe('NotificationDropdown', () => {
       unreadCount: 1,
       markAsRead: mockMarkAsRead,
       markAllAsRead: mockMarkAllAsRead,
+      refetch: jest.fn().mockResolvedValue(undefined),
     });
 
     render(<NotificationDropdown />);
@@ -207,6 +215,7 @@ describe('NotificationDropdown', () => {
       unreadCount: 0,
       markAsRead: mockMarkAsRead,
       markAllAsRead: mockMarkAllAsRead,
+      refetch: jest.fn().mockResolvedValue(undefined),
     });
 
     render(<NotificationDropdown />);
@@ -222,6 +231,7 @@ describe('NotificationDropdown', () => {
       unreadCount: 0,
       markAsRead: mockMarkAsRead,
       markAllAsRead: mockMarkAllAsRead,
+      refetch: jest.fn().mockResolvedValue(undefined),
     });
 
     render(<NotificationDropdown />);

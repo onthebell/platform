@@ -1,26 +1,11 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { formatRelativeTime, formatShortDate } from '@/lib/utils';
 import { CommunityPost } from '@/types';
 import { useAuth } from '@/lib/firebase/auth';
 import { deletePost } from '@/lib/firebase/firestore';
 import { useCommentCount } from '@/hooks/useCommentCount';
-import {
-  MapPinIcon,
-  CalendarIcon,
-  TagIcon,
-  HeartIcon,
-  ChatBubbleLeftIcon,
-  ShareIcon,
-  PencilIcon,
-  TrashIcon,
-  EllipsisVerticalIcon,
-} from '@heroicons/react/24/outline';
-import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 
 // For testing purposes
 export const __internal = {

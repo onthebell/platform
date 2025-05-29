@@ -34,7 +34,7 @@ jest.mock('leaflet', () => {
     _iconUrl: options?.iconUrl || 'default-icon.png',
   }));
 
-  MockIcon.Default = {
+  (MockIcon as any).Default = {
     prototype: {
       _getIconUrl: jest.fn(),
     },

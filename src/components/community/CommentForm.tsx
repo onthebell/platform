@@ -56,7 +56,7 @@ export function CommentForm({ onSubmit, placeholder = 'Write your comment...' }:
       <div className="flex space-x-3">
         {/* User avatar */}
         <div className="flex-shrink-0">
-          <div className="w-8 h-8 bg-brand-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
             {user.displayName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
           </div>
         </div>
@@ -68,7 +68,7 @@ export function CommentForm({ onSubmit, placeholder = 'Write your comment...' }:
             onChange={e => setContent(e.target.value)}
             placeholder={placeholder}
             rows={3}
-            className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-brand-500 focus:border-transparent placeholder-gray-400"
+            className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400"
             disabled={isSubmitting}
           />
         </div>
@@ -79,7 +79,7 @@ export function CommentForm({ onSubmit, placeholder = 'Write your comment...' }:
         <button
           type="submit"
           disabled={isSubmitting || !content.trim()}
-          className="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {isSubmitting ? 'Posting...' : 'Post Comment'}
         </button>

@@ -23,7 +23,14 @@ jest.mock('../config', () => ({ db: {} }));
 
 describe('Verification', () => {
   it('requests verification', async () => {
-    await expect(requestVerification('user123', { street: '1 Test St' })).resolves.toBeUndefined();
+    await expect(
+      requestVerification('user123', {
+        street: '1 Test St',
+        suburb: 'Testurb',
+        state: 'VIC',
+        postcode: '3122',
+      })
+    ).resolves.toBeUndefined();
   });
 
   it('verifies address', async () => {

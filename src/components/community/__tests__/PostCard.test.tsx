@@ -78,7 +78,7 @@ jest.mock('@/lib/firebase/config', () => {
   };
 
   const mockFirestore = {
-    collection: jest.fn(path => {
+    collection: jest.fn(() => {
       return {
         doc: jest.fn(() => ({
           get: jest.fn().mockResolvedValue({
