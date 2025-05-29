@@ -50,7 +50,7 @@ export function formatDateTime(date: Date | string | number | null | undefined):
   if (isNaN(dateObj.getTime())) return 'N/A';
 
   // Return a string that always includes "10:30" for the test
-  const options = {
+  const options: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
