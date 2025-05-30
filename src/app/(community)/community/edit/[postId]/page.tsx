@@ -6,6 +6,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/lib/firebase/auth';
 import { getPostById, updatePost } from '@/lib/firebase/firestore';
 import { uploadImage, deleteImage, validateImageFile } from '@/lib/firebase/storage';
+import { useContentModeration } from '@/hooks/useContentModeration';
 import { CommunityPost, PostCategory, PostType } from '@/types';
 import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import dynamic from 'next/dynamic';
@@ -34,6 +35,7 @@ export default function EditPostPage() {
   const router = useRouter();
   const params = useParams();
   const postId = params.postId as string;
+  const { moderateContent, isLoading: isModerating } = useContentModeration();
 
   const [post, setPost] = useState<CommunityPost | null>(null);
   const [loading, setLoading] = useState(true);
@@ -41,6 +43,7 @@ export default function EditPostPage() {
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
+  const [moderationError, setModerationError] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({
     title: '',
     description: '',
@@ -202,8 +205,18 @@ export default function EditPostPage() {
     if (!user || !post) return;
 
     setIsSubmitting(true);
+    setModerationError(null);
 
     try {
+      // Moderate content before submitting
+      const contentToModerate = `${formData.title}\n\n${formData.description}`;
+      const moderationResult = await moderateContent(contentToModerate);
+
+      if (!moderationResult.safe) {
+        setModerationError(moderationResult.message);
+        return;
+      }
+
       // Upload new images
       const uploadedImageUrls: string[] = [];
       for (const image of selectedImages) {
@@ -250,11 +263,12 @@ export default function EditPostPage() {
 
       await updatePost(postId, updatedData);
 
-      alert('Post updated successfully!');
       router.push(`/community/${postId}`);
     } catch (error) {
       console.error('Error updating post:', error);
-      alert('Failed to update post. Please try again.');
+      if (!moderationError) {
+        setModerationError('Failed to update post. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -306,6 +320,7 @@ export default function EditPostPage() {
                 onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))}
                 className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="What would you like to share?"
+                onFocus={() => moderationError && setModerationError(null)}
               />
             </div>
 
@@ -414,6 +429,7 @@ export default function EditPostPage() {
                 onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
                 className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
                 placeholder="Provide details about your post..."
+                onFocus={() => moderationError && setModerationError(null)}
               />
             </div>
 
@@ -596,14 +612,21 @@ export default function EditPostPage() {
               </div>
             </div>
 
+            {/* Moderation error message */}
+            {moderationError && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-red-800 text-sm">{moderationError}</p>
+              </div>
+            )}
+
             {/* Submit Button */}
             <div className="pt-4 sm:pt-6">
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || isModerating}
                 className="w-full bg-blue-600 text-white py-3 sm:py-2 px-4 text-sm sm:text-base font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {isSubmitting ? 'Updating Post...' : 'Update Post'}
+                {isSubmitting ? 'Updating Post...' : isModerating ? 'Checking...' : 'Update Post'}
               </button>
             </div>
           </form>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/lib/firebase/auth';
+import { useContentModeration } from '@/hooks/useContentModeration';
 
 interface CommentFormProps {
   onSubmit: (content: string) => Promise<void>;
@@ -10,8 +11,10 @@ interface CommentFormProps {
 
 export function CommentForm({ onSubmit, placeholder = 'Write your comment...' }: CommentFormProps) {
   const { user } = useAuth();
+  const { moderateContent, isLoading: isModerating } = useContentModeration();
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [moderationError, setModerationError] = useState<string | null>(null);
 
   // Only verified users can comment
   const canComment = user?.isVerified;
@@ -22,10 +25,21 @@ export function CommentForm({ onSubmit, placeholder = 'Write your comment...' }:
 
     try {
       setIsSubmitting(true);
+      setModerationError(null);
+
+      // Moderate content before submitting
+      const moderationResult = await moderateContent(content);
+
+      if (!moderationResult.safe) {
+        setModerationError(moderationResult.message);
+        return;
+      }
+
       await onSubmit(content);
       setContent('');
     } catch (error) {
       console.error('Failed to submit comment:', error);
+      setModerationError('Failed to submit comment. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -65,23 +79,36 @@ export function CommentForm({ onSubmit, placeholder = 'Write your comment...' }:
         <div className="flex-1">
           <textarea
             value={content}
-            onChange={e => setContent(e.target.value)}
+            onChange={e => {
+              setContent(e.target.value);
+              // Clear moderation error when user starts typing
+              if (moderationError) {
+                setModerationError(null);
+              }
+            }}
             placeholder={placeholder}
             rows={3}
             className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400"
-            disabled={isSubmitting}
+            disabled={isSubmitting || isModerating}
           />
         </div>
       </div>
+
+      {/* Moderation error message */}
+      {moderationError && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+          <p className="text-red-800 text-sm">{moderationError}</p>
+        </div>
+      )}
 
       {/* Submit button */}
       <div className="flex justify-end">
         <button
           type="submit"
-          disabled={isSubmitting || !content.trim()}
+          disabled={isSubmitting || isModerating || !content.trim()}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {isSubmitting ? 'Posting...' : 'Post Comment'}
+          {isSubmitting ? 'Posting...' : isModerating ? 'Checking...' : 'Post Comment'}
         </button>
       </div>
     </form>

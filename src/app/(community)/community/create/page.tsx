@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/firebase/auth';
 import { createPost } from '@/lib/firebase/firestore';
 import { uploadImages, validateImageFile, resizeImage } from '@/lib/firebase/storage';
+import { useContentModeration } from '@/hooks/useContentModeration';
 import { CommunityPost, PostCategory, PostType } from '@/types';
 import { MapIcon, PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
@@ -13,8 +14,10 @@ function CreatePostForm() {
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { moderateContent, isLoading: isModerating } = useContentModeration();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [moderationError, setModerationError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -102,8 +105,18 @@ function CreatePostForm() {
     }
 
     setIsSubmitting(true);
+    setModerationError(null);
 
     try {
+      // Moderate content before submitting
+      const contentToModerate = `${formData.title}\n\n${formData.description}`;
+      const moderationResult = await moderateContent(contentToModerate);
+
+      if (!moderationResult.safe) {
+        setModerationError(moderationResult.message);
+        return;
+      }
+
       // Upload images to Firebase Storage
       let imageUrls: string[] = [];
       if (selectedImages.length > 0) {
@@ -139,7 +152,9 @@ function CreatePostForm() {
       router.push(`/community/${postId}`);
     } catch (error) {
       console.error('Error creating post:', error);
-      alert('Failed to create post. Please try again.');
+      if (!moderationError) {
+        setModerationError('Failed to create post. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -187,6 +202,7 @@ function CreatePostForm() {
                 onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter a clear, descriptive title..."
+                onFocus={() => moderationError && setModerationError(null)}
               />
             </div>
 
@@ -248,6 +264,7 @@ function CreatePostForm() {
                 onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Provide details about your post..."
+                onFocus={() => moderationError && setModerationError(null)}
               />
             </div>
 
@@ -413,6 +430,13 @@ function CreatePostForm() {
               </div>
             </div>
 
+            {/* Moderation error message */}
+            {moderationError && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-red-800 text-sm">{moderationError}</p>
+              </div>
+            )}
+
             {/* Submit Buttons */}
             <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
               <button
@@ -424,10 +448,10 @@ function CreatePostForm() {
               </button>
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || isModerating}
                 className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
               >
-                {isSubmitting ? 'Creating...' : 'Create Post'}
+                {isSubmitting ? 'Creating...' : isModerating ? 'Checking...' : 'Create Post'}
               </button>
             </div>
           </form>
