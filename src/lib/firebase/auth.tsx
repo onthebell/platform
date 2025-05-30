@@ -57,6 +57,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             verificationStatus: 'none',
             joinedAt: new Date(),
             lastActive: new Date(),
+            // Admin fields with defaults
+            role: 'user',
+            permissions: [],
+            isSuspended: false,
           };
 
           await setDoc(doc(db, 'users', firebaseUser.uid), newUser);
@@ -98,6 +102,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         verificationStatus: 'none',
         joinedAt: new Date(),
         lastActive: new Date(),
+        // Admin fields with defaults
+        role: 'user',
+        permissions: [],
+        isSuspended: false,
       };
 
       await setDoc(doc(db, 'users', result.user.uid), newUser);

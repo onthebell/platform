@@ -27,14 +27,14 @@ describe('useContentModeration', () => {
 
     const { result } = renderHook(() => useContentModeration());
 
-    let moderationResult: ModerationResult;
+    let moderationResult: ModerationResult | undefined = undefined;
 
     await act(async () => {
       moderationResult = await result.current.moderateContent('This is safe content');
     });
 
-    expect(moderationResult.safe).toBe(true);
-    expect(moderationResult.flagged).toBe(false);
+    expect(moderationResult!.safe).toBe(true);
+    expect(moderationResult!.flagged).toBe(false);
     expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toBe(null);
     expect(mockFetch).toHaveBeenCalledWith('/api/moderate', {
@@ -56,15 +56,15 @@ describe('useContentModeration', () => {
 
     const { result } = renderHook(() => useContentModeration());
 
-    let moderationResult: ModerationResult;
+    let moderationResult: ModerationResult | undefined = undefined;
 
     await act(async () => {
       moderationResult = await result.current.moderateContent('Inappropriate content');
     });
 
-    expect(moderationResult.safe).toBe(false);
-    expect(moderationResult.flagged).toBe(true);
-    expect(moderationResult.message).toBe('Content contains inappropriate language');
+    expect(moderationResult!.safe).toBe(false);
+    expect(moderationResult!.flagged).toBe(true);
+    expect(moderationResult!.message).toBe('Content contains inappropriate language');
     expect(result.current.isLoading).toBe(false);
   });
 
@@ -73,16 +73,16 @@ describe('useContentModeration', () => {
 
     const { result } = renderHook(() => useContentModeration());
 
-    let moderationResult: ModerationResult;
+    let moderationResult: ModerationResult | undefined = undefined;
 
     await act(async () => {
       moderationResult = await result.current.moderateContent('Test content');
     });
 
     // Should allow content through when API fails
-    expect(moderationResult.safe).toBe(true);
-    expect(moderationResult.flagged).toBe(false);
-    expect(moderationResult.message).toBe('Content moderation temporarily unavailable');
+    expect(moderationResult!.safe).toBe(true);
+    expect(moderationResult!.flagged).toBe(false);
+    expect(moderationResult!.message).toBe('Content moderation temporarily unavailable');
     expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toBe('Network error');
   });
@@ -97,16 +97,16 @@ describe('useContentModeration', () => {
 
     const { result } = renderHook(() => useContentModeration());
 
-    let moderationResult: ModerationResult;
+    let moderationResult: ModerationResult | undefined;
 
     await act(async () => {
       moderationResult = await result.current.moderateContent('Test content');
     });
 
     // Should allow content through when API fails
-    expect(moderationResult.safe).toBe(true);
-    expect(moderationResult.flagged).toBe(false);
-    expect(moderationResult.message).toBe('Content moderation temporarily unavailable');
+    expect(moderationResult!.safe).toBe(true);
+    expect(moderationResult!.flagged).toBe(false);
+    expect(moderationResult!.message).toBe('Content moderation temporarily unavailable');
     expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toBe('Server error');
   });

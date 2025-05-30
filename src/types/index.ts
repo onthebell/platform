@@ -18,12 +18,30 @@ export interface User {
   };
   joinedAt: Date;
   lastActive: Date;
+  // Admin-related fields
+  role: UserRole;
+  permissions: AdminPermission[];
+  isSuspended?: boolean;
+  suspensionReason?: string;
+  suspensionExpiresAt?: Date;
 }
+
+export type UserRole = 'user' | 'moderator' | 'admin' | 'super_admin';
+
+export type AdminPermission =
+  | 'manage_posts'
+  | 'manage_users'
+  | 'manage_reports'
+  | 'manage_events'
+  | 'manage_businesses'
+  | 'view_analytics'
+  | 'manage_moderators';
 
 export interface CommunityPost {
   id: string;
   title: string;
   description: string;
+  content?: string; // Full content/body text for admin moderation
   category: PostCategory;
   type: PostType;
   authorId: string;
@@ -42,6 +60,16 @@ export interface CommunityPost {
   updatedAt: Date;
   expiresAt?: Date;
   tags: string[];
+  // Admin/moderation fields
+  isHidden?: boolean;
+  isDeleted?: boolean;
+  moderationReason?: string;
+  moderatedBy?: string;
+  moderatedAt?: Date;
+  // Engagement metrics
+  likes?: number;
+  commentCount?: number;
+  views?: number;
 }
 
 export type PostCategory =
@@ -149,4 +177,110 @@ export interface Notification {
   isRead: boolean;
   actionUrl?: string;
   createdAt: Date;
+}
+
+// Content Reporting System
+export interface ContentReport {
+  id: string;
+  reporterId: string;
+  reporterName: string;
+  contentType: 'post' | 'comment' | 'user';
+  contentId: string;
+  contentAuthorId: string;
+  reason: ReportReason;
+  customReason?: string;
+  description?: string;
+  status: ReportStatus;
+  reviewedBy?: string;
+  reviewedAt?: Date;
+  moderatorNotes?: string;
+  action?: ModerationAction;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type ReportReason =
+  | 'spam'
+  | 'harassment'
+  | 'hate_speech'
+  | 'violence'
+  | 'sexual_content'
+  | 'misinformation'
+  | 'inappropriate_content'
+  | 'scam'
+  | 'copyright_violation'
+  | 'other';
+
+export type ReportStatus = 'pending' | 'under_review' | 'resolved' | 'dismissed';
+
+export type ModerationAction =
+  | 'no_action'
+  | 'content_removed'
+  | 'content_hidden'
+  | 'content_edited'
+  | 'user_warned'
+  | 'user_suspended'
+  | 'user_banned';
+
+// Admin Dashboard Types
+export interface AdminStats {
+  users: {
+    total: number;
+    verified: number;
+    suspended: number;
+    newThisWeek: number;
+    newToday: number;
+  };
+  posts: {
+    total: number;
+    active: number;
+    removed: number;
+    hidden: number;
+    newThisWeek: number;
+    newToday: number;
+  };
+  reports: {
+    pending: number;
+    resolved: number;
+    resolvedToday: number;
+  };
+  comments: {
+    total: number;
+  };
+  activity: AdminActivity[];
+}
+
+export interface AdminActivity {
+  id: string;
+  adminId: string;
+  adminName: string;
+  action: AdminActionType;
+  targetType: 'user' | 'post' | 'comment' | 'report';
+  targetId: string;
+  description: string;
+  metadata?: Record<string, any>;
+  createdAt: Date;
+}
+
+export type AdminActionType =
+  | 'user_suspended'
+  | 'user_unsuspended'
+  | 'user_banned'
+  | 'user_role_changed'
+  | 'post_removed'
+  | 'post_restored'
+  | 'comment_removed'
+  | 'comment_restored'
+  | 'report_reviewed'
+  | 'report_dismissed';
+
+// Permission checking utilities
+export interface AdminPermissions {
+  canManagePosts: boolean;
+  canManageUsers: boolean;
+  canManageReports: boolean;
+  canManageEvents: boolean;
+  canManageBusinesses: boolean;
+  canViewAnalytics: boolean;
+  canManageModerators: boolean;
 }
