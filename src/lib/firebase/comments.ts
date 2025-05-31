@@ -13,6 +13,8 @@ import {
 } from 'firebase/firestore';
 import { db } from './config';
 import { Comment } from '@/types';
+import { createCommentNotification, removeCommentNotification } from './commentNotifications';
+import { getPost } from './firestore';
 
 const COMMENTS_COLLECTION = 'comments';
 
@@ -37,6 +39,26 @@ export async function addComment(
     };
 
     const docRef = await addDoc(collection(db, COMMENTS_COLLECTION), commentData);
+
+    // Create notification for the post author (async, non-blocking)
+    try {
+      const post = await getPost(postId);
+      if (post && post.authorId !== authorId) {
+        await createCommentNotification(
+          post.authorId,
+          authorId,
+          authorName,
+          postId,
+          docRef.id,
+          content.trim(),
+          post.title
+        );
+      }
+    } catch (notificationError) {
+      console.warn('Failed to create comment notification:', notificationError);
+      // Don't fail the comment creation if notification fails
+    }
+
     return docRef.id;
   } catch (error) {
     console.error('Error adding comment:', error);
@@ -99,7 +121,33 @@ export async function updateComment(commentId: string, content: string): Promise
 export async function deleteComment(commentId: string): Promise<void> {
   try {
     const commentRef = doc(db, COMMENTS_COLLECTION, commentId);
+
+    // Get comment data before deletion for notification cleanup
+    const commentDoc = await getDoc(commentRef);
+    let commentData = null;
+    if (commentDoc.exists()) {
+      commentData = commentDoc.data();
+    }
+
     await deleteDoc(commentRef);
+
+    // Remove comment notification if we have the comment data
+    if (commentData) {
+      try {
+        const post = await getPost(commentData.postId);
+        if (post && post.authorId !== commentData.authorId) {
+          await removeCommentNotification(
+            post.authorId,
+            commentData.authorId,
+            commentData.postId,
+            commentId
+          );
+        }
+      } catch (notificationError) {
+        console.warn('Failed to remove comment notification:', notificationError);
+        // Don't fail the comment deletion if notification cleanup fails
+      }
+    }
   } catch (error) {
     console.error('Error deleting comment:', error);
     throw new Error('Failed to delete comment');

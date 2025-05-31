@@ -333,23 +333,45 @@ export async function createNotification(notification: Omit<Notification, 'id' |
 }
 
 export async function getUserNotifications(userId: string, limitCount: number = 20) {
-  const q = query(
+  // Query for notifications using both userId (legacy) and recipientId (new)
+  // This ensures we get all notifications regardless of how they were created
+  const q1 = query(
     collection(db, 'notifications'),
     where('userId', '==', userId),
     orderBy('createdAt', 'desc'),
     limit(limitCount)
   );
 
-  const snapshot = await getDocs(q);
-
-  return snapshot.docs.map(
-    doc =>
-      ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate() || new Date(),
-      }) as Notification
+  const q2 = query(
+    collection(db, 'notifications'),
+    where('recipientId', '==', userId),
+    orderBy('createdAt', 'desc'),
+    limit(limitCount)
   );
+
+  const [snapshot1, snapshot2] = await Promise.all([getDocs(q1), getDocs(q2)]);
+
+  // Combine results and remove duplicates
+  const allNotifications = [
+    ...snapshot1.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toDate() || new Date(),
+    })),
+    ...snapshot2.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toDate() || new Date(),
+    })),
+  ];
+
+  // Remove duplicates by id and sort by createdAt descending
+  const uniqueNotifications = allNotifications
+    .filter((notification, index, self) => self.findIndex(n => n.id === notification.id) === index)
+    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+    .slice(0, limitCount);
+
+  return uniqueNotifications as Notification[];
 }
 
 export async function markNotificationAsRead(notificationId: string) {

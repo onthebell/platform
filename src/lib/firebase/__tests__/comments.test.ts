@@ -9,6 +9,7 @@ import {
   deleteDoc,
   doc,
   serverTimestamp,
+  getDoc,
 } from 'firebase/firestore';
 import { db } from '../config';
 
@@ -23,10 +24,22 @@ jest.mock('firebase/firestore', () => ({
   deleteDoc: jest.fn(),
   doc: jest.fn(),
   serverTimestamp: jest.fn(),
+  getDoc: jest.fn(),
 }));
 
 jest.mock('../config', () => ({
   db: 'mock-db',
+}));
+
+// Mock notification functions
+jest.mock('../commentNotifications', () => ({
+  createCommentNotification: jest.fn(),
+  removeCommentNotification: jest.fn(),
+}));
+
+// Mock firestore functions
+jest.mock('../firestore', () => ({
+  getPost: jest.fn(),
 }));
 
 const mockAddDoc = addDoc as jest.MockedFunction<typeof addDoc>;
@@ -38,10 +51,48 @@ const mockWhere = where as jest.MockedFunction<typeof where>;
 const mockOrderBy = orderBy as jest.MockedFunction<typeof orderBy>;
 const mockDoc = doc as jest.MockedFunction<typeof doc>;
 const mockServerTimestamp = serverTimestamp as jest.MockedFunction<typeof serverTimestamp>;
+const mockGetDoc = getDoc as jest.MockedFunction<typeof getDoc>;
+
+// Import the mocked functions
+import { createCommentNotification, removeCommentNotification } from '../commentNotifications';
+import { getPost } from '../firestore';
+
+// Cast imported functions as Jest mocks
+const mockCreateCommentNotification = createCommentNotification as jest.MockedFunction<
+  typeof createCommentNotification
+>;
+const mockRemoveCommentNotification = removeCommentNotification as jest.MockedFunction<
+  typeof removeCommentNotification
+>;
+const mockGetPost = getPost as jest.MockedFunction<typeof getPost>;
 
 describe('Comments Firebase Service', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Mock notification functions
+    mockCreateCommentNotification.mockResolvedValue(undefined);
+    mockRemoveCommentNotification.mockResolvedValue(undefined);
+
+    // Mock getPost function
+    mockGetPost.mockResolvedValue({
+      id: 'test-post-id',
+      title: 'Test Post',
+      description: 'Test post description',
+      content: 'Test post content',
+      category: 'community',
+      type: 'announcement',
+      authorId: 'post-author-id',
+      authorName: 'Test Author',
+      status: 'active',
+      visibility: 'public',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      tags: [],
+      likes: 0,
+      commentCount: 0,
+      views: 0,
+    });
   });
 
   describe('addComment', () => {
@@ -213,16 +264,39 @@ describe('Comments Firebase Service', () => {
 
   describe('deleteComment', () => {
     it('should delete a comment successfully', async () => {
+      // Mock getDoc to return comment data
+      const mockCommentDoc = {
+        exists: () => true,
+        data: () => ({
+          id: 'comment-123',
+          postId: 'test-post-id',
+          authorId: 'comment-author-id',
+          content: 'Test comment',
+        }),
+      };
+      mockGetDoc.mockResolvedValueOnce(mockCommentDoc as any);
       mockDeleteDoc.mockResolvedValueOnce(undefined);
       mockDoc.mockReturnValue('mock-doc-ref' as any);
 
       await deleteComment('comment-123');
 
+      expect(mockGetDoc).toHaveBeenCalled();
       expect(mockDeleteDoc).toHaveBeenCalledWith('mock-doc-ref');
       expect(mockDoc).toHaveBeenCalledWith(db, 'comments', 'comment-123');
     });
 
     it('should throw error when deleteDoc fails', async () => {
+      // Mock getDoc to return comment data first
+      const mockCommentDoc = {
+        exists: () => true,
+        data: () => ({
+          id: 'comment-123',
+          postId: 'test-post-id',
+          authorId: 'comment-author-id',
+          content: 'Test comment',
+        }),
+      };
+      mockGetDoc.mockResolvedValueOnce(mockCommentDoc as any);
       mockDeleteDoc.mockRejectedValueOnce(new Error('Firestore error'));
       mockDoc.mockReturnValue('mock-doc-ref' as any);
 

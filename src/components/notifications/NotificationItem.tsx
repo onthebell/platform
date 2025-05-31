@@ -9,6 +9,9 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon,
   XCircleIcon,
+  HeartIcon,
+  ChatBubbleLeftIcon,
+  UserPlusIcon,
 } from '@heroicons/react/24/outline';
 
 interface NotificationItemProps {
@@ -21,6 +24,9 @@ const notificationIcons = {
   success: CheckCircleIcon,
   warning: ExclamationTriangleIcon,
   error: XCircleIcon,
+  like: HeartIcon,
+  comment: ChatBubbleLeftIcon,
+  follow: UserPlusIcon,
 };
 
 const notificationColors = {
@@ -28,6 +34,9 @@ const notificationColors = {
   success: 'text-green-500',
   warning: 'text-yellow-500',
   error: 'text-red-500',
+  like: 'text-red-500',
+  comment: 'text-blue-500',
+  follow: 'text-green-500',
 };
 
 export function NotificationItem({ notification, onMarkAsRead }: NotificationItemProps) {
@@ -39,6 +48,42 @@ export function NotificationItem({ notification, onMarkAsRead }: NotificationIte
       onMarkAsRead(notification.id);
     }
   };
+
+  // Generate dynamic content based on notification type
+  const getNotificationContent = () => {
+    switch (notification.type) {
+      case 'like':
+        return {
+          title: notification.actorName || 'Someone',
+          message: `liked your post${notification.postTitle ? ` "${notification.postTitle}"` : ''}`,
+          actionUrl: notification.postId ? `/community/${notification.postId}` : undefined,
+        };
+      case 'comment':
+        return {
+          title: notification.actorName || 'Someone',
+          message: `commented on your post${notification.postTitle ? ` "${notification.postTitle}"` : ''}${
+            notification.commentPreview ? `: "${notification.commentPreview}"` : ''
+          }`,
+          actionUrl: notification.postId
+            ? `/community/${notification.postId}${notification.commentId ? `#comment-${notification.commentId}` : ''}`
+            : undefined,
+        };
+      case 'follow':
+        return {
+          title: notification.actorName || 'Someone',
+          message: 'started following you',
+          actionUrl: notification.actorId ? `/profile/${notification.actorId}` : undefined,
+        };
+      default:
+        return {
+          title: notification.title,
+          message: notification.message,
+          actionUrl: notification.actionUrl,
+        };
+    }
+  };
+
+  const { title, message, actionUrl } = getNotificationContent();
 
   const content = (
     <div
@@ -62,10 +107,7 @@ export function NotificationItem({ notification, onMarkAsRead }: NotificationIte
                 !notification.isRead && 'font-semibold'
               )}
             >
-              {notification.title}
-            </p>
-            <p className="text-xs sm:text-sm text-gray-600 mt-1 leading-relaxed">
-              {notification.message}
+              <span className="font-semibold">{title}</span> {message}
             </p>
             <p className="text-xs text-gray-500 mt-2">
               {formatDistanceToNow(notification.createdAt, { addSuffix: true })}
@@ -82,9 +124,9 @@ export function NotificationItem({ notification, onMarkAsRead }: NotificationIte
     </div>
   );
 
-  if (notification.actionUrl) {
+  if (actionUrl) {
     return (
-      <Link href={notification.actionUrl} className="block">
+      <Link href={actionUrl} className="block">
         {content}
       </Link>
     );

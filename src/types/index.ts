@@ -179,10 +179,18 @@ export interface Notification {
   userId: string;
   title: string;
   message: string;
-  type: 'info' | 'success' | 'warning' | 'error';
+  type: 'info' | 'success' | 'warning' | 'error' | 'like' | 'comment' | 'follow';
   isRead: boolean;
   actionUrl?: string;
   createdAt: Date;
+  // Specific notification data
+  actorId?: string;
+  actorName?: string;
+  postId?: string;
+  postTitle?: string;
+  commentId?: string;
+  commentPreview?: string;
+  followingType?: 'user' | 'business';
 }
 
 // Content Reporting System

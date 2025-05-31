@@ -162,11 +162,13 @@ describe('NotificationItem', () => {
     const container = screen.getByTestId('notification-item');
     expect(container).toHaveClass('space-x-2', 'sm:space-x-3', 'p-3', 'sm:p-4', 'touch-target');
 
-    const title = screen.getByText('Test Notification');
-    expect(title).toHaveClass('text-xs', 'sm:text-sm');
+    // Check the combined title and message paragraph has responsive text classes
+    const textContent = container.querySelector('p');
+    expect(textContent).toHaveClass('text-xs', 'sm:text-sm');
 
-    const message = screen.getByText('This is a test notification message');
-    expect(message).toHaveClass('text-xs', 'sm:text-sm');
+    // Check that the title span has font-semibold class
+    const title = screen.getByText('Test Notification');
+    expect(title).toHaveClass('font-semibold');
   });
 
   it('handles long notification messages gracefully', () => {

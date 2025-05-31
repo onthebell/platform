@@ -5,6 +5,7 @@ import { Popover, PopoverButton, Transition } from '@headlessui/react';
 import { BellIcon } from '@heroicons/react/24/outline';
 import { useNotifications } from '@/hooks/useNotifications';
 import { NotificationItem } from './NotificationItem';
+import Link from 'next/link';
 
 export function NotificationDropdown() {
   const { notifications, loading, unreadCount, markAsRead, markAllAsRead } = useNotifications();
@@ -85,9 +86,12 @@ export function NotificationDropdown() {
 
               {notifications.length > 0 && (
                 <div className="p-3 border-t border-gray-200">
-                  <button className="w-full text-center text-xs sm:text-sm text-blue-600 hover:text-blue-700 font-medium py-2 touch-target">
+                  <Link
+                    href="/notifications"
+                    className="block w-full text-center text-xs sm:text-sm text-blue-600 hover:text-blue-700 font-medium py-2 touch-target transition-colors"
+                  >
                     View all notifications
-                  </button>
+                  </Link>
                 </div>
               )}
             </Popover.Panel>

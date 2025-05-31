@@ -14,6 +14,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './config';
 import { Follow, FollowStats, User, Business } from '@/types';
+import { createFollowNotification, removeFollowNotification } from './followNotifications';
 
 // Collections
 export const followsCollection = collection(db, 'follows');
@@ -84,6 +85,23 @@ export async function followEntity(
   );
 
   await batch.commit();
+
+  // Create follow notification (async, non-blocking)
+  if (followingType === 'user') {
+    try {
+      const followerDoc = await getDoc(doc(usersCollection, followerId));
+      if (followerDoc.exists()) {
+        const followerData = followerDoc.data() as User;
+        const followerName = followerData.displayName || 'Someone';
+
+        await createFollowNotification(followingId, followerId, followerName, followingType);
+      }
+    } catch (notificationError) {
+      console.warn('Failed to create follow notification:', notificationError);
+      // Don't fail the follow action if notification fails
+    }
+  }
+
   return followRef.id;
 }
 
@@ -127,6 +145,16 @@ export async function unfollowEntity(
   );
 
   await batch.commit();
+
+  // Remove follow notification (async, non-blocking)
+  if (followingType === 'user') {
+    try {
+      await removeFollowNotification(followingId, followerId);
+    } catch (notificationError) {
+      console.warn('Failed to remove follow notification:', notificationError);
+      // Don't fail the unfollow action if notification removal fails
+    }
+  }
 }
 
 /**
