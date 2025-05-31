@@ -10,6 +10,7 @@ import {
   getDocs,
   serverTimestamp,
   getDoc,
+  onSnapshot,
 } from 'firebase/firestore';
 import { db } from './config';
 import { Comment } from '@/types';
@@ -196,4 +197,65 @@ export async function getPostCommentCount(postId: string): Promise<number> {
     console.error('Error fetching comment count:', error);
     return 0;
   }
+}
+
+/**
+ * Subscribe to real-time comment updates for a post
+ */
+export function subscribeToPostComments(
+  postId: string,
+  callback: (comments: Comment[]) => void
+): () => void {
+  const commentsRef = collection(db, COMMENTS_COLLECTION);
+  const q = query(commentsRef, where('postId', '==', postId), orderBy('createdAt', 'asc'));
+
+  const unsubscribe = onSnapshot(
+    q,
+    snapshot => {
+      const comments: Comment[] = [];
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        comments.push({
+          id: doc.id,
+          postId: data.postId,
+          authorId: data.authorId,
+          authorName: data.authorName,
+          content: data.content,
+          createdAt: data.createdAt?.toDate() || new Date(),
+          updatedAt: data.updatedAt?.toDate() || new Date(),
+          isEdited: data.isEdited || false,
+        });
+      });
+      callback(comments);
+    },
+    error => {
+      console.error('Error in comments subscription:', error);
+    }
+  );
+
+  return unsubscribe;
+}
+
+/**
+ * Subscribe to real-time comment count updates for a post
+ */
+export function subscribeToPostCommentCount(
+  postId: string,
+  callback: (count: number) => void
+): () => void {
+  const commentsRef = collection(db, COMMENTS_COLLECTION);
+  const q = query(commentsRef, where('postId', '==', postId));
+
+  const unsubscribe = onSnapshot(
+    q,
+    snapshot => {
+      const count = snapshot.size;
+      callback(count);
+    },
+    error => {
+      console.error('Error in comment count subscription:', error);
+    }
+  );
+
+  return unsubscribe;
 }

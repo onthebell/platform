@@ -11,6 +11,7 @@ import {
   writeBatch,
   increment,
   DocumentSnapshot,
+  onSnapshot,
 } from 'firebase/firestore';
 import { db } from './config';
 import { Follow, FollowStats, User, Business } from '@/types';
@@ -604,4 +605,132 @@ export async function getMutualFollowersWithData(
   });
 
   return users;
+}
+
+/**
+ * Subscribe to real-time follow status for a user
+ */
+export function subscribeToFollowStatus(
+  followerId: string,
+  followedId: string,
+  followedType: 'user' | 'business',
+  callback: (isFollowing: boolean) => void
+): () => void {
+  const q = query(
+    followsCollection,
+    where('followerId', '==', followerId),
+    where('followedId', '==', followedId),
+    where('followedType', '==', followedType)
+  );
+
+  const unsubscribe = onSnapshot(
+    q,
+    snapshot => {
+      const isFollowing = !snapshot.empty;
+      callback(isFollowing);
+    },
+    error => {
+      console.error('Error in follow status subscription:', error);
+    }
+  );
+
+  return unsubscribe;
+}
+
+/**
+ * Subscribe to real-time followers for a user
+ */
+export function subscribeToFollowers(
+  userId: string,
+  callback: (followers: Follow[]) => void,
+  limitCount: number = 50
+): () => void {
+  const q = query(
+    followsCollection,
+    where('followedId', '==', userId),
+    where('followedType', '==', 'user'),
+    orderBy('createdAt', 'desc'),
+    limit(limitCount)
+  );
+
+  const unsubscribe = onSnapshot(
+    q,
+    snapshot => {
+      const followers = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+      })) as Follow[];
+      callback(followers);
+    },
+    error => {
+      console.error('Error in followers subscription:', error);
+    }
+  );
+
+  return unsubscribe;
+}
+
+/**
+ * Subscribe to real-time following for a user
+ */
+export function subscribeToFollowing(
+  userId: string,
+  callback: (following: Follow[]) => void,
+  limitCount: number = 50
+): () => void {
+  const q = query(
+    followsCollection,
+    where('followerId', '==', userId),
+    orderBy('createdAt', 'desc'),
+    limit(limitCount)
+  );
+
+  const unsubscribe = onSnapshot(
+    q,
+    snapshot => {
+      const following = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+      })) as Follow[];
+      callback(following);
+    },
+    error => {
+      console.error('Error in following subscription:', error);
+    }
+  );
+
+  return unsubscribe;
+}
+
+/**
+ * Subscribe to real-time follow stats for a user
+ */
+export function subscribeToFollowStats(
+  userId: string,
+  callback: (stats: FollowStats | null) => void
+): () => void {
+  const statsDoc = doc(followStatsCollection, userId);
+
+  const unsubscribe = onSnapshot(
+    statsDoc,
+    snapshot => {
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        const stats: FollowStats = {
+          followersCount: data.followersCount || 0,
+          followingCount: data.followingCount || 0,
+        };
+        callback(stats);
+      } else {
+        callback(null);
+      }
+    },
+    error => {
+      console.error('Error in follow stats subscription:', error);
+    }
+  );
+
+  return unsubscribe;
 }

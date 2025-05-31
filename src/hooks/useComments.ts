@@ -3,11 +3,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Comment } from '@/types';
 import {
-  getPostComments,
   addComment as addCommentService,
   updateComment as updateCommentService,
   deleteComment as deleteCommentService,
-  getPostCommentCount,
+  subscribeToPostComments,
+  subscribeToPostCommentCount,
 } from '@/lib/firebase/comments';
 
 interface UseCommentsReturn {
@@ -27,43 +27,11 @@ export function useComments(postId: string): UseCommentsReturn {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadComments = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const [commentsData, count] = await Promise.all([
-        getPostComments(postId),
-        getPostCommentCount(postId),
-      ]);
-      setComments(commentsData);
-      setCommentCount(count);
-    } catch (err) {
-      console.error('Error loading comments:', err);
-      setError('Failed to load comments');
-    } finally {
-      setLoading(false);
-    }
-  }, [postId]);
-
   const addComment = async (content: string, authorId: string, authorName: string) => {
     try {
       setError(null);
-      const commentId = await addCommentService(postId, authorId, authorName, content);
-
-      // Add the new comment to the local state
-      const newComment: Comment = {
-        id: commentId,
-        postId,
-        authorId,
-        authorName,
-        content,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        isEdited: false,
-      };
-
-      setComments(prev => [...prev, newComment]);
-      setCommentCount(prev => prev + 1);
+      await addCommentService(postId, authorId, authorName, content);
+      // Real-time listener will update the state automatically
     } catch (err) {
       console.error('Error adding comment:', err);
       setError('Failed to add comment');
@@ -75,15 +43,7 @@ export function useComments(postId: string): UseCommentsReturn {
     try {
       setError(null);
       await updateCommentService(commentId, content);
-
-      // Update the comment in local state
-      setComments(prev =>
-        prev.map(comment =>
-          comment.id === commentId
-            ? { ...comment, content, updatedAt: new Date(), isEdited: true }
-            : comment
-        )
-      );
+      // Real-time listener will update the state automatically
     } catch (err) {
       console.error('Error updating comment:', err);
       setError('Failed to update comment');
@@ -95,10 +55,7 @@ export function useComments(postId: string): UseCommentsReturn {
     try {
       setError(null);
       await deleteCommentService(commentId);
-
-      // Remove the comment from local state
-      setComments(prev => prev.filter(comment => comment.id !== commentId));
-      setCommentCount(prev => prev - 1);
+      // Real-time listener will update the state automatically
     } catch (err) {
       console.error('Error deleting comment:', err);
       setError('Failed to delete comment');
@@ -107,14 +64,33 @@ export function useComments(postId: string): UseCommentsReturn {
   };
 
   const refreshComments = async () => {
-    await loadComments();
+    // No need to manually refresh - real-time listeners handle this
   };
 
+  // Set up real-time listeners
   useEffect(() => {
-    if (postId) {
-      loadComments();
-    }
-  }, [postId, loadComments]);
+    if (!postId) return;
+
+    setLoading(true);
+
+    // Subscribe to comments
+    const unsubscribeComments = subscribeToPostComments(postId, commentsData => {
+      setComments(commentsData);
+      setLoading(false);
+      setError(null);
+    });
+
+    // Subscribe to comment count
+    const unsubscribeCount = subscribeToPostCommentCount(postId, count => {
+      setCommentCount(count);
+    });
+
+    // Cleanup subscriptions
+    return () => {
+      unsubscribeComments();
+      unsubscribeCount();
+    };
+  }, [postId]);
 
   return {
     comments,

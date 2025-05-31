@@ -9,6 +9,10 @@ import {
   getFollowingWithData,
   getSuggestedUsersWithData,
   getMutualFollowersWithData,
+  subscribeToFollowStatus,
+  subscribeToFollowStats,
+  subscribeToFollowers,
+  subscribeToFollowing,
 } from '@/lib/firebase/follows';
 import { FollowStats, User, Business } from '@/types';
 
@@ -18,24 +22,24 @@ export function useFollow(entityId: string, entityType: 'user' | 'business') {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Check if currently following
+  // Subscribe to follow status changes
   useEffect(() => {
     if (!user || !entityId) return;
 
-    const checkFollowStatus = async () => {
-      try {
-        setLoading(true);
-        const following = await isFollowing(user.id, entityId, entityType);
-        setIsFollowingEntity(following);
-      } catch (err) {
-        console.error('Error checking follow status:', err);
-        setError(err instanceof Error ? err.message : 'Failed to check follow status');
-      } finally {
+    setLoading(true);
+    setError(null);
+
+    const unsubscribe = subscribeToFollowStatus(
+      user.id,
+      entityId,
+      entityType,
+      isFollowingEntity => {
+        setIsFollowingEntity(isFollowingEntity);
         setLoading(false);
       }
-    };
+    );
 
-    checkFollowStatus();
+    return unsubscribe;
   }, [user, entityId, entityType]);
 
   const follow = useCallback(async () => {
@@ -96,21 +100,15 @@ export function useFollowStats(entityId: string) {
   useEffect(() => {
     if (!entityId) return;
 
-    const fetchStats = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const followStats = await getFollowStats(entityId);
-        setStats(followStats);
-      } catch (err) {
-        console.error('Error fetching follow stats:', err);
-        setError(err instanceof Error ? err.message : 'Failed to fetch stats');
-      } finally {
-        setLoading(false);
-      }
-    };
+    setLoading(true);
+    setError(null);
 
-    fetchStats();
+    const unsubscribe = subscribeToFollowStats(entityId, followStats => {
+      setStats(followStats || { followersCount: 0, followingCount: 0 });
+      setLoading(false);
+    });
+
+    return unsubscribe;
   }, [entityId]);
 
   return { stats, loading, error };

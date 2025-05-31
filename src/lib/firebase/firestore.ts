@@ -13,6 +13,7 @@ import {
   startAfter,
   Timestamp,
   QueryConstraint,
+  onSnapshot,
 } from 'firebase/firestore';
 import { db } from './config';
 import { CommunityPost, Event, Business, User, Notification } from '@/types';
@@ -433,4 +434,137 @@ export async function searchPosts(searchTerm: string, category?: string) {
   }
 
   return posts;
+}
+
+/**
+ * Subscribe to real-time notification updates for a user
+ */
+export function subscribeToUserNotifications(
+  userId: string,
+  callback: (notifications: Notification[]) => void,
+  limitCount: number = 20
+): () => void {
+  // Query for notifications using both userId (legacy) and recipientId (new)
+  const q1 = query(
+    collection(db, 'notifications'),
+    where('userId', '==', userId),
+    orderBy('createdAt', 'desc'),
+    limit(limitCount)
+  );
+
+  const q2 = query(
+    collection(db, 'notifications'),
+    where('recipientId', '==', userId),
+    orderBy('createdAt', 'desc'),
+    limit(limitCount)
+  );
+
+  let notifications1: Notification[] = [];
+  let notifications2: Notification[] = [];
+
+  const combineAndCallback = () => {
+    // Combine results and remove duplicates
+    const allNotifications = [...notifications1, ...notifications2];
+
+    // Remove duplicates by id and sort by createdAt descending
+    const uniqueNotifications = allNotifications
+      .filter(
+        (notification, index, self) => self.findIndex(n => n.id === notification.id) === index
+      )
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, limitCount);
+
+    callback(uniqueNotifications);
+  };
+
+  // Subscribe to legacy notifications
+  const unsubscribe1 = onSnapshot(
+    q1,
+    snapshot => {
+      notifications1 = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+      })) as Notification[];
+      combineAndCallback();
+    },
+    error => {
+      console.error('Error in legacy notifications subscription:', error);
+    }
+  );
+
+  // Subscribe to new notifications
+  const unsubscribe2 = onSnapshot(
+    q2,
+    snapshot => {
+      notifications2 = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+      })) as Notification[];
+      combineAndCallback();
+    },
+    error => {
+      console.error('Error in new notifications subscription:', error);
+    }
+  );
+
+  // Return cleanup function
+  return () => {
+    unsubscribe1();
+    unsubscribe2();
+  };
+}
+
+/**
+ * Subscribe to real-time post updates
+ */
+export function subscribeToPosts(
+  callback: (posts: CommunityPost[]) => void,
+  filters: {
+    category?: string;
+    status?: string;
+    visibility?: string;
+    authorId?: string;
+  } = {},
+  limitCount: number = 20
+): () => void {
+  const constraints: QueryConstraint[] = [orderBy('createdAt', 'desc'), limit(limitCount)];
+
+  // Add filters
+  if (filters.category) {
+    constraints.unshift(where('category', '==', filters.category));
+  }
+  if (filters.status) {
+    constraints.unshift(where('status', '==', filters.status));
+  }
+  if (filters.visibility) {
+    constraints.unshift(where('visibility', '==', filters.visibility));
+  }
+  if (filters.authorId) {
+    constraints.unshift(where('authorId', '==', filters.authorId));
+  }
+
+  const q = query(postsCollection, ...constraints);
+
+  const unsubscribe = onSnapshot(
+    q,
+    snapshot => {
+      const posts = snapshot.docs.map(
+        doc =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+            createdAt: doc.data().createdAt?.toDate() || new Date(),
+            updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+          }) as CommunityPost
+      );
+      callback(posts);
+    },
+    error => {
+      console.error('Error in posts subscription:', error);
+    }
+  );
+
+  return unsubscribe;
 }

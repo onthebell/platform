@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/firebase/auth';
-import { getUserNotifications, markNotificationAsRead } from '@/lib/firebase/firestore';
+import { markNotificationAsRead, subscribeToUserNotifications } from '@/lib/firebase/firestore';
 import { Notification } from '@/types';
 
 export function useNotifications() {
@@ -10,28 +10,6 @@ export function useNotifications() {
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
   const { user } = useAuth();
-
-  const fetchNotifications = useCallback(async () => {
-    if (!user?.id) {
-      setNotifications([]);
-      setUnreadCount(0);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const userNotifications = await getUserNotifications(user.id);
-      setNotifications(userNotifications);
-
-      const unread = userNotifications.filter(n => !n.isRead).length;
-      setUnreadCount(unread);
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [user?.id]);
 
   const markAsRead = async (notificationId: string) => {
     try {
@@ -65,20 +43,35 @@ export function useNotifications() {
     }
   };
 
+  const refreshNotifications = () => {
+    // No need to manually refresh - real-time listeners handle this
+  };
+
+  // Set up real-time listener
   useEffect(() => {
-    fetchNotifications();
-  }, [fetchNotifications]);
+    if (!user?.id) {
+      setNotifications([]);
+      setUnreadCount(0);
+      setLoading(false);
+      return;
+    }
 
-  // Refresh notifications every 30 seconds when user is authenticated
-  useEffect(() => {
-    if (!user?.id) return;
+    setLoading(true);
 
-    const interval = setInterval(() => {
-      fetchNotifications();
-    }, 30000);
+    const unsubscribe = subscribeToUserNotifications(user.id, userNotifications => {
+      setNotifications(userNotifications);
 
-    return () => clearInterval(interval);
-  }, [user?.id, fetchNotifications]);
+      const unread = userNotifications.filter((n: Notification) => !n.isRead).length;
+      setUnreadCount(unread);
+
+      setLoading(false);
+    });
+
+    // Cleanup subscription
+    return () => {
+      unsubscribe();
+    };
+  }, [user?.id]);
 
   return {
     notifications,
@@ -86,6 +79,6 @@ export function useNotifications() {
     unreadCount,
     markAsRead,
     markAllAsRead,
-    refetch: fetchNotifications,
+    refetch: refreshNotifications,
   };
 }
