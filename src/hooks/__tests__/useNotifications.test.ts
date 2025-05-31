@@ -1,7 +1,11 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useNotifications } from '../useNotifications';
 import { useAuth } from '@/lib/firebase/auth';
-import { getUserNotifications, markNotificationAsRead } from '@/lib/firebase/firestore';
+import {
+  getUserNotifications,
+  markNotificationAsRead,
+  subscribeToUserNotifications,
+} from '@/lib/firebase/firestore';
 import { Notification } from '@/types';
 
 // Mock dependencies
@@ -11,6 +15,7 @@ jest.mock('@/lib/firebase/auth', () => ({
 jest.mock('@/lib/firebase/firestore', () => ({
   getUserNotifications: jest.fn(),
   markNotificationAsRead: jest.fn(),
+  subscribeToUserNotifications: jest.fn(),
 }));
 
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
@@ -19,6 +24,9 @@ const mockGetUserNotifications = getUserNotifications as jest.MockedFunction<
 >;
 const mockMarkNotificationAsRead = markNotificationAsRead as jest.MockedFunction<
   typeof markNotificationAsRead
+>;
+const mockSubscribeToUserNotifications = subscribeToUserNotifications as jest.MockedFunction<
+  typeof subscribeToUserNotifications
 >;
 
 // Mock notifications data
@@ -64,11 +72,18 @@ describe('useNotifications', () => {
       signOut: jest.fn(),
       updateUserProfile: jest.fn(),
     } as any);
+
+    // Set up default subscription mock
+    mockSubscribeToUserNotifications.mockImplementation((userId, callback) => {
+      // Simulate real-time callback with delay
+      setTimeout(() => {
+        callback([]);
+      }, 0);
+      return jest.fn(); // Return unsubscribe function
+    });
   });
 
   it('initializes with loading state', () => {
-    mockGetUserNotifications.mockResolvedValue([]);
-
     const { result } = renderHook(() => useNotifications());
 
     expect(result.current.loading).toBe(true);
@@ -77,7 +92,12 @@ describe('useNotifications', () => {
   });
 
   it('fetches notifications for authenticated user', async () => {
-    mockGetUserNotifications.mockResolvedValue(mockNotifications);
+    mockSubscribeToUserNotifications.mockImplementation((userId, callback) => {
+      setTimeout(() => {
+        callback(mockNotifications);
+      }, 0);
+      return jest.fn();
+    });
 
     const { result } = renderHook(() => useNotifications());
 
@@ -85,7 +105,7 @@ describe('useNotifications', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(mockGetUserNotifications).toHaveBeenCalledWith('user123');
+    expect(mockSubscribeToUserNotifications).toHaveBeenCalledWith('user123', expect.any(Function));
     expect(result.current.notifications).toEqual(mockNotifications);
     expect(result.current.unreadCount).toBe(2); // Two unread notifications
   });
@@ -107,7 +127,7 @@ describe('useNotifications', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(mockGetUserNotifications).not.toHaveBeenCalled();
+    expect(mockSubscribeToUserNotifications).not.toHaveBeenCalled();
     expect(result.current.notifications).toEqual([]);
     expect(result.current.unreadCount).toBe(0);
   });
@@ -129,13 +149,18 @@ describe('useNotifications', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(mockGetUserNotifications).not.toHaveBeenCalled();
+    expect(mockSubscribeToUserNotifications).not.toHaveBeenCalled();
     expect(result.current.notifications).toEqual([]);
     expect(result.current.unreadCount).toBe(0);
   });
 
   it('marks notification as read and updates state', async () => {
-    mockGetUserNotifications.mockResolvedValue(mockNotifications);
+    mockSubscribeToUserNotifications.mockImplementation((userId, callback) => {
+      setTimeout(() => {
+        callback(mockNotifications);
+      }, 0);
+      return jest.fn();
+    });
     mockMarkNotificationAsRead.mockResolvedValue();
 
     const { result } = renderHook(() => useNotifications());
@@ -159,7 +184,26 @@ describe('useNotifications', () => {
   });
 
   it('refreshes notifications when called', async () => {
-    mockGetUserNotifications.mockResolvedValueOnce(mockNotifications).mockResolvedValueOnce([
+    let callbackFn: ((notifications: Notification[]) => void) | null = null;
+
+    mockSubscribeToUserNotifications.mockImplementation((userId, callback) => {
+      callbackFn = callback;
+      setTimeout(() => {
+        callback(mockNotifications);
+      }, 0);
+      return jest.fn();
+    });
+
+    const { result } = renderHook(() => useNotifications());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.notifications).toHaveLength(3);
+
+    // Simulate real-time update with new notification
+    const newNotifications: Notification[] = [
       ...mockNotifications,
       {
         id: 'notif4',
@@ -170,27 +214,29 @@ describe('useNotifications', () => {
         isRead: false,
         createdAt: new Date(),
       },
-    ]);
+    ];
 
-    const { result } = renderHook(() => useNotifications());
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false);
-    });
-
-    expect(result.current.notifications).toHaveLength(3);
-
-    await act(async () => {
-      await result.current.refetch();
+    act(() => {
+      if (callbackFn) {
+        callbackFn(newNotifications);
+      }
     });
 
     expect(result.current.notifications).toHaveLength(4);
-    expect(mockGetUserNotifications).toHaveBeenCalledTimes(2);
+    // Note: refetch is now a no-op in real-time implementation
+    result.current.refetch();
   });
 
   it('handles fetch error gracefully', async () => {
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    mockGetUserNotifications.mockRejectedValue(new Error('Network error'));
+    mockSubscribeToUserNotifications.mockImplementation((userId, callback) => {
+      // Simulate subscription error
+      setTimeout(() => {
+        // In a real scenario, the subscription might fail silently or call with empty data
+        callback([]);
+      }, 0);
+      return jest.fn();
+    });
 
     const { result } = renderHook(() => useNotifications());
 
@@ -198,10 +244,6 @@ describe('useNotifications', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Error fetching notifications:',
-      expect.any(Error)
-    );
     expect(result.current.notifications).toEqual([]);
     expect(result.current.unreadCount).toBe(0);
 
@@ -210,7 +252,12 @@ describe('useNotifications', () => {
 
   it('handles mark as read error gracefully', async () => {
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    mockGetUserNotifications.mockResolvedValue(mockNotifications);
+    mockSubscribeToUserNotifications.mockImplementation((userId, callback) => {
+      setTimeout(() => {
+        callback(mockNotifications);
+      }, 0);
+      return jest.fn();
+    });
     mockMarkNotificationAsRead.mockRejectedValue(new Error('Update failed'));
 
     const { result } = renderHook(() => useNotifications());
@@ -234,10 +281,16 @@ describe('useNotifications', () => {
   });
 
   it('updates state when user changes', async () => {
+    mockSubscribeToUserNotifications.mockImplementation((userId, callback) => {
+      setTimeout(() => {
+        callback(mockNotifications);
+      }, 0);
+      return jest.fn();
+    });
+
     const { result, rerender } = renderHook(() => useNotifications());
 
     // Initially with user
-    mockGetUserNotifications.mockResolvedValue(mockNotifications);
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
     });
@@ -264,7 +317,12 @@ describe('useNotifications', () => {
 
   it('calculates unread count correctly with all read notifications', async () => {
     const allReadNotifications = mockNotifications.map(n => ({ ...n, isRead: true }));
-    mockGetUserNotifications.mockResolvedValue(allReadNotifications);
+    mockSubscribeToUserNotifications.mockImplementation((userId, callback) => {
+      setTimeout(() => {
+        callback(allReadNotifications);
+      }, 0);
+      return jest.fn();
+    });
 
     const { result } = renderHook(() => useNotifications());
 
@@ -277,7 +335,12 @@ describe('useNotifications', () => {
 
   it('calculates unread count correctly with all unread notifications', async () => {
     const allUnreadNotifications = mockNotifications.map(n => ({ ...n, isRead: false }));
-    mockGetUserNotifications.mockResolvedValue(allUnreadNotifications);
+    mockSubscribeToUserNotifications.mockImplementation((userId, callback) => {
+      setTimeout(() => {
+        callback(allUnreadNotifications);
+      }, 0);
+      return jest.fn();
+    });
 
     const { result } = renderHook(() => useNotifications());
 

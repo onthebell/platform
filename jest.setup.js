@@ -50,6 +50,14 @@ jest.mock('@/lib/firebase/firestore', () => ({
   createPost: jest.fn(() => Promise.resolve('test-id')),
   updatePost: jest.fn(() => Promise.resolve()),
   deletePost: jest.fn(() => Promise.resolve()),
+  subscribeToUserNotifications: jest.fn().mockImplementation((userId, callback) => {
+    // Simulate real-time subscription by calling callback with mock data
+    setTimeout(() => {
+      callback([]);
+    }, 0);
+    // Return unsubscribe function
+    return jest.fn();
+  }),
 }));
 
 // Firebase Comments mocks are handled in individual test files to avoid conflicts
