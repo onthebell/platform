@@ -22,12 +22,6 @@ const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 const mockTogglePostLike = likesModule.togglePostLike as jest.MockedFunction<
   typeof likesModule.togglePostLike
 >;
-const mockHasUserLikedPost = likesModule.hasUserLikedPost as jest.MockedFunction<
-  typeof likesModule.hasUserLikedPost
->;
-const mockGetPostLikeCount = likesModule.getPostLikeCount as jest.MockedFunction<
-  typeof likesModule.getPostLikeCount
->;
 const mockSubscribeToPostLikeCount = likesModule.subscribeToPostLikeCount as jest.MockedFunction<
   typeof likesModule.subscribeToPostLikeCount
 >;

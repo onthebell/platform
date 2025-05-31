@@ -57,6 +57,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             verificationStatus: 'none',
             joinedAt: new Date(),
             lastActive: new Date(),
+            // Default privacy settings
+            privacySettings: {
+              profileVisibility: 'public',
+              allowFollowing: true,
+              showInDiscovery: true,
+            },
             // Admin fields with defaults
             role: 'user',
             permissions: [],
@@ -102,6 +108,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         verificationStatus: 'none',
         joinedAt: new Date(),
         lastActive: new Date(),
+        // Default privacy settings
+        privacySettings: {
+          profileVisibility: 'public',
+          allowFollowing: true,
+          showInDiscovery: true,
+        },
         // Admin fields with defaults
         role: 'user',
         permissions: [],

@@ -1,10 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useFollow } from '@/hooks/useFollow';
 import { useAuth } from '@/lib/firebase/auth';
-import { UserPlusIcon, UserMinusIcon } from '@heroicons/react/24/outline';
+import { UserPlusIcon, UserMinusIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import { UserPlusIcon as UserPlusSolid } from '@heroicons/react/24/solid';
+import { getDoc, doc } from 'firebase/firestore';
+import { db } from '@/lib/firebase/config';
+import { User } from '@/types';
 
 interface FollowButtonProps {
   entityId: string;
@@ -24,10 +27,73 @@ export function FollowButton({
   const { user } = useAuth();
   const { isFollowing, loading, follow, unfollow } = useFollow(entityId, entityType);
   const [actionLoading, setActionLoading] = useState(false);
+  const [allowsFollowing, setAllowsFollowing] = useState<boolean | null>(null);
+  const [checkingPrivacy, setCheckingPrivacy] = useState(true);
+
+  // Check if the user allows following
+  useEffect(() => {
+    if (!user || user.id === entityId || entityType !== 'user') {
+      setCheckingPrivacy(false);
+      return;
+    }
+
+    const checkPrivacySettings = async () => {
+      try {
+        setCheckingPrivacy(true);
+        const userDoc = await getDoc(doc(db, 'users', entityId));
+        if (userDoc.exists()) {
+          const userData = userDoc.data() as User;
+          setAllowsFollowing(userData.privacySettings?.allowFollowing !== false);
+        } else {
+          setAllowsFollowing(true); // Default to true if user doc not found
+        }
+      } catch (error) {
+        console.error('Error checking privacy settings:', error);
+        setAllowsFollowing(true); // Default to true on error
+      } finally {
+        setCheckingPrivacy(false);
+      }
+    };
+
+    checkPrivacySettings();
+  }, [entityId, entityType, user]);
 
   // Don't show follow button for own profile/business
   if (!user || user.id === entityId) {
     return null;
+  }
+
+  // Don't show follow button if still checking privacy or if following is not allowed
+  if (checkingPrivacy) {
+    return (
+      <div
+        className={`inline-flex items-center justify-center ${variant === 'icon-only' ? 'h-9 w-9' : 'h-9'}`}
+      >
+        <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
+      </div>
+    );
+  }
+
+  if (allowsFollowing === false) {
+    if (variant === 'icon-only') {
+      return (
+        <div
+          className={`p-2 rounded-full text-gray-400 ${className}`}
+          title="This user does not allow following"
+        >
+          <LockClosedIcon className="h-5 w-5" />
+        </div>
+      );
+    }
+
+    return (
+      <div
+        className={`inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md text-gray-500 bg-gray-100 ${className}`}
+      >
+        <LockClosedIcon className="h-4 w-4 mr-1.5" />
+        Following disabled
+      </div>
+    );
   }
 
   const handleToggleFollow = async () => {

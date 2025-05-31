@@ -1,8 +1,6 @@
 import {
   collection,
   doc,
-  addDoc,
-  deleteDoc,
   getDocs,
   getDoc,
   query,
@@ -35,6 +33,18 @@ export async function followEntity(
   const existingFollow = await getFollowRelation(followerId, followingId, followingType);
   if (existingFollow) {
     throw new Error('Already following this entity');
+  }
+
+  // Check if the entity allows following
+  if (followingType === 'user') {
+    const userDoc = await getDoc(doc(usersCollection, followingId));
+    if (userDoc.exists()) {
+      const userData = userDoc.data() as User;
+      // Check if user allows following
+      if (userData.privacySettings?.allowFollowing === false) {
+        throw new Error('This user does not allow following');
+      }
+    }
   }
 
   const batch = writeBatch(db);
@@ -238,20 +248,47 @@ export async function getSuggestedUsers(
   currentUserId: string,
   limitCount: number = 10
 ): Promise<string[]> {
-  // This is a simplified version - in production you might want more sophisticated logic
-  const q = query(
-    followStatsCollection,
-    orderBy('followersCount', 'desc'),
-    limit(limitCount * 2) // Get more to filter out current user and already following
-  );
+  try {
+    // Get users the current user is already following
+    const followingDocs = await getDocs(
+      query(
+        followsCollection,
+        where('followerId', '==', currentUserId),
+        where('followingType', '==', 'user')
+      )
+    );
+    const followingIds = followingDocs.docs.map(doc => doc.data().followingId);
 
-  const snapshot = await getDocs(q);
-  const userIds = snapshot.docs
-    .map(doc => doc.id)
-    .filter(id => id !== currentUserId)
-    .slice(0, limitCount);
+    // Don't include the user themselves
+    const excludeIds = [...followingIds, currentUserId];
 
-  return userIds;
+    // Get all users and filter client-side to avoid Firestore query limitations
+    const usersQuery = query(
+      usersCollection,
+      orderBy('createdAt', 'desc'),
+      limit(100) // Get more users to filter from
+    );
+
+    const suggestedUserDocs = await getDocs(usersQuery);
+    const filteredUsers = suggestedUserDocs.docs
+      .map(doc => ({ id: doc.id, data: doc.data() as User }))
+      .filter(
+        ({ id, data }) =>
+          // Exclude already following and current user
+          !excludeIds.includes(id) &&
+          // Only include users who allow discovery
+          data.privacySettings?.showInDiscovery !== false &&
+          // Only include users who allow their profile to be viewed
+          data.privacySettings?.profileVisibility !== 'private'
+      )
+      .slice(0, limitCount) // Limit the final results
+      .map(({ id }) => id);
+
+    return filteredUsers;
+  } catch (error) {
+    console.error('Error getting suggested users:', error);
+    return [];
+  }
 }
 
 /**
@@ -374,7 +411,10 @@ export async function getFollowersWithData(
     userDocs.forEach(userDoc => {
       const user = convertDocToUser(userDoc);
       if (user) {
-        results.push(user);
+        // Only include users who haven't set their profile to private
+        if (user.privacySettings?.profileVisibility !== 'private') {
+          results.push(user);
+        }
       }
     });
   }
@@ -429,7 +469,10 @@ export async function getFollowingWithData(
     userDocs.forEach(userDoc => {
       const user = convertDocToUser(userDoc);
       if (user) {
-        results.push(user);
+        // Only include users who haven't set their profile to private
+        if (user.privacySettings?.profileVisibility !== 'private') {
+          results.push(user);
+        }
       }
     });
   }
@@ -463,24 +506,46 @@ export async function getSuggestedUsersWithData(
   currentUserId: string,
   limitCount: number = 10
 ): Promise<User[]> {
-  const userIds = await getSuggestedUsers(currentUserId, limitCount);
+  try {
+    // First, get users that the current user is already following
+    const followingQuery = query(
+      followsCollection,
+      where('followerId', '==', currentUserId),
+      where('followingType', '==', 'user')
+    );
+    const followingSnapshot = await getDocs(followingQuery);
+    const followingIds = followingSnapshot.docs.map(doc => doc.data().followingId);
 
-  if (userIds.length === 0) {
+    // Add current user to the exclusion list
+    const excludeIds = [...followingIds, currentUserId];
+
+    // Get all users first, then filter client-side to avoid Firestore query limitations
+    const usersQuery = query(
+      usersCollection,
+      orderBy('createdAt', 'desc'),
+      limit(100) // Get more users to filter from
+    );
+
+    const usersSnapshot = await getDocs(usersQuery);
+    const allUsers = usersSnapshot.docs
+      .map(doc => convertDocToUser(doc))
+      .filter((user): user is User => user !== null)
+      .filter(
+        user =>
+          // Exclude already following and current user
+          !excludeIds.includes(user.id) &&
+          // Only include users who allow discovery
+          user.privacySettings?.showInDiscovery !== false &&
+          // Only include users who allow their profile to be viewed
+          user.privacySettings?.profileVisibility !== 'private'
+      )
+      .slice(0, limitCount); // Limit the final results
+
+    return allUsers;
+  } catch (error) {
+    console.error('Error getting suggested users:', error);
     return [];
   }
-
-  const userPromises = userIds.map(id => getDoc(doc(usersCollection, id)));
-  const userDocs = await Promise.all(userPromises);
-
-  const users: User[] = [];
-  userDocs.forEach(userDoc => {
-    const user = convertDocToUser(userDoc);
-    if (user) {
-      users.push(user);
-    }
-  });
-
-  return users;
 }
 
 /**
@@ -503,7 +568,10 @@ export async function getMutualFollowersWithData(
   userDocs.forEach(userDoc => {
     const user = convertDocToUser(userDoc);
     if (user) {
-      users.push(user);
+      // Only include users who haven't set their profile to private
+      if (user.privacySettings?.profileVisibility !== 'private') {
+        users.push(user);
+      }
     }
   });
 

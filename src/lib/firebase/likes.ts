@@ -3,9 +3,7 @@ import {
   doc,
   getDocs,
   getDoc,
-  addDoc,
   deleteDoc,
-  updateDoc,
   query,
   where,
   orderBy,
@@ -14,8 +12,6 @@ import {
   runTransaction,
   increment,
   onSnapshot,
-  DocumentSnapshot,
-  QuerySnapshot,
 } from 'firebase/firestore';
 import { db } from './config';
 import {

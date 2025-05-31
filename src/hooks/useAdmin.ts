@@ -59,7 +59,7 @@ export function useAdminDashboard() {
 
   useEffect(() => {
     fetchStats();
-  }, [user]);
+  }, [user, fetchStats]);
 
   return {
     stats,

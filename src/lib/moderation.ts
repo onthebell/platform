@@ -91,7 +91,7 @@ export function getFlaggedContentMessage(result: ModerationResult): string {
   }
 
   const flaggedCategories = Object.entries(result.categories)
-    .filter(([_, flagged]) => flagged)
+    .filter(([, flagged]) => flagged)
     .map(([category]) => category);
 
   if (flaggedCategories.length === 0) {

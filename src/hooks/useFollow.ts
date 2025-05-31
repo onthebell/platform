@@ -10,7 +10,7 @@ import {
   getSuggestedUsersWithData,
   getMutualFollowersWithData,
 } from '@/lib/firebase/follows';
-import { Follow, FollowStats, User, Business } from '@/types';
+import { FollowStats, User, Business } from '@/types';
 
 export function useFollow(entityId: string, entityType: 'user' | 'business') {
   const { user } = useAuth();

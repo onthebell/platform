@@ -1,12 +1,4 @@
-import {
-  togglePostLike,
-  hasUserLikedPost,
-  getPostLikeCount,
-  getPostLikes,
-  getUserLikedPosts,
-  removePostLikes,
-} from '../likes';
-import { db } from '../config';
+import { togglePostLike, hasUserLikedPost, getPostLikeCount, removePostLikes } from '../likes';
 import {
   collection,
   doc,

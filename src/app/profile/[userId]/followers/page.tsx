@@ -37,6 +37,21 @@ export default function FollowersPage() {
 
         const userData = userDoc.data() as User;
         setTargetUser({ ...userData, id: userDoc.id });
+
+        // Check privacy settings
+        if (userData.privacySettings?.profileVisibility === 'private') {
+          setError('This profile is private');
+          return;
+        }
+
+        // If profile is for verified users only, check if current user is verified
+        if (
+          userData.privacySettings?.profileVisibility === 'verified_only' &&
+          (!currentUser || !currentUser.isVerified)
+        ) {
+          setError('This profile is only visible to verified residents');
+          return;
+        }
       } catch (err) {
         console.error('Error fetching user profile:', err);
         setError('Failed to load user profile');
@@ -46,7 +61,7 @@ export default function FollowersPage() {
     };
 
     fetchUserProfile();
-  }, [userId]);
+  }, [userId, currentUser]);
 
   // Redirect to own profile if viewing self
   useEffect(() => {

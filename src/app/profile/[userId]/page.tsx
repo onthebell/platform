@@ -12,6 +12,7 @@ import UserLikedPosts from '@/components/community/UserLikedPosts';
 import { formatDate, toDate } from '@/lib/utils';
 import { FollowButton } from '@/components/ui/FollowButton';
 import { FollowStats } from '@/components/ui/FollowStats';
+import { canViewUserProfile } from '@/lib/utils/privacy';
 import {
   UserIcon,
   ArrowLeftIcon,
@@ -51,6 +52,21 @@ export default function UserProfilePage() {
         const userData = userDoc.data() as User;
         setTargetUser({ ...userData, id: userDoc.id });
 
+        // Check privacy settings
+        if (userData.privacySettings?.profileVisibility === 'private') {
+          setError('This profile is private');
+          return;
+        }
+
+        // If profile is for verified users only, check if current user is verified
+        if (
+          userData.privacySettings?.profileVisibility === 'verified_only' &&
+          (!currentUser || !currentUser.isVerified)
+        ) {
+          setError('This profile is only visible to verified residents');
+          return;
+        }
+
         // Get user's posts
         const posts = await getPosts(
           {
@@ -68,7 +84,7 @@ export default function UserProfilePage() {
     };
 
     fetchUserProfile();
-  }, [userId]);
+  }, [userId, currentUser]);
 
   // Redirect current user to their own profile page
   useEffect(() => {

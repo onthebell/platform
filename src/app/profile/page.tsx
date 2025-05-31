@@ -9,6 +9,7 @@ import { deleteDoc, doc } from 'firebase/firestore';
 import { CommunityPost } from '@/types';
 import PostCard from '@/components/community/PostCard';
 import UserLikedPosts from '@/components/community/UserLikedPosts';
+import PrivacySettings from '@/components/profile/PrivacySettings';
 import { FollowStats } from '@/components/ui/FollowStats';
 import { formatDate, toDate } from '@/lib/utils';
 import {
@@ -20,6 +21,7 @@ import {
   MapPinIcon,
   CheckBadgeIcon,
   ExclamationTriangleIcon,
+  ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
@@ -28,7 +30,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const [userPosts, setUserPosts] = useState<CommunityPost[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'posts' | 'liked' | 'settings'>('posts');
+  const [activeTab, setActiveTab] = useState<'posts' | 'liked' | 'settings' | 'privacy'>('posts');
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -224,6 +226,16 @@ export default function ProfilePage() {
               Liked Posts
             </button>
             <button
+              onClick={() => setActiveTab('privacy')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'privacy'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Privacy
+            </button>
+            <button
               onClick={() => setActiveTab('settings')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'settings'
@@ -292,6 +304,24 @@ export default function ProfilePage() {
         {activeTab === 'liked' && (
           <div>
             <UserLikedPosts userId={user.id} />
+          </div>
+        )}
+
+        {activeTab === 'privacy' && (
+          <div>
+            <PrivacySettings
+              initialSettings={user.privacySettings}
+              onSave={async settings => {
+                try {
+                  await updateUserProfile({
+                    privacySettings: settings,
+                  });
+                  return Promise.resolve();
+                } catch (error) {
+                  return Promise.reject(error);
+                }
+              }}
+            />
           </div>
         )}
 

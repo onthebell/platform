@@ -18,6 +18,12 @@ export interface User {
   };
   joinedAt: Date;
   lastActive: Date;
+  // Privacy settings
+  privacySettings?: {
+    profileVisibility: 'public' | 'verified_only' | 'private';
+    allowFollowing: boolean;
+    showInDiscovery: boolean;
+  };
   // Admin-related fields
   role: UserRole;
   permissions: AdminPermission[];
