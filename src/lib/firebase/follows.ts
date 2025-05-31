@@ -619,8 +619,8 @@ export function subscribeToFollowStatus(
   const q = query(
     followsCollection,
     where('followerId', '==', followerId),
-    where('followedId', '==', followedId),
-    where('followedType', '==', followedType)
+    where('followingId', '==', followedId),
+    where('followingType', '==', followedType)
   );
 
   const unsubscribe = onSnapshot(
@@ -647,8 +647,8 @@ export function subscribeToFollowers(
 ): () => void {
   const q = query(
     followsCollection,
-    where('followedId', '==', userId),
-    where('followedType', '==', 'user'),
+    where('followingId', '==', userId),
+    where('followingType', '==', 'user'),
     orderBy('createdAt', 'desc'),
     limit(limitCount)
   );

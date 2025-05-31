@@ -8,6 +8,7 @@ import { getPostById, updatePost } from '@/lib/firebase/firestore';
 import { uploadImage, deleteImage, validateImageFile } from '@/lib/firebase/storage';
 import { useContentModeration } from '@/hooks/useContentModeration';
 import { CommunityPost, PostCategory, PostType } from '@/types';
+import AddressAutocomplete from '@/components/ui/AddressAutocomplete';
 import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import dynamic from 'next/dynamic';
 
@@ -437,17 +438,21 @@ export default function EditPostPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
               <div className="space-y-3 sm:space-y-4">
-                <input
-                  type="text"
+                <AddressAutocomplete
+                  type="locality"
                   value={formData.location.address}
-                  onChange={e =>
+                  onChange={(address: string, coordinates?: { lat: number; lng: number }) =>
                     setFormData(prev => ({
                       ...prev,
-                      location: { ...prev.location, address: e.target.value },
+                      location: {
+                        address,
+                        lat: coordinates?.lat || prev.location.lat,
+                        lng: coordinates?.lng || prev.location.lng,
+                      },
                     }))
                   }
-                  className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter address"
+                  className=""
                 />
                 <div className="h-48 sm:h-64 rounded-md border overflow-hidden">
                   <MapPicker

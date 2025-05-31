@@ -8,6 +8,7 @@ import { createPost } from '@/lib/firebase/firestore';
 import { uploadImages, validateImageFile, resizeImage } from '@/lib/firebase/storage';
 import { useContentModeration } from '@/hooks/useContentModeration';
 import { CommunityPost, PostCategory, PostType } from '@/types';
+import AddressAutocomplete from '@/components/ui/AddressAutocomplete';
 import { MapIcon, PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 function CreatePostForm() {
@@ -311,22 +312,22 @@ function CreatePostForm() {
               <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
                 Location
               </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  id="location"
-                  value={formData.location.address}
-                  onChange={e =>
-                    setFormData(prev => ({
-                      ...prev,
-                      location: { ...prev.location, address: e.target.value },
-                    }))
-                  }
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter address or suburb..."
-                />
-                <MapIcon className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-              </div>
+              <AddressAutocomplete
+                type="locality"
+                value={formData.location.address}
+                onChange={(address: string, coordinates?: { lat: number; lng: number }) =>
+                  setFormData(prev => ({
+                    ...prev,
+                    location: {
+                      address,
+                      lat: coordinates?.lat || 0,
+                      lng: coordinates?.lng || 0,
+                    },
+                  }))
+                }
+                placeholder="Enter address or suburb..."
+                className=""
+              />
             </div>
 
             {/* Images */}

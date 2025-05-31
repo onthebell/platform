@@ -5557,7 +5557,6 @@ export const bellarineSuburbs = {
         ],
       },
     },
-    // Ocean Grove (example)
     {
       type: 'Feature',
       properties: { name: 'Ocean Grove' },
@@ -11744,6 +11743,5 @@ export const bellarineSuburbs = {
         ],
       },
     },
-    // Add more as needed
   ],
 };

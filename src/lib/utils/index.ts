@@ -153,8 +153,9 @@ export function validatePostcode(postcode: string): boolean {
   return postcodeRegex.test(postcode);
 }
 
+export const bellarinePostcodes = ['3222', '3223', '3225', '3226', '3227'];
+
 export function isBellarinePostcode(postcode: string): boolean {
-  const bellarinePostcodes = ['3220', '3221', '3222', '3223', '3224', '3225'];
   return bellarinePostcodes.includes(postcode);
 }
 

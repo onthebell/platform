@@ -49,7 +49,7 @@ export function useFollow(entityId: string, entityType: 'user' | 'business') {
       setLoading(true);
       setError(null);
       await followEntity(user.id, entityId, entityType);
-      setIsFollowingEntity(true);
+      // Real-time subscription will update the state
     } catch (err) {
       console.error('Error following entity:', err);
       setError(err instanceof Error ? err.message : 'Failed to follow');
@@ -65,7 +65,7 @@ export function useFollow(entityId: string, entityType: 'user' | 'business') {
       setLoading(true);
       setError(null);
       await unfollowEntity(user.id, entityId, entityType);
-      setIsFollowingEntity(false);
+      // Real-time subscription will update the state
     } catch (err) {
       console.error('Error unfollowing entity:', err);
       setError(err instanceof Error ? err.message : 'Failed to unfollow');

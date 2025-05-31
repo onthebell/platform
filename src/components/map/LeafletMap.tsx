@@ -1,6 +1,6 @@
 'use client';
 
-import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, GeoJSON, ZoomControl } from 'react-leaflet';
 import { bellarineSuburbs } from './bellarineSuburbs';
 import 'leaflet/dist/leaflet.css';
 import './map-styles.css';
@@ -31,6 +31,10 @@ interface LeafletMapProps {
     title: string;
     description?: string;
     category?: string;
+    date?: string;
+    time?: string;
+    address?: string;
+    contact?: string;
   }>;
   onMarkerClick?: (markerId: string) => void;
 }
@@ -99,14 +103,22 @@ export default function LeafletMap({ center, zoom, markers, onMarkerClick }: Lea
     <MapContainer
       center={center}
       zoom={zoom}
-      minZoom={11}
+      minZoom={10}
+      maxZoom={18}
       scrollWheelZoom={true}
-      className="w-full h-64 sm:h-80 md:h-96 lg:h-full rounded-lg"
+      zoomControl={false} // We'll add custom positioned zoom controls
+      className="w-full h-full"
+      style={{ height: '100%', width: '100%' }}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        tileSize={256}
+        zoomOffset={0}
       />
+
+      {/* Custom positioned zoom control */}
+      <ZoomControl position="topright" />
 
       <GeoJSON
         data={bellarineSuburbs as GeoJSON.FeatureCollection}
@@ -114,7 +126,8 @@ export default function LeafletMap({ center, zoom, markers, onMarkerClick }: Lea
           color: '#2563eb',
           weight: 2,
           fillColor: suburbColors[feature?.properties?.name] || '#e9e9e9',
-          fillOpacity: 0.5,
+          fillOpacity: 0.3,
+          opacity: 0.7,
         })}
         onEachFeature={onEachSuburb}
       />
@@ -128,20 +141,27 @@ export default function LeafletMap({ center, zoom, markers, onMarkerClick }: Lea
             click: () => onMarkerClick?.(marker.id),
           }}
         >
-          <Popup className="custom-popup">
-            <div className="p-2 sm:p-3">
-              <h3 className="font-semibold text-sm sm:text-base">{marker.title}</h3>
+          <Popup
+            className="custom-popup"
+            maxWidth={300}
+            minWidth={200}
+            closeButton={true}
+            autoClose={false}
+            closeOnEscapeKey={true}
+          >
+            <div className="p-3">
+              <h3 className="font-semibold text-base mb-2">{marker.title}</h3>
               {marker.description && (
-                <p className="text-xs sm:text-sm text-gray-600 mt-1">{marker.description}</p>
+                <p className="text-sm text-gray-600 mb-3 leading-relaxed">{marker.description}</p>
               )}
               {marker.category && (
-                <div className="flex items-center mt-2">
-                  <span className="text-base sm:text-lg mr-1">
-                    {categoryIcons[marker.category] || '📍'}
-                  </span>
-                  <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-                    {marker.category.charAt(0).toUpperCase() + marker.category.slice(1)}
-                  </span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <span className="text-lg mr-2">{categoryIcons[marker.category] || '📍'}</span>
+                    <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">
+                      {marker.category.charAt(0).toUpperCase() + marker.category.slice(1)}
+                    </span>
+                  </div>
                 </div>
               )}
             </div>

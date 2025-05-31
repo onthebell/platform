@@ -12,6 +12,7 @@ import {
   parseAddressString,
 } from '@/lib/firebase/verification';
 import { uploadImage, validateImageFile } from '@/lib/firebase/storage';
+import AddressAutocomplete from '@/components/ui/AddressAutocomplete';
 import {
   DocumentIcon,
   MapPinIcon,
@@ -229,13 +230,14 @@ export default function VerifyAddressPage() {
                 >
                   Full Address
                 </label>
-                <textarea
-                  id="addressString"
-                  rows={3}
+                <AddressAutocomplete
                   value={formData.addressString}
-                  onChange={e => handleAddressStringChange(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onChange={(address: string, coordinates?: { lat: number; lng: number }) => {
+                    handleAddressStringChange(address);
+                    // If coordinates are provided, we could use them for additional validation
+                  }}
                   placeholder="Enter your full address (e.g., 123 Main Street, Ocean Grove, VIC 3226)"
+                  className=""
                 />
                 <p className="mt-1 text-sm text-gray-500">
                   Enter your complete address and we'll help parse it into the fields below.
@@ -248,14 +250,18 @@ export default function VerifyAddressPage() {
                   <label htmlFor="street" className="block text-sm font-medium text-gray-700 mb-2">
                     Street Address *
                   </label>
-                  <input
-                    type="text"
-                    id="street"
-                    required
+                  <AddressAutocomplete
                     value={formData.street}
-                    onChange={e => setFormData(prev => ({ ...prev, street: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(address: string, coordinates?: { lat: number; lng: number }) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        street: address,
+                        // If coordinates are provided, we could use them for additional validation
+                      }));
+                    }}
                     placeholder="123 Main Street"
+                    required
+                    className=""
                   />
                 </div>
 

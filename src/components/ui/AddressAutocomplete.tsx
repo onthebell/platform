@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { MapPinIcon } from '@heroicons/react/24/outline';
+import { bellarinePostcodes } from '../../lib/utils';
 
 interface GooglePlacesAutocompleteProps {
   value: string;
@@ -10,6 +11,7 @@ interface GooglePlacesAutocompleteProps {
   required?: boolean;
   className?: string;
   forceManualMode?: boolean; // For testing purposes
+  type?: 'address' | 'locality' | 'establishment' | 'geocode'; // Not used but can be extended
 }
 
 declare global {
@@ -17,10 +19,77 @@ declare global {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     google: any;
     initGooglePlaces: () => void;
+    googleMapsApiLoaded: boolean;
+    googleMapsApiLoading: boolean;
+    googleMapsLoadCallbacks: (() => void)[];
   }
 }
 
-const BELLARINE_POSTCODES = ['3222', '3223', '3225', '3226', '3227'];
+// Global Google Maps API loader to prevent multiple script loads
+const loadGoogleMapsAPI = (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    // Check if already loaded
+    if (window.googleMapsApiLoaded && window.google?.maps?.places) {
+      console.debug('Google Maps API already loaded');
+      resolve();
+      return;
+    }
+
+    // Check if currently loading
+    if (window.googleMapsApiLoading) {
+      console.debug('Google Maps API currently loading, adding to callback queue');
+      // Add to callback queue
+      if (!window.googleMapsLoadCallbacks) {
+        window.googleMapsLoadCallbacks = [];
+      }
+      window.googleMapsLoadCallbacks.push(resolve);
+      return;
+    }
+
+    console.debug('Starting Google Maps API load');
+    // Start loading
+    window.googleMapsApiLoading = true;
+    window.googleMapsLoadCallbacks = [resolve];
+
+    // Check if script already exists (safety check)
+    const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+    if (existingScript) {
+      console.warn('Google Maps script already exists in DOM, but API not loaded');
+      window.googleMapsApiLoading = false;
+      reject(new Error('Script exists but API not available'));
+      return;
+    }
+
+    // Create global callback
+    window.initGooglePlaces = () => {
+      console.debug('Google Maps API loaded successfully');
+      window.googleMapsApiLoaded = true;
+      window.googleMapsApiLoading = false;
+
+      // Call all waiting callbacks
+      const callbacks = window.googleMapsLoadCallbacks || [];
+      window.googleMapsLoadCallbacks = [];
+      callbacks.forEach(callback => callback());
+    };
+
+    // Load the script
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&callback=initGooglePlaces`;
+    script.async = true;
+    script.defer = true;
+    script.id = 'google-maps-api'; // Add ID for easier detection
+
+    script.onerror = () => {
+      console.error('Google Maps API failed to load. Please check your API key configuration.');
+      window.googleMapsApiLoading = false;
+      const callbacks = window.googleMapsLoadCallbacks || [];
+      window.googleMapsLoadCallbacks = [];
+      callbacks.forEach(() => reject(new Error('Failed to load Google Maps API')));
+    };
+
+    document.head.appendChild(script);
+  });
+};
 
 export default function GooglePlacesAutocomplete({
   value,
@@ -29,6 +98,7 @@ export default function GooglePlacesAutocomplete({
   required = false,
   className = '',
   forceManualMode = false,
+  type = 'address',
 }: GooglePlacesAutocompleteProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -44,54 +114,58 @@ export default function GooglePlacesAutocomplete({
   };
   const isGoogleAvailable = checkGoogleMaps();
 
-  // Update loaded state when Google availability changes
+  // Load Google Places API using global loader
   useEffect(() => {
-    setIsLoaded(isGoogleAvailable);
-  }, [isGoogleAvailable]);
+    if (forceManualMode || typeof window === 'undefined') return;
 
-  // Load Google Places API
-  useEffect(() => {
+    // If already available, set loaded immediately
     if (isGoogleAvailable) {
+      console.debug('Google Maps already available, setting loaded state');
+      setIsLoaded(true);
       return;
     }
 
-    // Define the callback function globally
-    window.initGooglePlaces = () => {
-      setIsLoaded(true);
-    };
-
-    // Load the Google Maps JavaScript API with error handling
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&callback=initGooglePlaces`;
-    script.async = true;
-    script.defer = true;
-
-    // Add error handling for API load failures
-    script.onerror = () => {
-      console.error('Google Maps API failed to load. Please check your API key configuration.');
-      // Don't set isLoaded to true so we'll use the fallback input
-    };
-
-    document.head.appendChild(script);
-
-    return () => {
-      // Cleanup
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-      // @ts-expect-error Allow delete global function
-      delete window.initGooglePlaces;
-    };
-  }, [isGoogleAvailable]);
+    console.debug('Loading Google Maps API...');
+    // Use global loader to prevent multiple script loads
+    loadGoogleMapsAPI()
+      .then(() => {
+        console.debug('Google Maps API loaded, setting component state');
+        setIsLoaded(true);
+      })
+      .catch(error => {
+        console.error('Failed to load Google Maps API:', error);
+        // Component will fall back to manual mode
+      });
+  }, [forceManualMode, isGoogleAvailable]);
 
   // Initialize autocomplete when loaded
   useEffect(() => {
-    if (!isLoaded || !isGoogleAvailable || !inputRef.current || autocompleteRef.current) return;
+    if (!isLoaded || !inputRef.current || autocompleteRef.current) return;
+
+    // Double-check that Google Maps is actually available
+    if (!window.google?.maps?.places) {
+      console.warn('Google Maps Places API not available');
+      return;
+    }
 
     const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, {
       componentRestrictions: { country: 'AU' }, // Restrict to Australia
-      types: ['address'], // Only return street addresses
+      types: [type], // Only street addresses (cannot mix with other types)
       fields: ['formatted_address', 'geometry.location', 'address_components'],
+    });
+
+    // Restrict autocomplete predictions to Bellarine postcodes
+    // This is a workaround: set the 'location' and 'radius' to bias results,
+    // but Google Places API does not support direct postcode restriction.
+    // We filter after selection as well (see below).
+    autocomplete.setBounds(
+      new window.google.maps.LatLngBounds(
+        new window.google.maps.LatLng(-38.4, 144.2), // Southwest
+        new window.google.maps.LatLng(-38.0, 144.8) // Northeast
+      )
+    );
+    autocomplete.setOptions({
+      strictBounds: true,
     });
 
     // Set bounds to Bellarine Peninsula area
@@ -124,9 +198,9 @@ export default function GooglePlacesAutocomplete({
       const postcode = postcodeComponent.long_name;
 
       // Check if postcode is within Bellarine Peninsula
-      if (!BELLARINE_POSTCODES.includes(postcode)) {
+      if (!bellarinePostcodes.includes(postcode)) {
         alert(
-          `This address is outside the Bellarine Peninsula area. Please select an address with postcode: ${BELLARINE_POSTCODES.join(', ')}`
+          `This address is outside the Bellarine Peninsula area. Please select an address with postcode: ${bellarinePostcodes.join(', ')}`
         );
         setInputValue('');
         onChange('');
@@ -144,7 +218,7 @@ export default function GooglePlacesAutocomplete({
     });
 
     autocompleteRef.current = autocomplete;
-  }, [isLoaded, isGoogleAvailable, onChange]);
+  }, [isLoaded, onChange]);
 
   // Update input value when prop changes
   useEffect(() => {
@@ -164,13 +238,13 @@ export default function GooglePlacesAutocomplete({
             // Always call onChange to allow manual entry mode
             onChange(e.target.value);
           }}
-          placeholder={!isGoogleAvailable ? `${placeholder} (Manual Entry)` : placeholder}
+          placeholder={!isLoaded ? `${placeholder} (Manual Entry)` : placeholder}
           required={required}
           className={`${className} pl-10 w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6`}
         />
       </div>
 
-      {!isGoogleAvailable && (
+      {!isLoaded && (
         <div className="mt-2 text-xs text-yellow-600">
           <p>Google Maps API not loaded. Manual address entry enabled.</p>
           <p className="mt-1">Please include a complete address with postcode.</p>

@@ -9,6 +9,7 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { db } from './config';
+import { bellarinePostcodes } from '../utils';
 
 export interface AddressVerificationRequest {
   id?: string;
@@ -53,8 +54,6 @@ const BELLARINE_SUBURBS = [
   'Newcomb',
   'Whittington',
 ];
-
-const BELLARINE_POSTCODES = ['3225', '3226', '3224', '3223', '3222'];
 
 /**
  * Submit an address verification request
@@ -149,7 +148,7 @@ export function validateBellarineAddress(address: {
   }
 
   // Check postcode
-  if (!BELLARINE_POSTCODES.includes(address.postcode)) {
+  if (!bellarinePostcodes.includes(address.postcode)) {
     return { isValid: false, error: 'Postcode is not within the Bellarine Peninsula area' };
   }
 
@@ -178,7 +177,7 @@ export function getBellarineSuburbs(): string[] {
  * Get list of valid Bellarine postcodes
  */
 export function getBellarinePostcodes(): string[] {
-  return [...BELLARINE_POSTCODES].sort();
+  return [...bellarinePostcodes].sort();
 }
 
 /**

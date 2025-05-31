@@ -9,6 +9,7 @@ import {
   BuildingStorefrontIcon,
   CalendarIcon,
 } from '@heroicons/react/24/outline';
+import { bellarinePostcodes } from '../../lib/utils';
 
 export const metadata: Metadata = {
   title: 'How It Works - OnTheBell',
@@ -160,8 +161,8 @@ export default function HowItWorksPage() {
               <div className="bg-white p-6 rounded-lg shadow">
                 <h3 className="font-semibold text-gray-900 mb-2">What We Check</h3>
                 <p className="text-gray-600 text-sm">
-                  We verify addresses within Bellarine Peninsula postcodes (3222, 3223, 3225, 3226,
-                  3227).
+                  We verify addresses within Bellarine Peninsula postcodes (
+                  {bellarinePostcodes.join(', ')}).
                 </p>
               </div>
               <div className="bg-white p-6 rounded-lg shadow">

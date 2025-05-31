@@ -2,6 +2,7 @@
 import { Metadata } from 'next';
 import { ShieldCheckIcon, EyeIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
 import { ServerStackIcon } from '@heroicons/react/24/outline';
+import { bellarinePostcodes } from '../../lib/utils';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy - OnTheBell',
@@ -149,8 +150,8 @@ export default function PrivacyPage() {
               </h3>
               <ul className="list-disc pl-4 sm:pl-6 text-sm sm:text-base text-blue-800 space-y-1">
                 <li>
-                  We verify you live within Bellarine Peninsula postcodes (3222, 3223, 3225, 3226,
-                  3227)
+                  We verify you live within Bellarine Peninsula postcodes (
+                  {bellarinePostcodes.join(', ')})
                 </li>
                 <li>Your exact address is never displayed publicly</li>
                 <li>We only confirm you're a verified local resident</li>
