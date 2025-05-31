@@ -126,27 +126,9 @@ jest.mock('@/lib/firebase/config', () => {
     signOut: jest.fn(),
   };
 
-  const mockFirestore = {
-    collection: jest.fn(() => ({
-      doc: jest.fn(() => ({
-        get: jest.fn(),
-        set: jest.fn(),
-        update: jest.fn(),
-        delete: jest.fn(),
-      })),
-      where: jest.fn(() => ({
-        get: jest.fn(),
-        onSnapshot: jest.fn(),
-      })),
-      orderBy: jest.fn(() => ({
-        get: jest.fn(),
-        onSnapshot: jest.fn(),
-      })),
-      limit: jest.fn(() => ({
-        get: jest.fn(),
-        onSnapshot: jest.fn(),
-      })),
-    })),
+  const mockDb = {
+    collection: jest.fn(),
+    doc: jest.fn(),
   };
 
   const mockStorage = {
@@ -159,8 +141,37 @@ jest.mock('@/lib/firebase/config', () => {
 
   return {
     auth: mockAuth,
-    db: mockFirestore,
+    db: mockDb,
     storage: mockStorage,
     default: {},
   };
 });
+
+// Mock Firebase Firestore functions
+jest.mock('firebase/firestore', () => ({
+  collection: jest.fn(() => ({})),
+  doc: jest.fn(() => ({})),
+  getDocs: jest.fn(() => Promise.resolve({ docs: [], size: 0, empty: true })),
+  getDoc: jest.fn(() => Promise.resolve({ exists: () => false, data: () => ({}) })),
+  addDoc: jest.fn(() => Promise.resolve({ id: 'mock-id' })),
+  setDoc: jest.fn(() => Promise.resolve()),
+  updateDoc: jest.fn(() => Promise.resolve()),
+  deleteDoc: jest.fn(() => Promise.resolve()),
+  query: jest.fn(() => ({})),
+  where: jest.fn(() => ({})),
+  orderBy: jest.fn(() => ({})),
+  limit: jest.fn(() => ({})),
+  onSnapshot: jest.fn(() => jest.fn()),
+  runTransaction: jest.fn(() => Promise.resolve()),
+  writeBatch: jest.fn(() => ({
+    set: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+    commit: jest.fn(() => Promise.resolve()),
+  })),
+  increment: jest.fn(val => ({ increment: val })),
+  Timestamp: {
+    fromDate: jest.fn(date => ({ toDate: () => date })),
+    now: jest.fn(() => ({ toDate: () => new Date() })),
+  },
+}));

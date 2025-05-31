@@ -10,6 +10,8 @@ import { CommunityPost, User } from '@/types';
 import PostCard from '@/components/community/PostCard';
 import UserLikedPosts from '@/components/community/UserLikedPosts';
 import { formatDate, toDate } from '@/lib/utils';
+import { FollowButton } from '@/components/ui/FollowButton';
+import { FollowStats } from '@/components/ui/FollowStats';
 import {
   UserIcon,
   ArrowLeftIcon,
@@ -174,6 +176,11 @@ export default function UserProfilePage() {
                     </div>
                   )}
                 </div>
+
+                {/* Follow Stats */}
+                <div className="mt-3">
+                  <FollowStats entityId={targetUser.id} entityType="user" className="text-sm" />
+                </div>
                 {targetUser.address && targetUser.verificationStatus === 'approved' && (
                   <div className="flex items-center mt-2 text-sm text-gray-600">
                     <MapPinIcon className="h-4 w-4 mr-1" />
@@ -183,6 +190,9 @@ export default function UserProfilePage() {
                   </div>
                 )}
               </div>
+            </div>
+            <div>
+              <FollowButton entityId={targetUser.id} entityType="user" />
             </div>
           </div>
         </div>

@@ -23,6 +23,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 import ReportButton from '@/components/moderation/ReportButton';
+import { FollowButton } from '@/components/ui/FollowButton';
 
 // For testing purposes
 export const __internal = {
@@ -359,13 +360,18 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
             />
           )}
         </div>
-        <div className="text-sm font-medium">
-          <Link
-            href={`/profile/${post.authorId}`}
-            className="text-blue-600 hover:underline transition-colors"
-          >
-            <span className="truncate">{post.authorName}</span>
-          </Link>
+        <div className="flex items-center space-x-2">
+          <div className="text-sm font-medium">
+            <Link
+              href={`/profile/${post.authorId}`}
+              className="text-blue-600 hover:underline transition-colors"
+            >
+              <span className="truncate">{post.authorName}</span>
+            </Link>
+          </div>
+          {!isOwner && user && (
+            <FollowButton entityId={post.authorId} entityType="user" variant="icon-only" />
+          )}
         </div>
       </div>
     </div>

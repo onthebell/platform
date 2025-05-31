@@ -9,6 +9,7 @@ import { deleteDoc, doc } from 'firebase/firestore';
 import { CommunityPost } from '@/types';
 import PostCard from '@/components/community/PostCard';
 import UserLikedPosts from '@/components/community/UserLikedPosts';
+import { FollowStats } from '@/components/ui/FollowStats';
 import { formatDate, toDate } from '@/lib/utils';
 import {
   UserIcon,
@@ -171,6 +172,11 @@ export default function ProfilePage() {
                       <span>Verification Pending</span>
                     </div>
                   )}
+                </div>
+
+                {/* Follow Stats */}
+                <div className="mt-3">
+                  <FollowStats entityId={user.id} entityType="user" className="text-sm" />
                 </div>
                 {user.address && (
                   <div className="flex items-center mt-2 text-sm text-gray-600">

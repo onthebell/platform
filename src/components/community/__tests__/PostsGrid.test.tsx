@@ -23,6 +23,46 @@ jest.mock('@heroicons/react/24/solid', () => ({
   HeartIcon: () => <svg data-testid="heart-solid-icon" />,
 }));
 
+// Mock ReportButton component
+jest.mock('@/components/moderation/ReportButton', () => {
+  // eslint-disable-next-line react/display-name
+  return ({
+    targetId,
+    targetType,
+    onReport,
+  }: {
+    targetId: string;
+    targetType: string;
+    onReport?: () => void;
+  }) => (
+    <button data-testid="report-button" onClick={onReport}>
+      Report {targetType}
+    </button>
+  );
+});
+
+// Mock FollowButton component
+jest.mock('@/components/ui/FollowButton', () => ({
+  FollowButton: ({
+    entityId,
+    entityType,
+    variant,
+  }: {
+    entityId: string;
+    entityType: string;
+    variant?: string;
+  }) => (
+    <button
+      data-testid="follow-button"
+      data-entity-id={entityId}
+      data-entity-type={entityType}
+      data-variant={variant}
+    >
+      Follow
+    </button>
+  ),
+}));
+
 // Mock router
 const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({

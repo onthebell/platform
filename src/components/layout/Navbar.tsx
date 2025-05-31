@@ -16,6 +16,7 @@ import {
   BellIcon,
   BuildingStorefrontIcon,
   GiftIcon,
+  UserGroupIcon,
 } from '@heroicons/react/24/outline';
 import { NotificationDropdown } from '@/components/notifications';
 
@@ -35,6 +36,7 @@ const navigation: NavigationItem[] = [
   { name: 'Events', href: '/events', icon: CalendarIcon },
   { name: 'Marketplace', href: '/marketplace', icon: ShoppingBagIcon },
   { name: 'Community', href: '/community', icon: HeartIcon, verifiedOnly: true },
+  { name: 'Discover', href: '/discover', icon: UserGroupIcon, requiresAuth: true },
 ];
 
 export default function Navbar() {

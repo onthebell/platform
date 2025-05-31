@@ -274,6 +274,30 @@ export type AdminActionType =
   | 'report_reviewed'
   | 'report_dismissed';
 
+// Follow System
+export interface Follow {
+  id: string;
+  followerId: string;
+  followingId: string;
+  followingType: 'user' | 'business';
+  createdAt: Date;
+}
+
+export interface FollowStats {
+  followersCount: number;
+  followingCount: number;
+}
+
+export interface UserWithFollowStats extends User {
+  followStats?: FollowStats;
+  isFollowing?: boolean;
+}
+
+export interface BusinessWithFollowStats extends Business {
+  followStats?: FollowStats;
+  isFollowing?: boolean;
+}
+
 // Permission checking utilities
 export interface AdminPermissions {
   canManagePosts: boolean;

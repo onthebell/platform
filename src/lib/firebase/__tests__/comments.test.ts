@@ -13,7 +13,18 @@ import {
 import { db } from '../config';
 
 // Mock Firebase Firestore
-jest.mock('firebase/firestore');
+jest.mock('firebase/firestore', () => ({
+  collection: jest.fn(),
+  addDoc: jest.fn(),
+  query: jest.fn(),
+  where: jest.fn(),
+  orderBy: jest.fn(),
+  getDocs: jest.fn(),
+  deleteDoc: jest.fn(),
+  doc: jest.fn(),
+  serverTimestamp: jest.fn(),
+}));
+
 jest.mock('../config', () => ({
   db: 'mock-db',
 }));

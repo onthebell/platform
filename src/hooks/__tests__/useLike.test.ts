@@ -4,11 +4,21 @@ import { useAuth } from '@/lib/firebase/auth';
 import * as likesModule from '@/lib/firebase/likes';
 
 // Mock the auth hook
-jest.mock('@/lib/firebase/auth');
-const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
+jest.mock('@/lib/firebase/auth', () => ({
+  useAuth: jest.fn(),
+}));
 
 // Mock the likes module
-jest.mock('@/lib/firebase/likes');
+jest.mock('@/lib/firebase/likes', () => ({
+  togglePostLike: jest.fn(),
+  hasUserLikedPost: jest.fn(),
+  getPostLikeCount: jest.fn(),
+  subscribeToPostLikeCount: jest.fn(() => jest.fn()),
+  subscribeToUserLikeStatus: jest.fn(() => jest.fn()),
+}));
+
+const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
+
 const mockTogglePostLike = likesModule.togglePostLike as jest.MockedFunction<
   typeof likesModule.togglePostLike
 >;
@@ -17,6 +27,12 @@ const mockHasUserLikedPost = likesModule.hasUserLikedPost as jest.MockedFunction
 >;
 const mockGetPostLikeCount = likesModule.getPostLikeCount as jest.MockedFunction<
   typeof likesModule.getPostLikeCount
+>;
+const mockSubscribeToPostLikeCount = likesModule.subscribeToPostLikeCount as jest.MockedFunction<
+  typeof likesModule.subscribeToPostLikeCount
+>;
+const mockSubscribeToUserLikeStatus = likesModule.subscribeToUserLikeStatus as jest.MockedFunction<
+  typeof likesModule.subscribeToUserLikeStatus
 >;
 
 const mockUser = {
@@ -49,8 +65,9 @@ describe('useLike hook', () => {
       updateUserProfile: jest.fn(),
     });
 
-    mockHasUserLikedPost.mockResolvedValue(false);
-    mockGetPostLikeCount.mockResolvedValue(5);
+    // Set up subscription mocks but don't call callbacks immediately
+    mockSubscribeToPostLikeCount.mockImplementation(() => jest.fn());
+    mockSubscribeToUserLikeStatus.mockImplementation(() => jest.fn());
 
     const { result } = renderHook(() => useLike('post123', 3));
 
@@ -72,8 +89,18 @@ describe('useLike hook', () => {
       updateUserProfile: jest.fn(),
     });
 
-    mockHasUserLikedPost.mockResolvedValue(true);
-    mockGetPostLikeCount.mockResolvedValue(10);
+    // Set up subscription mocks for both like count and like status
+    mockSubscribeToPostLikeCount.mockImplementation((postId, callback) => {
+      // Immediately call callback with value
+      callback(10);
+      return jest.fn(); // Return unsubscribe function
+    });
+
+    mockSubscribeToUserLikeStatus.mockImplementation((postId, userId, callback) => {
+      // Immediately call callback with value
+      callback(true);
+      return jest.fn(); // Return unsubscribe function
+    });
 
     const { result } = renderHook(() => useLike('post123', 5));
 
@@ -83,8 +110,12 @@ describe('useLike hook', () => {
       expect(result.current.likeCount).toBe(10);
     });
 
-    expect(mockHasUserLikedPost).toHaveBeenCalledWith('post123', 'user123');
-    expect(mockGetPostLikeCount).toHaveBeenCalledWith('post123');
+    expect(mockSubscribeToPostLikeCount).toHaveBeenCalledWith('post123', expect.any(Function));
+    expect(mockSubscribeToUserLikeStatus).toHaveBeenCalledWith(
+      'post123',
+      'user123',
+      expect.any(Function)
+    );
   });
 
   it('should handle like toggle with optimistic updates', async () => {
@@ -98,15 +129,27 @@ describe('useLike hook', () => {
       updateUserProfile: jest.fn(),
     });
 
-    mockHasUserLikedPost.mockResolvedValue(false);
-    mockGetPostLikeCount.mockResolvedValue(5);
-    mockTogglePostLike.mockResolvedValue(true);
+    // Set up subscription mocks for both like count and like status
+    mockSubscribeToPostLikeCount.mockImplementation((postId, callback) => {
+      // Immediately call callback with initial value
+      callback(5);
+      return jest.fn(); // Return unsubscribe function
+    });
+
+    mockSubscribeToUserLikeStatus.mockImplementation((postId, userId, callback) => {
+      // Immediately call callback with initial value
+      callback(false);
+      return jest.fn(); // Return unsubscribe function
+    });
+
+    mockTogglePostLike.mockResolvedValue(true); // Will be true after toggling from false
 
     const { result } = renderHook(() => useLike('post123', 5));
 
     // Wait for initial load
     await waitFor(() => {
       expect(result.current.likeCount).toBe(5);
+      expect(result.current.isLiked).toBe(false);
     });
 
     // Toggle like
@@ -116,10 +159,9 @@ describe('useLike hook', () => {
 
     expect(mockTogglePostLike).toHaveBeenCalledWith('post123', 'user123', 'Test User');
 
-    // Check that like count was updated
-    await waitFor(() => {
-      expect(result.current.isLiked).toBe(true);
-    });
+    // Check optimistic update
+    expect(result.current.isLiked).toBe(true);
+    expect(result.current.likeCount).toBe(6);
   });
 
   it('should handle errors during like toggle', async () => {
@@ -133,8 +175,19 @@ describe('useLike hook', () => {
       updateUserProfile: jest.fn(),
     });
 
-    mockHasUserLikedPost.mockResolvedValue(false);
-    mockGetPostLikeCount.mockResolvedValue(5);
+    // Set up subscription mocks for both like count and like status
+    mockSubscribeToPostLikeCount.mockImplementation((postId, callback) => {
+      // Immediately call callback with initial value
+      callback(5);
+      return jest.fn(); // Return unsubscribe function
+    });
+
+    mockSubscribeToUserLikeStatus.mockImplementation((postId, userId, callback) => {
+      // Immediately call callback with initial value
+      callback(false);
+      return jest.fn(); // Return unsubscribe function
+    });
+
     mockTogglePostLike.mockRejectedValue(new Error('Network error'));
 
     const { result } = renderHook(() => useLike('post123', 5));
@@ -142,6 +195,7 @@ describe('useLike hook', () => {
     // Wait for initial load
     await waitFor(() => {
       expect(result.current.likeCount).toBe(5);
+      expect(result.current.isLiked).toBe(false);
     });
 
     // Toggle like (should fail)
@@ -191,22 +245,28 @@ describe('useLike hook', () => {
       updateUserProfile: jest.fn(),
     });
 
-    // Make the API calls take some time
-    mockHasUserLikedPost.mockImplementation(
-      () => new Promise(resolve => setTimeout(() => resolve(false), 100))
-    );
-    mockGetPostLikeCount.mockImplementation(
-      () => new Promise(resolve => setTimeout(() => resolve(5), 100))
-    );
+    // Delay the subscription callbacks
+    mockSubscribeToPostLikeCount.mockImplementation((postId, callback) => {
+      setTimeout(() => callback(5), 100);
+      return jest.fn();
+    });
+
+    mockSubscribeToUserLikeStatus.mockImplementation((postId, userId, callback) => {
+      setTimeout(() => callback(false), 100);
+      return jest.fn();
+    });
 
     const { result } = renderHook(() => useLike('post123', 0));
 
-    // Should be loading initially
-    expect(result.current.isLoading).toBe(true);
+    // Initially, we'll have the default values
+    expect(result.current.likeCount).toBe(0);
 
-    // Wait for loading to complete
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
+    // Wait for loading to complete (subscriptions to fire)
+    await waitFor(
+      () => {
+        expect(result.current.likeCount).toBe(5);
+      },
+      { timeout: 200 }
+    );
   });
 });
