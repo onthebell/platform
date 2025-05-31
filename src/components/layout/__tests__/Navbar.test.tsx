@@ -32,26 +32,10 @@ jest.mock('@/lib/firebase/auth', () => ({
   useAuth: () => mockAuthState,
 }));
 
-// Mock theme
-const mockToggleTheme = jest.fn();
-jest.mock('@/lib/theme', () => ({
-  useTheme: () => ({
-    theme: 'light',
-    toggleTheme: mockToggleTheme,
-  }),
-}));
-
 // Mock NotificationDropdown
 jest.mock('@/components/notifications', () => ({
   NotificationDropdown: () => <div data-testid="notification-dropdown">Notifications</div>,
 }));
-
-// Mock ThemeToggle
-jest.mock('@/components/ui/ThemeToggle', () => {
-  return function ThemeToggle() {
-    return <button aria-label="switch to dark mode">Toggle Theme</button>;
-  };
-});
 
 describe('Navbar Component', () => {
   beforeEach(() => {
@@ -147,13 +131,6 @@ describe('Navbar Component', () => {
     // Should highlight current page based on pathname (/community)
     const communityButton = screen.getByText('Community');
     expect(communityButton.closest('button')).toHaveClass('text-blue-600');
-  });
-
-  it('includes theme toggle', () => {
-    render(<Navbar />);
-
-    const themeToggle = screen.getByLabelText(/switch to dark mode/i);
-    expect(themeToggle).toBeInTheDocument();
   });
 
   it('has proper accessibility attributes', () => {

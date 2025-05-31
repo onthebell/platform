@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/lib/firebase/auth';
-import { ThemeProvider } from '@/lib/theme';
 import ConditionalLayout from '@/components/layout/ConditionalLayout';
 
 const inter = Inter({
@@ -25,11 +24,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} font-sans antialiased`}>
-        <ThemeProvider>
-          <AuthProvider>
-            <ConditionalLayout>{children}</ConditionalLayout>
-          </AuthProvider>
-        </ThemeProvider>
+        <AuthProvider>
+          <ConditionalLayout>{children}</ConditionalLayout>
+        </AuthProvider>
       </body>
     </html>
   );
