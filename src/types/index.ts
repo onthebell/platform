@@ -24,6 +24,22 @@ export interface User {
     allowFollowing: boolean;
     showInDiscovery: boolean;
   };
+  // Notification preferences
+  notificationPreferences?: {
+    newPosts: {
+      deals: boolean;
+      events: boolean;
+      marketplace: boolean;
+      free_items: boolean;
+      help_requests: boolean;
+      community: boolean;
+      food: boolean;
+      services: boolean;
+    };
+    likes: boolean;
+    comments: boolean;
+    follows: boolean;
+  };
   // Admin-related fields
   role: UserRole;
   permissions: AdminPermission[];
@@ -179,7 +195,7 @@ export interface Notification {
   userId: string;
   title: string;
   message: string;
-  type: 'info' | 'success' | 'warning' | 'error' | 'like' | 'comment' | 'follow';
+  type: 'info' | 'success' | 'warning' | 'error' | 'like' | 'comment' | 'follow' | 'new_post';
   isRead: boolean;
   actionUrl?: string;
   createdAt: Date;
@@ -188,6 +204,7 @@ export interface Notification {
   actorName?: string;
   postId?: string;
   postTitle?: string;
+  postCategory?: PostCategory;
   commentId?: string;
   commentPreview?: string;
   followingType?: 'user' | 'business';

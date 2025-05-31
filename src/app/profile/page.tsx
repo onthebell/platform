@@ -10,6 +10,7 @@ import { CommunityPost } from '@/types';
 import PostCard from '@/components/community/PostCard';
 import UserLikedPosts from '@/components/community/UserLikedPosts';
 import PrivacySettings from '@/components/profile/PrivacySettings';
+import NotificationPreferences from '@/components/profile/NotificationPreferences';
 import { FollowStats } from '@/components/ui/FollowStats';
 import { formatDate, toDate } from '@/lib/utils';
 import {
@@ -30,7 +31,9 @@ export default function ProfilePage() {
   const router = useRouter();
   const [userPosts, setUserPosts] = useState<CommunityPost[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'posts' | 'liked' | 'settings' | 'privacy'>('posts');
+  const [activeTab, setActiveTab] = useState<
+    'posts' | 'liked' | 'settings' | 'privacy' | 'notifications'
+  >('posts');
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -236,6 +239,16 @@ export default function ProfilePage() {
               Privacy
             </button>
             <button
+              onClick={() => setActiveTab('notifications')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'notifications'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Notifications
+            </button>
+            <button
               onClick={() => setActiveTab('settings')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'settings'
@@ -315,6 +328,24 @@ export default function ProfilePage() {
                 try {
                   await updateUserProfile({
                     privacySettings: settings,
+                  });
+                  return Promise.resolve();
+                } catch (error) {
+                  return Promise.reject(error);
+                }
+              }}
+            />
+          </div>
+        )}
+
+        {activeTab === 'notifications' && (
+          <div>
+            <NotificationPreferences
+              initialPreferences={user.notificationPreferences}
+              onSave={async preferences => {
+                try {
+                  await updateUserProfile({
+                    notificationPreferences: preferences,
                   });
                   return Promise.resolve();
                 } catch (error) {

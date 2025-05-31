@@ -16,7 +16,7 @@ import {
   onSnapshot,
 } from 'firebase/firestore';
 import { db } from './config';
-import { CommunityPost, Event, Business, User, Notification } from '@/types';
+import { CommunityPost, Event, Business, User, Notification, PostCategory } from '@/types';
 
 // Posts operations
 export const postsCollection = collection(db, 'posts');
@@ -40,7 +40,34 @@ export async function createPost(post: Omit<CommunityPost, 'id' | 'createdAt' | 
   };
 
   const docRef = await addDoc(postsCollection, postData);
-  return docRef.id;
+  const postId = docRef.id;
+
+  // After successfully creating the post, create post notifications
+  // We'll do this in a try/catch to avoid blocking the post creation if notification fails
+  try {
+    // Import here to avoid circular dependencies
+    const { createPostNotifications } = await import('./postNotifications');
+
+    // Get the full post with ID to pass to the notification function
+    const newPost: CommunityPost = {
+      id: postId,
+      ...cleanPost,
+      createdAt: now,
+      updatedAt: now,
+    } as CommunityPost;
+
+    // Fetch the author profile to get the display name
+    const author = await getUserProfile(post.authorId);
+    if (author) {
+      // Create notifications for interested users
+      await createPostNotifications(post.authorId, author.displayName || 'Anonymous', newPost);
+    }
+  } catch (error) {
+    console.error('Failed to create post notifications:', error);
+    // Continue even if notifications fail
+  }
+
+  return postId;
 }
 
 export async function getPosts(
@@ -304,6 +331,28 @@ export async function getUserProfile(userId: string) {
   }
 
   return null;
+}
+
+/**
+ * Get users who have enabled notifications for a specific post category
+ */
+export async function getUsersByPreference(category: PostCategory): Promise<User[]> {
+  const querySnapshot = await getDocs(
+    query(
+      collection(db, 'users'),
+      where(`notificationPreferences.newPosts.${category}`, '==', true)
+    )
+  );
+
+  return querySnapshot.docs.map(doc => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      ...data,
+      joinedAt: data.joinedAt?.toDate() || new Date(),
+      lastActive: data.lastActive?.toDate() || new Date(),
+    } as User;
+  });
 }
 
 export async function updateUserProfile(userId: string, updates: Partial<User>) {

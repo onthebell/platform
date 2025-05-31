@@ -2,11 +2,11 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NotificationDropdown } from '../NotificationDropdown';
-import { useNotifications } from '@/hooks/useNotifications';
+import { useFilteredNotifications } from '@/hooks/useFilteredNotifications';
 
-// Mock the useNotifications hook
-jest.mock('@/hooks/useNotifications', () => ({
-  useNotifications: jest.fn(),
+// Mock the useFilteredNotifications hook
+jest.mock('@/hooks/useFilteredNotifications', () => ({
+  useFilteredNotifications: jest.fn(),
 }));
 
 // Mock Headless UI components
@@ -33,7 +33,9 @@ jest.mock('@headlessui/react', () => {
   };
 });
 
-const mockUseNotifications = useNotifications as jest.MockedFunction<typeof useNotifications>;
+const mockUseFilteredNotifications = useFilteredNotifications as jest.MockedFunction<
+  typeof useFilteredNotifications
+>;
 
 describe('NotificationDropdown', () => {
   const mockMarkAsRead = jest.fn();
@@ -45,13 +47,12 @@ describe('NotificationDropdown', () => {
   });
 
   it('renders with no notifications', () => {
-    mockUseNotifications.mockReturnValue({
+    mockUseFilteredNotifications.mockReturnValue({
       notifications: [],
       loading: false,
       unreadCount: 0,
       markAsRead: mockMarkAsRead,
       markAllAsRead: mockMarkAllAsRead,
-      refetch: jest.fn().mockResolvedValue(undefined),
     });
 
     render(<NotificationDropdown />);
@@ -84,13 +85,12 @@ describe('NotificationDropdown', () => {
       },
     ];
 
-    mockUseNotifications.mockReturnValue({
+    mockUseFilteredNotifications.mockReturnValue({
       notifications: mockNotifications,
       loading: false,
       unreadCount: 1,
       markAsRead: mockMarkAsRead,
       markAllAsRead: mockMarkAllAsRead,
-      refetch: jest.fn().mockResolvedValue(undefined),
     });
 
     render(<NotificationDropdown />);
@@ -102,13 +102,12 @@ describe('NotificationDropdown', () => {
   });
 
   it('shows correct unread count in badge', () => {
-    mockUseNotifications.mockReturnValue({
+    mockUseFilteredNotifications.mockReturnValue({
       notifications: [],
       loading: false,
       unreadCount: 5,
       markAsRead: mockMarkAsRead,
       markAllAsRead: mockMarkAllAsRead,
-      refetch: jest.fn().mockResolvedValue(undefined),
     });
 
     render(<NotificationDropdown />);
@@ -118,13 +117,12 @@ describe('NotificationDropdown', () => {
   });
 
   it('shows 99+ for unread count over 99', () => {
-    mockUseNotifications.mockReturnValue({
+    mockUseFilteredNotifications.mockReturnValue({
       notifications: [],
       loading: false,
       unreadCount: 150,
       markAsRead: mockMarkAsRead,
       markAllAsRead: mockMarkAllAsRead,
-      refetch: jest.fn().mockResolvedValue(undefined),
     });
 
     render(<NotificationDropdown />);
@@ -136,13 +134,12 @@ describe('NotificationDropdown', () => {
   it('calls markAllAsRead when button is clicked', async () => {
     const user = userEvent.setup();
 
-    mockUseNotifications.mockReturnValue({
+    mockUseFilteredNotifications.mockReturnValue({
       notifications: [],
       loading: false,
       unreadCount: 3,
       markAsRead: mockMarkAsRead,
       markAllAsRead: mockMarkAllAsRead,
-      refetch: jest.fn().mockResolvedValue(undefined),
     });
 
     render(<NotificationDropdown />);
@@ -154,13 +151,12 @@ describe('NotificationDropdown', () => {
   });
 
   it('shows loading state', () => {
-    mockUseNotifications.mockReturnValue({
+    mockUseFilteredNotifications.mockReturnValue({
       notifications: [],
       loading: true,
       unreadCount: 0,
       markAsRead: mockMarkAsRead,
       markAllAsRead: mockMarkAllAsRead,
-      refetch: jest.fn().mockResolvedValue(undefined),
     });
 
     render(<NotificationDropdown />);
@@ -169,13 +165,12 @@ describe('NotificationDropdown', () => {
   });
 
   it('handles plural notifications text correctly', () => {
-    mockUseNotifications.mockReturnValue({
+    mockUseFilteredNotifications.mockReturnValue({
       notifications: [],
       loading: false,
       unreadCount: 2,
       markAsRead: mockMarkAsRead,
       markAllAsRead: mockMarkAllAsRead,
-      refetch: jest.fn().mockResolvedValue(undefined),
     });
 
     render(<NotificationDropdown />);
@@ -184,13 +179,12 @@ describe('NotificationDropdown', () => {
   });
 
   it('has mobile-responsive classes', () => {
-    mockUseNotifications.mockReturnValue({
+    mockUseFilteredNotifications.mockReturnValue({
       notifications: [],
       loading: false,
       unreadCount: 1,
       markAsRead: mockMarkAsRead,
       markAllAsRead: mockMarkAllAsRead,
-      refetch: jest.fn().mockResolvedValue(undefined),
     });
 
     render(<NotificationDropdown />);
@@ -200,7 +194,7 @@ describe('NotificationDropdown', () => {
   });
 
   it('does not show mark all read button when no unread notifications', () => {
-    mockUseNotifications.mockReturnValue({
+    mockUseFilteredNotifications.mockReturnValue({
       notifications: [
         {
           id: '1',
@@ -216,7 +210,6 @@ describe('NotificationDropdown', () => {
       unreadCount: 0,
       markAsRead: mockMarkAsRead,
       markAllAsRead: mockMarkAllAsRead,
-      refetch: jest.fn().mockResolvedValue(undefined),
     });
 
     render(<NotificationDropdown />);
@@ -226,13 +219,12 @@ describe('NotificationDropdown', () => {
   });
 
   it('does not show view all button when no notifications', () => {
-    mockUseNotifications.mockReturnValue({
+    mockUseFilteredNotifications.mockReturnValue({
       notifications: [],
       loading: false,
       unreadCount: 0,
       markAsRead: mockMarkAsRead,
       markAllAsRead: mockMarkAllAsRead,
-      refetch: jest.fn().mockResolvedValue(undefined),
     });
 
     render(<NotificationDropdown />);

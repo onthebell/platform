@@ -12,6 +12,7 @@ import {
   HeartIcon,
   ChatBubbleLeftIcon,
   UserPlusIcon,
+  BellIcon,
 } from '@heroicons/react/24/outline';
 
 interface NotificationItemProps {
@@ -27,6 +28,7 @@ const notificationIcons = {
   like: HeartIcon,
   comment: ChatBubbleLeftIcon,
   follow: UserPlusIcon,
+  new_post: BellIcon,
 };
 
 const notificationColors = {
@@ -37,6 +39,7 @@ const notificationColors = {
   like: 'text-red-500',
   comment: 'text-blue-500',
   follow: 'text-green-500',
+  new_post: 'text-indigo-500',
 };
 
 export function NotificationItem({ notification, onMarkAsRead }: NotificationItemProps) {
@@ -73,6 +76,12 @@ export function NotificationItem({ notification, onMarkAsRead }: NotificationIte
           title: notification.actorName || 'Someone',
           message: 'started following you',
           actionUrl: notification.actorId ? `/profile/${notification.actorId}` : undefined,
+        };
+      case 'new_post':
+        return {
+          title: notification.actorName || 'New Post',
+          message: `posted a new ${notification.postCategory || ''} post: "${notification.postTitle || 'Untitled'}"`,
+          actionUrl: notification.postId ? `/community/${notification.postId}` : undefined,
         };
       default:
         return {

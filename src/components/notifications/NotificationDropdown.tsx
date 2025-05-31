@@ -3,12 +3,13 @@
 import { Fragment } from 'react';
 import { Popover, PopoverButton, Transition } from '@headlessui/react';
 import { BellIcon } from '@heroicons/react/24/outline';
-import { useNotifications } from '@/hooks/useNotifications';
+import { useFilteredNotifications } from '@/hooks/useFilteredNotifications';
 import { NotificationItem } from './NotificationItem';
 import Link from 'next/link';
 
 export function NotificationDropdown() {
-  const { notifications, loading, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const { notifications, loading, unreadCount, markAsRead, markAllAsRead } =
+    useFilteredNotifications();
 
   return (
     <Popover className="relative">

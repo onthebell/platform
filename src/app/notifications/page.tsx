@@ -2,14 +2,14 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/lib/firebase/auth';
-import { useNotifications } from '@/hooks/useNotifications';
+import { useFilteredNotifications } from '@/hooks/useFilteredNotifications';
 import { NotificationItem } from '@/components/notifications/NotificationItem';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
 export default function NotificationsPage() {
   const { user } = useAuth();
-  const { notifications, loading, markAsRead, markAllAsRead } = useNotifications();
+  const { notifications, loading, markAsRead, markAllAsRead } = useFilteredNotifications();
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
 
   if (!user) {

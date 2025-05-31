@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/firebase/auth';
 import { isAdmin, hasPermission } from '@/lib/admin';
 import { AdminStats, ContentReport, User, CommunityPost, AdminPermission } from '@/types';
@@ -31,7 +31,7 @@ export function useAdminDashboard() {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -55,11 +55,11 @@ export function useAdminDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchStats();
-  }, [user, fetchStats]);
+  }, [fetchStats]);
 
   return {
     stats,
