@@ -34,6 +34,8 @@ const createMockUser = (id: string): User => ({
   verificationStatus: 'none',
   joinedAt: new Date(),
   lastActive: new Date(),
+  role: 'user' as const,
+  permissions: [],
 });
 
 describe('Comment', () => {

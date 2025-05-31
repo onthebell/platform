@@ -142,6 +142,15 @@ export async function updatePost(id: string, updates: Partial<CommunityPost>) {
 
 // Delete a post
 export async function deletePost(postId: string) {
+  // Remove all likes for this post first
+  try {
+    const { removePostLikes } = await import('./likes');
+    await removePostLikes(postId);
+  } catch (error) {
+    console.warn('Failed to remove post likes:', error);
+    // Continue with post deletion even if like cleanup fails
+  }
+
   const docRef = doc(db, 'posts', postId);
   await deleteDoc(docRef);
 }

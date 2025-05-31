@@ -1,21 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/firebase/config';
-import {
-  doc,
-  collection,
-  query,
-  where,
-  orderBy,
-  limit,
-  getDocs,
-  updateDoc,
-  deleteDoc,
-  getDoc,
-  startAfter,
-} from 'firebase/firestore';
+import { getAdminFirestore } from '@/lib/firebase/admin';
 import { getAuthUser } from '@/lib/firebase/admin';
 import { isAdmin, hasPermission } from '@/lib/admin';
 import { CommunityPost } from '@/types';
+import type { Query, CollectionReference, DocumentData } from 'firebase-admin/firestore';
 
 // GET /api/admin/posts - Get all posts with pagination
 export async function GET(request: NextRequest) {
@@ -43,54 +31,36 @@ export async function GET(request: NextRequest) {
     const authorId = searchParams.get('authorId');
     const startAfterId = searchParams.get('startAfter');
 
-    // Build query
-    let postsQuery = query(collection(db, 'posts'), orderBy('createdAt', 'desc'), limit(pageSize));
+    const db = getAdminFirestore();
+    let query: Query<DocumentData> | CollectionReference<DocumentData> = db.collection('posts');
 
     // Add filters
     if (status && status !== 'all') {
       if (status === 'active') {
-        postsQuery = query(
-          collection(db, 'posts'),
-          where('isHidden', '==', false),
-          where('isDeleted', '==', false),
-          orderBy('createdAt', 'desc'),
-          limit(pageSize)
-        );
+        query = query.where('isHidden', '==', false).where('isDeleted', '==', false);
       } else if (status === 'hidden') {
-        postsQuery = query(
-          collection(db, 'posts'),
-          where('isHidden', '==', true),
-          orderBy('createdAt', 'desc'),
-          limit(pageSize)
-        );
+        query = query.where('isHidden', '==', true);
       } else if (status === 'deleted') {
-        postsQuery = query(
-          collection(db, 'posts'),
-          where('isDeleted', '==', true),
-          orderBy('createdAt', 'desc'),
-          limit(pageSize)
-        );
+        query = query.where('isDeleted', '==', true);
       }
     }
 
     if (authorId) {
-      postsQuery = query(
-        collection(db, 'posts'),
-        where('authorId', '==', authorId),
-        orderBy('createdAt', 'desc'),
-        limit(pageSize)
-      );
+      query = query.where('authorId', '==', authorId);
     }
+
+    // Order and limit
+    query = query.orderBy('createdAt', 'desc').limit(pageSize);
 
     // Handle pagination
     if (startAfterId) {
-      const startAfterDoc = await getDoc(doc(db, 'posts', startAfterId));
-      if (startAfterDoc.exists()) {
-        postsQuery = query(postsQuery, startAfter(startAfterDoc));
+      const startAfterDoc = await db.collection('posts').doc(startAfterId).get();
+      if (startAfterDoc.exists) {
+        query = query.startAfter(startAfterDoc);
       }
     }
 
-    const snapshot = await getDocs(postsQuery);
+    const snapshot = await query.get();
     const posts = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
@@ -109,9 +79,17 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// PUT /api/admin/posts - Update post (hide, restore, etc.)
-export async function PUT(request: NextRequest) {
+// POST /api/admin/posts - Moderate a post (hide/show/delete/restore)
+export async function POST(request: NextRequest) {
   try {
+    const body = await request.json();
+    const { action, postId, reason } = body;
+
+    if (!postId || !action) {
+      return NextResponse.json({ error: 'Post ID and action are required' }, { status: 400 });
+    }
+
+    // Check authentication and admin permissions
     const userHeader = request.headers.get('x-user-id');
     if (!userHeader) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
@@ -126,23 +104,17 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 
-    const { postId, action, reason } = await request.json();
+    const db = getAdminFirestore();
+    const postRef = db.collection('posts').doc(postId);
+    const postDoc = await postRef.get();
 
-    if (!postId || !action) {
-      return NextResponse.json({ error: 'Post ID and action are required' }, { status: 400 });
-    }
-
-    const postRef = doc(db, 'posts', postId);
-    const postDoc = await getDoc(postRef);
-
-    if (!postDoc.exists()) {
+    if (!postDoc.exists) {
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     }
 
     const updates: any = {
-      updatedAt: new Date(),
-      moderatedBy: user.id,
       moderatedAt: new Date(),
+      moderatedBy: user.id,
     };
 
     if (reason) {
@@ -153,32 +125,40 @@ export async function PUT(request: NextRequest) {
       case 'hide':
         updates.isHidden = true;
         break;
-      case 'restore':
+      case 'show':
         updates.isHidden = false;
-        updates.isDeleted = false;
         break;
       case 'delete':
         updates.isDeleted = true;
+        break;
+      case 'restore':
+        updates.isDeleted = false;
+        updates.isHidden = false;
         break;
       default:
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
 
-    await updateDoc(postRef, updates);
+    await postRef.update(updates);
 
-    return NextResponse.json({
-      success: true,
-      message: `Post ${action}d successfully`,
-    });
+    return NextResponse.json({ success: true, message: `Post ${action}d successfully` });
   } catch (error) {
-    console.error('Error updating post:', error);
-    return NextResponse.json({ error: 'Failed to update post' }, { status: 500 });
+    console.error('Error moderating post:', error);
+    return NextResponse.json({ error: 'Failed to moderate post' }, { status: 500 });
   }
 }
 
-// DELETE /api/admin/posts - Permanently delete post
+// DELETE /api/admin/posts - Permanently delete a post
 export async function DELETE(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const postId = searchParams.get('id');
+
+    if (!postId) {
+      return NextResponse.json({ error: 'Post ID is required' }, { status: 400 });
+    }
+
+    // Check authentication and admin permissions
     const userHeader = request.headers.get('x-user-id');
     if (!userHeader) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
@@ -193,19 +173,17 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 
-    const { searchParams } = new URL(request.url);
-    const postId = searchParams.get('postId');
+    const db = getAdminFirestore();
+    const postRef = db.collection('posts').doc(postId);
+    const postDoc = await postRef.get();
 
-    if (!postId) {
-      return NextResponse.json({ error: 'Post ID is required' }, { status: 400 });
+    if (!postDoc.exists) {
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     }
 
-    await deleteDoc(doc(db, 'posts', postId));
+    await postRef.delete();
 
-    return NextResponse.json({
-      success: true,
-      message: 'Post permanently deleted',
-    });
+    return NextResponse.json({ success: true, message: 'Post deleted permanently' });
   } catch (error) {
     console.error('Error deleting post:', error);
     return NextResponse.json({ error: 'Failed to delete post' }, { status: 500 });

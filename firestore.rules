@@ -111,5 +111,15 @@ service cloud.firestore {
       allow update: if isAuthenticated() && request.auth.uid == attendeeId;
       allow delete: if isAuthenticated() && request.auth.uid == attendeeId;
     }
+
+    // Likes collection
+    match /likes/{likeId} {
+      allow read: if true; // Public read access for like counts
+      allow create: if isAuthenticated() && 
+                      request.auth.uid == request.resource.data.userId &&
+                      request.resource.data.keys().hasAll(['userId', 'postId', 'createdAt']);
+      allow update: if false; // Likes are immutable
+      allow delete: if isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
   }
 }

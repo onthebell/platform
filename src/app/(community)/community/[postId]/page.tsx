@@ -14,7 +14,9 @@ import {
   ArrowLeftIcon,
 } from '@heroicons/react/24/outline';
 import { HeartIcon, ShareIcon } from '@heroicons/react/24/solid';
+import { HeartIcon as HeartIconOutline } from '@heroicons/react/24/outline';
 import { CommentsSection } from '@/components/community/CommentsSection';
+import { useLike } from '@/hooks/useLike';
 
 export default function PostDetailPage() {
   const params = useParams();
@@ -24,6 +26,15 @@ export default function PostDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Like functionality
+  const {
+    isLiked,
+    likeCount,
+    isLoading: likeLoading,
+    toggleLike,
+    canLike,
+  } = useLike(post?.id || '', post?.likes || 0);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -55,6 +66,15 @@ export default function PostDetailPage() {
     // Here you would implement contact functionality
     // For now, we'll just show an alert
     alert('Contact functionality will be implemented with messaging system');
+  };
+
+  const handleLike = async () => {
+    if (!canLike) {
+      router.push('/auth/signin');
+      return;
+    }
+
+    await toggleLike();
   };
 
   const handleShare = async () => {
@@ -212,8 +232,17 @@ export default function PostDetailPage() {
                 >
                   <ShareIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                 </button>
-                <button className="p-2 sm:p-2.5 text-gray-400 hover:text-red-500 border border-gray-300 rounded-lg hover:bg-gray-50 touch-target">
-                  <HeartIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                <button
+                  onClick={handleLike}
+                  disabled={likeLoading}
+                  className="flex items-center p-2 sm:p-2.5 text-gray-400 hover:text-red-500 border border-gray-300 rounded-lg hover:bg-gray-50 touch-target disabled:opacity-50"
+                >
+                  {isLiked ? (
+                    <HeartIcon className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
+                  ) : (
+                    <HeartIconOutline className="h-4 w-4 sm:h-5 sm:w-5" />
+                  )}
+                  {likeCount > 0 && <span className="ml-1 text-xs">{likeCount}</span>}
                 </button>
               </div>
             </div>

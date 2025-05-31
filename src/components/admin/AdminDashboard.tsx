@@ -4,8 +4,10 @@ import {
   DocumentTextIcon,
   FlagIcon,
   ExclamationTriangleIcon,
+  HeartIcon,
 } from '@heroicons/react/24/outline';
 import { formatDistanceToNow } from 'date-fns';
+import AdminLikeAnalytics from './AdminLikeAnalytics';
 
 interface StatCardProps {
   title: string;
@@ -215,6 +217,16 @@ export default function AdminDashboard() {
               </div>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* Like Analytics */}
+      <div className="bg-white rounded-lg shadow">
+        <div className="p-6 border-b border-gray-200">
+          <h3 className="text-lg font-medium text-gray-900">Like Analytics</h3>
+        </div>
+        <div className="p-6">
+          <AdminLikeAnalytics />
         </div>
       </div>
     </div>

@@ -9,6 +9,7 @@ import { CommunityPost } from '@/types';
 import { useAuth } from '@/lib/firebase/auth';
 import { deletePost } from '@/lib/firebase/firestore';
 import { useCommentCount } from '@/hooks/useCommentCount';
+import { useLike } from '@/hooks/useLike';
 import {
   MapPinIcon,
   CalendarIcon,
@@ -37,12 +38,20 @@ interface PostCardProps {
 export default function PostCard({ post, isCompact = false }: PostCardProps) {
   const { user } = useAuth();
   const router = useRouter();
-  const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
   const [showOptions, setShowOptions] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const optionsRef = useRef<HTMLDivElement>(null);
   const { count: commentCount } = useCommentCount(post.id);
+
+  // Use the new like hook instead of local state
+  const {
+    isLiked,
+    likeCount,
+    isLoading: likeLoading,
+    error: likeError,
+    toggleLike,
+    canLike,
+  } = useLike(post.id, post.likes || 0);
 
   const isOwner = user && user.id === post.authorId;
 
@@ -63,13 +72,14 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
     };
   }, [showOptions]);
 
-  const handleLike = () => {
-    if (liked) {
-      setLikeCount(prev => prev - 1);
-    } else {
-      setLikeCount(prev => prev + 1);
+  const handleLike = async () => {
+    if (!canLike) {
+      // Could show a toast or redirect to login
+      console.log('Must be signed in to like posts');
+      return;
     }
-    setLiked(!liked);
+
+    await toggleLike();
   };
 
   const handleCardClick = () => {
@@ -315,8 +325,9 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
             onClick={handleLike}
             className="flex items-center mr-4 text-gray-500 hover:text-red-500 focus:outline-none transition-colors"
             aria-label="Like post"
+            disabled={likeLoading}
           >
-            {liked ? (
+            {isLiked ? (
               <HeartIconSolid className="h-4 w-4 sm:h-5 sm:w-5 text-red-500 mr-1" />
             ) : (
               <HeartIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1" />

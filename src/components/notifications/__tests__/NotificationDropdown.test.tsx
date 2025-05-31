@@ -18,6 +18,7 @@ jest.mock('@headlessui/react', () => {
       {children}
     </div>
   );
+  // @ts-expect-error nested components are not typed
   MockPopover.Panel.displayName = 'MockPopoverPanel';
 
   return {
