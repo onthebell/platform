@@ -22,6 +22,7 @@ import {
   EllipsisVerticalIcon,
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
+import ReportButton from '@/components/moderation/ReportButton';
 
 // For testing purposes
 export const __internal = {
@@ -348,6 +349,15 @@ export default function PostCard({ post, isCompact = false }: PostCardProps) {
           >
             <ShareIcon className="h-4 w-4 sm:h-5 sm:w-5" />
           </button>
+          {!isOwner && user && (
+            <ReportButton
+              contentType="post"
+              contentId={post.id}
+              contentAuthorId={post.authorId}
+              size="sm"
+              className="ml-4"
+            />
+          )}
         </div>
         <div className="text-sm font-medium">
           <Link

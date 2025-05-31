@@ -17,6 +17,7 @@ import { HeartIcon, ShareIcon } from '@heroicons/react/24/solid';
 import { HeartIcon as HeartIconOutline } from '@heroicons/react/24/outline';
 import { CommentsSection } from '@/components/community/CommentsSection';
 import { useLike } from '@/hooks/useLike';
+import ReportButton from '@/components/moderation/ReportButton';
 
 export default function PostDetailPage() {
   const params = useParams();
@@ -244,6 +245,17 @@ export default function PostDetailPage() {
                   )}
                   {likeCount > 0 && <span className="ml-1 text-xs">{likeCount}</span>}
                 </button>
+                {user && user.id !== post.authorId && (
+                  <div className="border border-gray-300 rounded-lg hover:bg-gray-50">
+                    <ReportButton
+                      contentType="post"
+                      contentId={post.id}
+                      contentAuthorId={post.authorId}
+                      size="md"
+                      className="p-2 sm:p-2.5"
+                    />
+                  </div>
+                )}
               </div>
             </div>
 

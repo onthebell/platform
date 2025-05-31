@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useAuth } from '@/lib/firebase/auth';
 import { ReportReason } from '@/types';
 import { FlagIcon } from '@heroicons/react/24/outline';
 import ReportModal from './ReportModal';
@@ -22,12 +23,18 @@ export default function ReportButton({
 }: ReportButtonProps) {
   const [showModal, setShowModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user } = useAuth();
 
   const handleSubmitReport = async (data: {
     reason: ReportReason;
     customReason?: string;
     description?: string;
   }) => {
+    if (!user) {
+      alert('You must be signed in to report content.');
+      return false;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -35,6 +42,7 @@ export default function ReportButton({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-user-id': user.id,
         },
         body: JSON.stringify({
           contentType,

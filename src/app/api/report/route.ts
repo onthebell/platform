@@ -14,22 +14,10 @@ interface ReportRequest {
 
 export async function POST(request: NextRequest) {
   try {
-    // Get the user ID from the Authorization header
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
-
-    const token = authHeader.substring(7);
-    // In a real implementation, you would verify the Firebase ID token
-    // For now, we'll assume the token contains the user ID
-    // TODO: Implement proper token verification
-
-    // For development, we'll extract user from request differently
-    // In production, verify the Firebase ID token and get uid
+    // Get user ID from header (consistent with other API endpoints)
     const userHeader = request.headers.get('x-user-id');
     if (!userHeader) {
-      return NextResponse.json({ error: 'User ID required' }, { status: 401 });
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     const user = await getAuthUser(userHeader);
@@ -83,26 +71,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Cannot report your own content' }, { status: 400 });
     }
 
-    // Create the report
-    const reportData: Omit<ContentReport, 'id'> = {
+    // Create the report data (without timestamps initially)
+    const reportData: any = {
       reporterId: user.id,
       reporterName: user.displayName || user.email,
       contentType,
       contentId,
       contentAuthorId,
       reason,
-      customReason: reason === 'other' ? customReason : undefined,
-      description,
       status: 'pending',
-      createdAt: new Date(),
-      updatedAt: new Date(),
     };
 
-    const reportRef = await addDoc(collection(db, 'contentReports'), {
-      ...reportData,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    });
+    // Only include optional fields if they have values
+    if (reason === 'other' && customReason?.trim()) {
+      reportData.customReason = customReason.trim();
+    }
+    if (description?.trim()) {
+      reportData.description = description.trim();
+    }
+
+    // Add timestamps using serverTimestamp()
+    reportData.createdAt = serverTimestamp();
+    reportData.updatedAt = serverTimestamp();
+
+    const reportRef = await addDoc(collection(db, 'contentReports'), reportData);
 
     return NextResponse.json({
       success: true,

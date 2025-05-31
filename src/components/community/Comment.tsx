@@ -5,6 +5,7 @@ import { Comment as CommentType } from '@/types';
 import { useAuth } from '@/lib/firebase/auth';
 import { formatRelativeTime } from '@/lib/utils';
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import ReportButton from '@/components/moderation/ReportButton';
 
 interface CommentProps {
   comment: CommentType;
@@ -92,6 +93,16 @@ export function Comment({ comment, onUpdate, onDelete }: CommentProps) {
                 <TrashIcon className="w-4 h-4" />
               </button>
             </div>
+          )}
+
+          {/* Report button for other users */}
+          {!canModify && user && !isEditing && (
+            <ReportButton
+              contentType="comment"
+              contentId={comment.id}
+              contentAuthorId={comment.authorId}
+              size="sm"
+            />
           )}
         </div>
 
