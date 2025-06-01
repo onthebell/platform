@@ -9,6 +9,7 @@ const mockGoogleMaps = {
       Autocomplete: jest.fn().mockImplementation(() => ({
         addListener: jest.fn(),
         setBounds: jest.fn(),
+        setOptions: jest.fn(),
         getPlace: jest.fn(),
       })),
     },

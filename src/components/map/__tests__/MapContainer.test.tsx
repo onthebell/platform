@@ -51,8 +51,8 @@ describe('MapContainer', () => {
 
     const mapElement = screen.getByTestId('mocked-leaflet-map');
     expect(mapElement).toBeInTheDocument();
-    expect(screen.getByText('Center: -38.1599, 144.3617')).toBeInTheDocument();
-    expect(screen.getByText('Zoom: 11')).toBeInTheDocument();
+    expect(screen.getByText('Center: -38.196, 144.599')).toBeInTheDocument();
+    expect(screen.getByText('Zoom: 9')).toBeInTheDocument();
     expect(screen.getByText('Markers: 0')).toBeInTheDocument();
   });
 
@@ -88,7 +88,7 @@ describe('MapContainer', () => {
     render(<MapContainer />);
 
     const container = screen.getByTestId('mocked-leaflet-map').parentElement;
-    expect(container).toHaveClass('w-full', 'h-64', 'sm:h-80', 'md:h-96');
+    expect(container).toHaveClass('w-full', 'h-full');
   });
 
   it('passes markers correctly', () => {
