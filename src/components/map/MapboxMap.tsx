@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useCallback, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
+import Supercluster from 'supercluster';
 import { bellarineSuburbs } from './bellarineSuburbs';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './map-styles.css';
@@ -21,8 +22,10 @@ interface MapboxMapProps {
     contact?: string;
   }>;
   onMarkerClick?: (markerId: string) => void;
+  onClusterClick?: (clusterPoints: Array<{ id: string; position: [number, number] }>) => void;
   selectedMarkerId?: string;
   onMapStateChange?: (center: [number, number], zoom: number) => void;
+  onVisibleMarkersChange?: (markerIds: string[]) => void;
 }
 
 const categoryIcons: { [key: string]: string } = {
@@ -51,12 +54,15 @@ export default function MapboxMap({
   zoom,
   markers,
   onMarkerClick,
+  onClusterClick,
   selectedMarkerId,
   onMapStateChange,
+  onVisibleMarkersChange,
 }: MapboxMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const clusterRef = useRef<Supercluster | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -149,7 +155,7 @@ export default function MapboxMap({
     };
   }, []); // Only initialize once
 
-  // Separate effect for handling map state changes
+  // Handle map state changes
   useEffect(() => {
     if (!map.current || !mapLoaded) return;
 
@@ -172,7 +178,7 @@ export default function MapboxMap({
     };
   }, [onMapStateChange, mapLoaded]);
 
-  // Separate effect for updating map center and zoom
+  // Update map center and zoom when props change
   useEffect(() => {
     if (!map.current || !mapLoaded) return;
 
@@ -229,76 +235,338 @@ export default function MapboxMap({
     el.appendChild(iconSpan);
 
     return el;
-  }, []); // Remove dependencies to prevent constant recreation
+  }, []);
 
-  // Update markers when data changes (optimized)
+  // Create cluster marker element
+  const createClusterElement = useCallback((pointCount: number, clusteredCategories: string[]) => {
+    const el = document.createElement('div');
+    el.className = 'cluster-marker';
+
+    // Determine cluster color based on most common category or use default
+    const primaryCategory = clusteredCategories[0] || 'default';
+    const color = categoryColors[primaryCategory] || categoryColors.default;
+
+    el.style.cssText = `
+      background-color: ${color};
+      color: white;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 16px;
+      border: 3px solid white;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    `;
+
+    el.textContent = pointCount.toString();
+
+    // Add hover effects
+    el.addEventListener('mouseenter', () => {
+      el.style.filter = 'drop-shadow(0 4px 12px rgba(0,0,0,0.4))';
+    });
+
+    el.addEventListener('mouseleave', () => {
+      el.style.filter = '';
+    });
+
+    return el;
+  }, []);
+
+  // Initialize clustering
+  useEffect(() => {
+    if (markers.length === 0) {
+      clusterRef.current = null;
+      return;
+    }
+
+    // Convert markers to GeoJSON points for clustering
+    const points = markers.map(marker => ({
+      type: 'Feature' as const,
+      properties: {
+        cluster: false,
+        markerId: marker.id,
+        category: marker.category || 'default',
+      },
+      geometry: {
+        type: 'Point' as const,
+        coordinates: [marker.position[1], marker.position[0]], // [lng, lat]
+      },
+    }));
+
+    clusterRef.current = new Supercluster({
+      radius: 50,
+      maxZoom: 16,
+      minZoom: 0,
+      minPoints: 2,
+    });
+
+    clusterRef.current.load(points);
+  }, [markers]);
+
+  // Update markers when data changes (with clustering)
   useEffect(() => {
     if (!map.current || !mapLoaded) return;
 
-    // Create a map of existing markers by ID for efficient updates
-    const existingMarkerIds = new Set(
-      markersRef.current.map((_, index) => markers[index]?.id).filter(Boolean)
-    );
-    const newMarkerIds = new Set(markers.map(m => m.id));
+    // Clear all existing markers first
+    markersRef.current.forEach(marker => marker.remove());
+    markersRef.current = [];
 
-    // Remove markers that no longer exist
-    markersRef.current = markersRef.current.filter((marker, index) => {
-      const markerId = markers[index]?.id;
-      if (!markerId || !newMarkerIds.has(markerId)) {
-        marker.remove();
-        return false;
+    if (markers.length === 0 || !clusterRef.current) return;
+
+    // Get current map bounds
+    const bounds = map.current.getBounds();
+    if (!bounds) return;
+
+    const bbox = [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()] as [
+      number,
+      number,
+      number,
+      number,
+    ];
+
+    // Get clusters for current zoom and bounds
+    const currentZoom = Math.floor(map.current.getZoom());
+    const clusters = clusterRef.current.getClusters(bbox, currentZoom);
+
+    clusters.forEach(cluster => {
+      const [lng, lat] = cluster.geometry.coordinates;
+      const { cluster: isCluster, point_count: pointCount } = cluster.properties;
+
+      if (isCluster) {
+        // Create cluster marker
+        const leaves = clusterRef.current!.getLeaves(cluster.id as number, pointCount || 10);
+        const categories = leaves.map(leaf => leaf.properties.category);
+        const clusterElement = createClusterElement(pointCount || 0, categories);
+
+        clusterElement.addEventListener('click', e => {
+          e.stopPropagation();
+          if (onClusterClick) {
+            const clusterPoints = leaves.map(leaf => ({
+              id: leaf.properties.markerId,
+              position: [leaf.geometry.coordinates[1], leaf.geometry.coordinates[0]] as [
+                number,
+                number,
+              ],
+            }));
+            onClusterClick(clusterPoints);
+          }
+        });
+
+        const mapboxMarker = new mapboxgl.Marker({
+          element: clusterElement,
+          anchor: 'center',
+        })
+          .setLngLat([lng, lat])
+          .addTo(map.current!);
+
+        markersRef.current.push(mapboxMarker);
+      } else {
+        // Create individual marker
+        const markerId = cluster.properties.markerId;
+        const category = cluster.properties.category;
+        const markerElement = createMarkerElement(category);
+
+        // Add click handler
+        markerElement.addEventListener('click', e => {
+          e.stopPropagation();
+          if (onMarkerClick) {
+            onMarkerClick(markerId);
+          }
+        });
+
+        // Add hover effects
+        markerElement.addEventListener('mouseenter', () => {
+          markerElement.style.filter = 'drop-shadow(0 4px 12px rgba(0,0,0,0.4))';
+          markerElement.style.zIndex = '1000';
+          const innerSpan = markerElement.querySelector('span');
+          if (innerSpan) {
+            innerSpan.style.transform = 'rotate(45deg) scale(1.2)';
+          }
+        });
+
+        markerElement.addEventListener('mouseleave', () => {
+          markerElement.style.filter = '';
+          markerElement.style.zIndex = 'auto';
+          const innerSpan = markerElement.querySelector('span');
+          if (innerSpan) {
+            innerSpan.style.transform = 'rotate(45deg) scale(1)';
+          }
+        });
+
+        const mapboxMarker = new mapboxgl.Marker({
+          element: markerElement,
+          anchor: 'bottom',
+        })
+          .setLngLat([lng, lat])
+          .addTo(map.current!);
+
+        markersRef.current.push(mapboxMarker);
       }
-      return true;
     });
 
-    // Add new markers only
-    markers.forEach((marker, index) => {
-      // Skip if marker already exists
-      if (existingMarkerIds.has(marker.id) && markersRef.current[index]) {
-        return;
+    // Initial visible markers calculation
+    if (onVisibleMarkersChange && map.current) {
+      const bounds = map.current.getBounds();
+      if (bounds) {
+        const visibleMarkerIds = markers
+          .filter(marker => {
+            const [lat, lng] = marker.position;
+            return bounds.contains([lng, lat]); // Mapbox uses [lng, lat]
+          })
+          .map(marker => marker.id);
+        onVisibleMarkersChange(visibleMarkerIds);
       }
+    }
+  }, [
+    markers,
+    mapLoaded,
+    createMarkerElement,
+    createClusterElement,
+    onMarkerClick,
+    onClusterClick,
+    onVisibleMarkersChange,
+  ]);
 
-      const markerElement = createMarkerElement(marker.category);
+  // Update clusters when map moves or zooms
+  useEffect(() => {
+    if (!map.current || !mapLoaded) return;
 
-      // Add click handler that triggers the drawer instead of a popup
-      markerElement.addEventListener('click', e => {
-        e.stopPropagation();
-        console.log('🔥 Marker clicked:', marker.id);
-        if (onMarkerClick) {
-          onMarkerClick(marker.id);
+    const updateClusters = () => {
+      // Clear existing markers
+      markersRef.current.forEach(marker => marker.remove());
+      markersRef.current = [];
+
+      if (markers.length === 0 || !clusterRef.current || !map.current) return;
+
+      // Get current map bounds and zoom
+      const bounds = map.current.getBounds();
+      if (!bounds) return;
+
+      const bbox = [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()] as [
+        number,
+        number,
+        number,
+        number,
+      ];
+
+      const currentZoom = Math.floor(map.current.getZoom());
+      const clusters = clusterRef.current.getClusters(bbox, currentZoom);
+
+      clusters.forEach(cluster => {
+        const [lng, lat] = cluster.geometry.coordinates;
+        const { cluster: isCluster, point_count: pointCount } = cluster.properties;
+
+        if (isCluster) {
+          // Create cluster marker
+          const leaves = clusterRef.current!.getLeaves(cluster.id as number, pointCount || 10);
+          const categories = leaves.map(leaf => leaf.properties.category);
+          const clusterElement = createClusterElement(pointCount || 0, categories);
+
+          clusterElement.addEventListener('click', e => {
+            e.stopPropagation();
+            if (onClusterClick) {
+              const clusterPoints = leaves.map(leaf => ({
+                id: leaf.properties.markerId,
+                position: [leaf.geometry.coordinates[1], leaf.geometry.coordinates[0]] as [
+                  number,
+                  number,
+                ],
+              }));
+              onClusterClick(clusterPoints);
+            }
+          });
+
+          const mapboxMarker = new mapboxgl.Marker({
+            element: clusterElement,
+            anchor: 'center',
+          })
+            .setLngLat([lng, lat])
+            .addTo(map.current!);
+
+          markersRef.current.push(mapboxMarker);
+        } else {
+          // Create individual marker
+          const markerId = cluster.properties.markerId;
+          const category = cluster.properties.category;
+          const markerElement = createMarkerElement(category);
+
+          // Add click handler
+          markerElement.addEventListener('click', e => {
+            e.stopPropagation();
+            if (onMarkerClick) {
+              onMarkerClick(markerId);
+            }
+          });
+
+          // Add hover effects
+          markerElement.addEventListener('mouseenter', () => {
+            markerElement.style.filter = 'drop-shadow(0 4px 12px rgba(0,0,0,0.4))';
+            markerElement.style.zIndex = '1000';
+            const innerSpan = markerElement.querySelector('span');
+            if (innerSpan) {
+              innerSpan.style.transform = 'rotate(45deg) scale(1.2)';
+            }
+          });
+
+          markerElement.addEventListener('mouseleave', () => {
+            markerElement.style.filter = '';
+            markerElement.style.zIndex = 'auto';
+            const innerSpan = markerElement.querySelector('span');
+            if (innerSpan) {
+              innerSpan.style.transform = 'rotate(45deg) scale(1)';
+            }
+          });
+
+          const mapboxMarker = new mapboxgl.Marker({
+            element: markerElement,
+            anchor: 'bottom',
+          })
+            .setLngLat([lng, lat])
+            .addTo(map.current!);
+
+          markersRef.current.push(mapboxMarker);
         }
       });
 
-      // Add hover effects (using scale without overriding transform)
-      markerElement.addEventListener('mouseenter', () => {
-        markerElement.style.filter = 'drop-shadow(0 4px 12px rgba(0,0,0,0.4))';
-        markerElement.style.zIndex = '1000';
-        // Use a nested element for scaling to avoid breaking Mapbox positioning
-        const innerSpan = markerElement.querySelector('span');
-        if (innerSpan) {
-          innerSpan.style.transform = 'rotate(45deg) scale(1.2)';
+      // Update visible markers after clusters are rendered
+      if (onVisibleMarkersChange) {
+        // Get all markers within the current viewport bounds, whether clustered or not
+        const bounds = map.current.getBounds();
+        if (bounds) {
+          const visibleMarkerIds = markers
+            .filter(marker => {
+              const [lat, lng] = marker.position;
+              return bounds.contains([lng, lat]); // Mapbox uses [lng, lat]
+            })
+            .map(marker => marker.id);
+          onVisibleMarkersChange(visibleMarkerIds);
         }
-      });
+      }
+    };
 
-      markerElement.addEventListener('mouseleave', () => {
-        markerElement.style.filter = '';
-        markerElement.style.zIndex = 'auto';
-        const innerSpan = markerElement.querySelector('span');
-        if (innerSpan) {
-          innerSpan.style.transform = 'rotate(45deg) scale(1)';
-        }
-      });
+    map.current.on('moveend', updateClusters);
+    map.current.on('zoomend', updateClusters);
 
-      const mapboxMarker = new mapboxgl.Marker({
-        element: markerElement,
-        anchor: 'bottom',
-      })
-        .setLngLat([marker.position[1], marker.position[0]]) // Mapbox uses [lng, lat]
-        .addTo(map.current!);
-
-      markersRef.current[index] = mapboxMarker;
-    });
-  }, [markers, mapLoaded, createMarkerElement, onMarkerClick]);
+    return () => {
+      if (map.current) {
+        map.current.off('moveend', updateClusters);
+        map.current.off('zoomend', updateClusters);
+      }
+    };
+  }, [
+    markers,
+    mapLoaded,
+    createMarkerElement,
+    createClusterElement,
+    onMarkerClick,
+    onClusterClick,
+    onVisibleMarkersChange,
+  ]);
 
   // Handle selected marker highlighting
   useEffect(() => {

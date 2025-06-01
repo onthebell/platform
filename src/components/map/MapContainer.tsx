@@ -32,8 +32,10 @@ interface MapContainerProps {
     contact?: string;
   }>;
   onMarkerClick?: (markerId: string) => void;
+  onClusterClick?: (clusterPoints: Array<{ id: string; position: [number, number] }>) => void;
   selectedMarkerId?: string;
   onMapStateChange?: (center: [number, number], zoom: number) => void;
+  onVisibleMarkersChange?: (markerIds: string[]) => void;
 }
 
 export default function MapContainer({
@@ -42,8 +44,10 @@ export default function MapContainer({
   className = 'w-full h-full',
   markers = [],
   onMarkerClick,
+  onClusterClick,
   selectedMarkerId,
   onMapStateChange,
+  onVisibleMarkersChange,
 }: MapContainerProps) {
   const [mounted, setMounted] = useState(false);
 
@@ -69,8 +73,10 @@ export default function MapContainer({
         zoom={zoom}
         markers={markers}
         onMarkerClick={onMarkerClick}
+        onClusterClick={onClusterClick}
         selectedMarkerId={selectedMarkerId}
         onMapStateChange={onMapStateChange}
+        onVisibleMarkersChange={onVisibleMarkersChange}
       />
     </div>
   );
