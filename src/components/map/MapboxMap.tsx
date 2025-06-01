@@ -60,7 +60,7 @@ export default function MapboxMap({
   const [mapLoaded, setMapLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize map
+  // Initialize map (only once)
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
 
@@ -141,29 +141,60 @@ export default function MapboxMap({
       setError('Map failed to load. Please refresh the page.');
     });
 
-    // Add map state change listeners
-    if (onMapStateChange) {
-      const handleMapMove = () => {
-        if (map.current) {
-          const currentCenter = map.current.getCenter();
-          const currentZoom = map.current.getZoom();
-          onMapStateChange([currentCenter.lat, currentCenter.lng], currentZoom);
-        }
-      };
-
-      map.current.on('moveend', handleMapMove);
-      map.current.on('zoomend', handleMapMove);
-    }
-
     return () => {
       if (map.current) {
         map.current.remove();
         map.current = null;
       }
     };
-  }, [center, zoom, onMapStateChange]);
+  }, []); // Only initialize once
 
-  // Create marker element
+  // Separate effect for handling map state changes
+  useEffect(() => {
+    if (!map.current || !mapLoaded) return;
+
+    const handleMapMove = () => {
+      if (map.current && onMapStateChange) {
+        const currentCenter = map.current.getCenter();
+        const currentZoom = map.current.getZoom();
+        onMapStateChange([currentCenter.lat, currentCenter.lng], currentZoom);
+      }
+    };
+
+    map.current.on('moveend', handleMapMove);
+    map.current.on('zoomend', handleMapMove);
+
+    return () => {
+      if (map.current) {
+        map.current.off('moveend', handleMapMove);
+        map.current.off('zoomend', handleMapMove);
+      }
+    };
+  }, [onMapStateChange, mapLoaded]);
+
+  // Separate effect for updating map center and zoom
+  useEffect(() => {
+    if (!map.current || !mapLoaded) return;
+
+    const currentCenter = map.current.getCenter();
+    const currentZoom = map.current.getZoom();
+
+    // Only update if the center or zoom has actually changed significantly
+    const centerChanged =
+      Math.abs(currentCenter.lat - center[0]) > 0.001 ||
+      Math.abs(currentCenter.lng - center[1]) > 0.001;
+    const zoomChanged = Math.abs(currentZoom - zoom) > 0.1;
+
+    if (centerChanged || zoomChanged) {
+      map.current.flyTo({
+        center: [center[1], center[0]],
+        zoom: zoom,
+        duration: 1000,
+      });
+    }
+  }, [center, zoom, mapLoaded]);
+
+  // Create marker element (memoized to prevent unnecessary re-renders)
   const createMarkerElement = useCallback((category?: string) => {
     const color = categoryColors[category || 'default'] || categoryColors.default;
     const icon = categoryIcons[category || 'default'] || '📍';
@@ -198,18 +229,35 @@ export default function MapboxMap({
     el.appendChild(iconSpan);
 
     return el;
-  }, []);
+  }, []); // Remove dependencies to prevent constant recreation
 
-  // Update markers when data changes
+  // Update markers when data changes (optimized)
   useEffect(() => {
     if (!map.current || !mapLoaded) return;
 
-    // Clear existing markers
-    markersRef.current.forEach(marker => marker.remove());
-    markersRef.current = [];
+    // Create a map of existing markers by ID for efficient updates
+    const existingMarkerIds = new Set(
+      markersRef.current.map((_, index) => markers[index]?.id).filter(Boolean)
+    );
+    const newMarkerIds = new Set(markers.map(m => m.id));
 
-    // Add new markers
-    markers.forEach(marker => {
+    // Remove markers that no longer exist
+    markersRef.current = markersRef.current.filter((marker, index) => {
+      const markerId = markers[index]?.id;
+      if (!markerId || !newMarkerIds.has(markerId)) {
+        marker.remove();
+        return false;
+      }
+      return true;
+    });
+
+    // Add new markers only
+    markers.forEach((marker, index) => {
+      // Skip if marker already exists
+      if (existingMarkerIds.has(marker.id) && markersRef.current[index]) {
+        return;
+      }
+
       const markerElement = createMarkerElement(marker.category);
 
       // Add click handler that triggers the drawer instead of a popup
@@ -248,7 +296,7 @@ export default function MapboxMap({
         .setLngLat([marker.position[1], marker.position[0]]) // Mapbox uses [lng, lat]
         .addTo(map.current!);
 
-      markersRef.current.push(mapboxMarker);
+      markersRef.current[index] = mapboxMarker;
     });
   }, [markers, mapLoaded, createMarkerElement, onMarkerClick]);
 
