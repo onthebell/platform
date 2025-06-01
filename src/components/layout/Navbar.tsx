@@ -127,8 +127,9 @@ export default function Navbar() {
           {/* User menu */}
           <div className="flex items-center space-x-2 sm:space-x-3 lg:space-x-4 flex-shrink-0">
             {user && <NotificationDropdown />}
-            {user ? (
-              <div className="relative" ref={userMenuRef}>
+            {/* Desktop user dropdown (hidden on mobile) */}
+            {user && (
+              <div className="relative hidden md:block" ref={userMenuRef}>
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="flex items-center space-x-1 sm:space-x-2 p-1.5 sm:p-2 rounded-md hover:bg-gray-50 transition-colors"
@@ -180,7 +181,9 @@ export default function Navbar() {
                   </div>
                 )}
               </div>
-            ) : (
+            )}
+
+            {!user && (
               <div className="flex items-center space-x-1 sm:space-x-3">
                 <Link
                   href="/auth/signin"
@@ -247,7 +250,7 @@ export default function Navbar() {
               );
             })}
 
-            {/* User menu items for mobile */}
+            {/* Mobile Sign Out button for logged-in users */}
             {user && (
               <>
                 <hr className="my-2 border-gray-200" />
