@@ -48,11 +48,28 @@ interface UseFirestoreMapDataOptions {
 }
 
 export function useFirestoreMapData(options: UseFirestoreMapDataOptions = {}) {
+  console.log('🔧 useFirestoreMapData hook initialized with options:', options);
+
+  // All state hooks first
   const [dataPoints, setDataPoints] = useState<MapDataPoint[]>([]);
   const [suburbData, setSuburbData] = useState<SuburbData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  console.log('🔧 Hook state:', { mounted, loading, dataPoints: dataPoints.length });
+
+  // Test useEffect hooks immediately after state
+  useEffect(() => {
+    console.log('🎯 SIMPLE TEST useEffect is definitely running!');
+    console.log('🎯 Testing if useEffect works at all');
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    console.log('🎯 SECOND TEST useEffect running, mounted:', mounted);
+  }, [mounted]);
 
   // Calculate center point of a polygon
   const calculatePolygonCenter = useCallback((coordinates: number[][][]): [number, number] => {
@@ -211,6 +228,7 @@ export function useFirestoreMapData(options: UseFirestoreMapDataOptions = {}) {
 
   // Fetch data from Firestore
   const fetchData = useCallback(async () => {
+    console.log('🚀 fetchData function called!');
     setLoading(true);
     setError(null);
 
@@ -317,10 +335,81 @@ export function useFirestoreMapData(options: UseFirestoreMapDataOptions = {}) {
     groupDataBySuburb,
   ]);
 
-  // Initial data fetch
+  // Initial mount effect
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    console.log('🎯 Mount useEffect is running - starting data fetch immediately');
+
+    const initializeData = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        console.log('🔄 Starting map data fetch...');
+
+        const [posts, businesses, events] = await Promise.all([
+          getPosts({ status: 'active' }, 100),
+          getBusinesses({}, 50),
+          getEvents({ status: 'active' }, 50),
+        ]);
+
+        console.log('📊 Fetched data:', {
+          posts: posts.length,
+          businesses: businesses.length,
+          events: events.length,
+        });
+
+        const allDataPoints: MapDataPoint[] = [];
+
+        // Process posts
+        posts.forEach(post => {
+          const dataPoint = postToMapDataPoint(post);
+          if (dataPoint) {
+            allDataPoints.push(dataPoint);
+          }
+        });
+
+        // Process businesses
+        businesses.forEach(business => {
+          const dataPoint = businessToMapDataPoint(business);
+          if (dataPoint) {
+            allDataPoints.push(dataPoint);
+          }
+        });
+
+        // Process events
+        events.forEach(event => {
+          const dataPoint = eventToMapDataPoint(event);
+          if (dataPoint) {
+            allDataPoints.push(dataPoint);
+          }
+        });
+
+        console.log('✅ Final data points:', allDataPoints.length);
+        const suburbDataResult = groupDataBySuburb(allDataPoints);
+        console.log('🏘️ Suburb data result:', suburbDataResult.length);
+
+        setDataPoints(allDataPoints);
+        setSuburbData(suburbDataResult);
+        setLastRefresh(new Date());
+        setMounted(true);
+      } catch (err) {
+        console.error('❌ Error fetching map data:', err);
+        setError('Failed to load map data. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeData();
+  }, []);
+
+  // Remove the complex fetchData dependency useEffect
+  // useEffect(() => {
+  //   if (mounted) {
+  //     console.log('🎯 Data fetch useEffect is running - mounted:', mounted);
+  //     fetchData();
+  //   }
+  // }, [mounted, fetchData]);
 
   // Set up refresh interval if specified
   useEffect(() => {

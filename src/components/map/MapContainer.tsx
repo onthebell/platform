@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { SuburbData } from '@/hooks/useFirestoreMapData';
 
 // Dynamically import the map to avoid SSR issues
 const DynamicMap = dynamic(() => import('./MapboxMap'), {
@@ -32,10 +31,9 @@ interface MapContainerProps {
     address?: string;
     contact?: string;
   }>;
-  suburbData?: SuburbData[];
   onMarkerClick?: (markerId: string) => void;
   selectedMarkerId?: string;
-  viewMode?: 'markers' | 'suburbs';
+  onMapStateChange?: (center: [number, number], zoom: number) => void;
 }
 
 export default function MapContainer({
@@ -43,10 +41,9 @@ export default function MapContainer({
   zoom = 9,
   className = 'w-full h-full',
   markers = [],
-  suburbData = [],
   onMarkerClick,
   selectedMarkerId,
-  viewMode = 'markers',
+  onMapStateChange,
 }: MapContainerProps) {
   const [mounted, setMounted] = useState(false);
 
@@ -71,10 +68,9 @@ export default function MapContainer({
         center={center}
         zoom={zoom}
         markers={markers}
-        suburbData={suburbData}
         onMarkerClick={onMarkerClick}
         selectedMarkerId={selectedMarkerId}
-        viewMode={viewMode}
+        onMapStateChange={onMapStateChange}
       />
     </div>
   );

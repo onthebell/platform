@@ -22,7 +22,6 @@ interface MapboxMapProps {
   }>;
   onMarkerClick?: (markerId: string) => void;
   selectedMarkerId?: string;
-  onMapStateChange?: (center: [number, number], zoom: number) => void;
 }
 
 const categoryIcons: { [key: string]: string } = {
@@ -52,7 +51,6 @@ export default function MapboxMap({
   markers,
   onMarkerClick,
   selectedMarkerId,
-  onMapStateChange,
 }: MapboxMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -141,27 +139,13 @@ export default function MapboxMap({
       setError('Map failed to load. Please refresh the page.');
     });
 
-    // Add map state change listeners
-    if (onMapStateChange) {
-      const handleMapMove = () => {
-        if (map.current) {
-          const currentCenter = map.current.getCenter();
-          const currentZoom = map.current.getZoom();
-          onMapStateChange([currentCenter.lat, currentCenter.lng], currentZoom);
-        }
-      };
-
-      map.current.on('moveend', handleMapMove);
-      map.current.on('zoomend', handleMapMove);
-    }
-
     return () => {
       if (map.current) {
         map.current.remove();
         map.current = null;
       }
     };
-  }, [center, zoom, onMapStateChange]);
+  }, [center, zoom]);
 
   // Create marker element
   const createMarkerElement = useCallback((category?: string) => {
@@ -183,7 +167,7 @@ export default function MapboxMap({
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: filter 0.2s ease, border 0.2s ease;
+      transition: all 0.2s ease;
     `;
 
     const iconSpan = document.createElement('span');
@@ -192,7 +176,6 @@ export default function MapboxMap({
       transform: rotate(45deg);
       font-size: 14px;
       line-height: 1;
-      transition: transform 0.2s ease;
     `;
 
     el.appendChild(iconSpan);
@@ -221,24 +204,15 @@ export default function MapboxMap({
         }
       });
 
-      // Add hover effects (using scale without overriding transform)
+      // Add hover effects
       markerElement.addEventListener('mouseenter', () => {
-        markerElement.style.filter = 'drop-shadow(0 4px 12px rgba(0,0,0,0.4))';
+        markerElement.style.transform = 'rotate(-45deg) scale(1.1)';
         markerElement.style.zIndex = '1000';
-        // Use a nested element for scaling to avoid breaking Mapbox positioning
-        const innerSpan = markerElement.querySelector('span');
-        if (innerSpan) {
-          innerSpan.style.transform = 'rotate(45deg) scale(1.2)';
-        }
       });
 
       markerElement.addEventListener('mouseleave', () => {
-        markerElement.style.filter = '';
+        markerElement.style.transform = 'rotate(-45deg) scale(1)';
         markerElement.style.zIndex = 'auto';
-        const innerSpan = markerElement.querySelector('span');
-        if (innerSpan) {
-          innerSpan.style.transform = 'rotate(45deg) scale(1)';
-        }
       });
 
       const mapboxMarker = new mapboxgl.Marker({
@@ -259,12 +233,8 @@ export default function MapboxMap({
     // Remove highlighting from all markers
     markersRef.current.forEach(marker => {
       const element = marker.getElement();
-      element.style.filter = '';
-      element.style.border = '2px solid white';
-      const innerSpan = element.querySelector('span');
-      if (innerSpan) {
-        innerSpan.style.transform = 'rotate(45deg) scale(1)';
-      }
+      element.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
+      element.style.transform = 'rotate(-45deg) scale(1)';
     });
 
     // Highlight selected marker
@@ -274,15 +244,15 @@ export default function MapboxMap({
         const markerIndex = markers.findIndex(m => m.id === selectedMarkerId);
         if (markersRef.current[markerIndex]) {
           const element = markersRef.current[markerIndex].getElement();
-          element.style.filter = 'drop-shadow(0 6px 20px rgba(59, 130, 246, 0.6))';
-          element.style.border = '3px solid #3B82F6';
-          const innerSpan = element.querySelector('span');
-          if (innerSpan) {
-            innerSpan.style.transform = 'rotate(45deg) scale(1.3)';
-          }
+          element.style.boxShadow = '0 4px 16px rgba(59, 130, 246, 0.5)';
+          element.style.transform = 'rotate(-45deg) scale(1.2)';
 
-          // Remove automatic centering - preserve user's current map view
-          // Users can manually navigate to the marker if they want to see it
+          // Center the map on the selected marker
+          map.current!.flyTo({
+            center: [selectedMarker.position[1], selectedMarker.position[0]],
+            zoom: Math.max(map.current!.getZoom(), 12),
+            duration: 800,
+          });
         }
       }
     }

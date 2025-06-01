@@ -2,6 +2,7 @@
 
 import { MapContainer, TileLayer, Marker, Popup, GeoJSON, ZoomControl } from 'react-leaflet';
 import { bellarineSuburbs } from './bellarineSuburbs';
+import { SuburbData } from '@/hooks/useFirestoreMapData';
 import 'leaflet/dist/leaflet.css';
 import './map-styles.css';
 
