@@ -84,6 +84,24 @@ jest.mock('next/navigation', () => ({
   }),
 }));
 
+// Mock Next.js Link component to call router.push
+jest.mock('next/link', () => {
+  return function MockLink({ href, children, ...props }: any) {
+    return (
+      <a
+        href={href}
+        onClick={e => {
+          e.preventDefault();
+          mockPush(href);
+        }}
+        {...props}
+      >
+        {children}
+      </a>
+    );
+  };
+});
+
 // Mock auth
 const mockUser = {
   id: 'user-123',

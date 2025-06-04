@@ -88,35 +88,6 @@ community connections, and services.
 
 ---
 
-## 🔁 Copilot Changelog Instruction
-
-Copilot **must** append a new entry to `CHANGELOG.md` for any change it assists
-with.
-
-Each entry should include the **date** and categorized changes using the format
-below:
-
-```
-### [YYYY-MM-DD]
-**Feature**: Describe new functionality
-**Fix**: Describe bug fix
-**Refactor**: Describe code reorganization
-**Test**: Describe new or updated test coverage
-**Chore**: Linting, formatting, dependency updates, config changes
-```
-
-**Example:**
-
-```
-### [2025-06-04]
-**Feature**: Added Leaflet map integration for event pages
-**Fix**: Corrected Firestore query for user verification status
-**Test**: Created tests for AddressVerification component
-**Chore**: Ran Prettier and ESLint cleanup across /src/app/pages
-```
-
----
-
 ## ✅ Approved Copilot Tasks
 
 Copilot is encouraged to:

@@ -13,6 +13,7 @@ import {
   CogIcon,
   HomeIcon,
   ArrowLeftOnRectangleIcon,
+  ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 
 interface AdminLayoutProps {
@@ -33,6 +34,12 @@ const navigation = [
     href: '/admin/reports',
     icon: FlagIcon,
     permission: 'manage_reports' as const,
+  },
+  {
+    name: 'Verifications',
+    href: '/admin/verifications',
+    icon: ShieldCheckIcon,
+    permission: 'manage_users' as const,
   },
 ];
 

@@ -3,13 +3,16 @@ import {
   doc,
   addDoc,
   updateDoc,
+  getDoc,
   query,
   where,
   getDocs,
+  orderBy,
   Timestamp,
 } from 'firebase/firestore';
 import { db } from './config';
 import { bellarinePostcodes } from '../utils';
+import { VerificationMethod } from '../../types';
 
 export interface AddressVerificationRequest {
   id?: string;
@@ -22,12 +25,17 @@ export interface AddressVerificationRequest {
     state: string;
     country: string;
   };
-  proofDocument?: string; // URL to uploaded proof document
+  method: 'document' | 'postal'; // New field for verification method
+  proofDocument?: string; // URL to uploaded proof document (for document method)
+  postalCode?: string; // Generated verification code (for postal method)
+  postalCodeExpiry?: Date; // Expiry date for postal verification code
+  paymentIntentId?: string; // Stripe payment intent ID (for postal method)
   status: 'pending' | 'approved' | 'rejected';
   submittedAt: Date;
   reviewedAt?: Date;
   reviewedBy?: string;
   reviewNotes?: string;
+  autoDeletedAt?: Date; // Track when document was automatically deleted
 }
 
 // Define Bellarine Peninsula suburbs for verification
@@ -62,22 +70,38 @@ export async function submitAddressVerification(
   userId: string,
   userEmail: string,
   address: AddressVerificationRequest['address'],
-  proofDocumentUrl?: string
+  method: 'document' | 'postal',
+  proofDocumentUrl?: string,
+  postalCode?: string,
+  paymentIntentId?: string
 ): Promise<string> {
   try {
     const verificationData: Omit<AddressVerificationRequest, 'id'> = {
       userId,
       userEmail,
       address,
+      method,
       proofDocument: proofDocumentUrl,
+      postalCode,
+      paymentIntentId,
+      postalCodeExpiry:
+        method === 'postal' ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) : undefined, // 30 days expiry
       status: 'pending',
       submittedAt: new Date(),
     };
 
-    const docRef = await addDoc(collection(db, 'verifications'), {
-      ...verificationData,
-      submittedAt: Timestamp.fromDate(verificationData.submittedAt),
-    });
+    // Filter out undefined values to prevent Firestore errors
+    const firestoreData = Object.fromEntries(
+      Object.entries({
+        ...verificationData,
+        submittedAt: Timestamp.fromDate(verificationData.submittedAt),
+        postalCodeExpiry: verificationData.postalCodeExpiry
+          ? Timestamp.fromDate(verificationData.postalCodeExpiry)
+          : undefined,
+      }).filter(([_, value]) => value !== undefined)
+    );
+
+    const docRef = await addDoc(collection(db, 'verifications'), firestoreData);
 
     return docRef.id;
   } catch (error) {
@@ -93,6 +117,8 @@ export async function getUserVerificationStatus(userId: string): Promise<{
   hasRequest: boolean;
   status?: 'pending' | 'approved' | 'rejected';
   verificationId?: string;
+  method?: VerificationMethod;
+  paymentIntentId?: string;
 }> {
   try {
     const q = query(collection(db, 'verifications'), where('userId', '==', userId));
@@ -117,6 +143,8 @@ export async function getUserVerificationStatus(userId: string): Promise<{
       hasRequest: true,
       status: data.status,
       verificationId: latestRequest.id,
+      method: data.method,
+      paymentIntentId: data.paymentIntentId,
     };
   } catch (error) {
     console.error('Error checking verification status:', error);
@@ -201,8 +229,21 @@ export async function updateVerificationStatus(
 
     // If approved, update the user's verification status
     if (status === 'approved') {
-      // This would need to get the user document and update it
-      // Implementation depends on how you store user verification status
+      // Get the verification document to find the userId
+      const verificationDocRef = doc(db, 'verifications', verificationId);
+      const verificationSnapshot = await getDoc(verificationDocRef);
+
+      if (verificationSnapshot.exists()) {
+        const verificationData = verificationSnapshot.data() as AddressVerificationRequest;
+
+        // Update the user's profile with verification status
+        const userRef = doc(db, 'users', verificationData.userId);
+        await updateDoc(userRef, {
+          isVerified: true,
+          verificationStatus: 'approved',
+          verifiedAt: Timestamp.fromDate(new Date()),
+        });
+      }
     }
   } catch (error) {
     console.error('Error updating verification status:', error);
@@ -321,5 +362,129 @@ export async function requestVerification(
   } catch (error) {
     console.error('Error submitting verification request:', error);
     throw new Error('Failed to submit verification request');
+  }
+}
+
+/**
+ * Generate a random postal verification code
+ */
+export function generatePostalCode(): string {
+  const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let result = '';
+  for (let i = 0; i < 8; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
+/**
+ * Verify a postal code submission
+ */
+export async function verifyPostalCode(
+  userId: string,
+  submittedCode: string
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const q = query(
+      collection(db, 'verifications'),
+      where('userId', '==', userId),
+      where('method', '==', 'postal'),
+      where('status', '==', 'pending')
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      return { success: false, message: 'No pending postal verification found' };
+    }
+
+    const verificationDoc = querySnapshot.docs[0];
+    const verification = verificationDoc.data() as AddressVerificationRequest;
+
+    // Check if code has expired - convert Firestore Timestamp to Date for comparison
+    if (verification.postalCodeExpiry) {
+      const expiryDate =
+        verification.postalCodeExpiry instanceof Timestamp
+          ? verification.postalCodeExpiry.toDate()
+          : new Date(verification.postalCodeExpiry);
+
+      if (expiryDate < new Date()) {
+        return { success: false, message: 'Verification code has expired' };
+      }
+    }
+
+    // Check if codes match
+    if (verification.postalCode !== submittedCode.toUpperCase()) {
+      return { success: false, message: 'Invalid verification code' };
+    }
+
+    // Approve the verification
+    await updateDoc(doc(db, 'verifications', verificationDoc.id), {
+      status: 'approved',
+      reviewedAt: Timestamp.fromDate(new Date()),
+      reviewedBy: 'system',
+      reviewNotes: 'Approved via postal code verification',
+    });
+
+    // Update the user's profile with verification status
+    const userRef = doc(db, 'users', userId);
+    await updateDoc(userRef, {
+      isVerified: true,
+      verificationStatus: 'approved',
+      verifiedAt: Timestamp.fromDate(new Date()),
+    });
+
+    return { success: true, message: 'Address verified successfully!' };
+  } catch (error) {
+    console.error('Error verifying postal code:', error);
+    return { success: false, message: 'Failed to verify postal code' };
+  }
+}
+
+/**
+ * Auto-delete document after verification approval
+ */
+export async function deleteVerificationDocument(
+  verificationId: string,
+  documentUrl: string
+): Promise<void> {
+  try {
+    // Import deleteFile from storage
+    const { deleteFile } = await import('./storage');
+
+    // Delete the file from Firebase Storage
+    await deleteFile(documentUrl);
+
+    // Update verification record to mark document as deleted
+    await updateDoc(doc(db, 'verifications', verificationId), {
+      autoDeletedAt: Timestamp.fromDate(new Date()),
+      proofDocument: null, // Clear the document URL
+    });
+  } catch (error) {
+    console.error('Error deleting verification document:', error);
+    throw new Error('Failed to delete verification document');
+  }
+}
+
+/**
+ * Get all address verification requests (admin function)
+ */
+export async function getAddressVerificationRequests(): Promise<AddressVerificationRequest[]> {
+  try {
+    const q = query(collection(db, 'verifications'), orderBy('submittedAt', 'desc'));
+
+    const querySnapshot = await getDocs(q);
+
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      submittedAt: doc.data().submittedAt.toDate(),
+      reviewedAt: doc.data().reviewedAt?.toDate(),
+      postalCodeExpiry: doc.data().postalCodeExpiry?.toDate(),
+      autoDeletedAt: doc.data().autoDeletedAt?.toDate(),
+    })) as AddressVerificationRequest[];
+  } catch (error) {
+    console.error('Error fetching verification requests:', error);
+    throw new Error('Failed to fetch verification requests');
   }
 }

@@ -119,6 +119,7 @@ export default function EventsPage() {
           showFilters={false}
           showCreateButton={true}
           emptyMessage="No events scheduled at the moment. Check back later or create your own event!"
+          context="events"
         />
 
         {/* Call to Action */}

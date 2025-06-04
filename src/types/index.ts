@@ -7,6 +7,7 @@ export interface User {
   photoURL: string | null;
   isVerified: boolean;
   verificationStatus: 'pending' | 'approved' | 'rejected' | 'none';
+  verifiedAt?: Date;
   address?: {
     street: string;
     suburb: string;
@@ -396,3 +397,5 @@ export interface AdminPermissions {
   canViewAnalytics: boolean;
   canManageModerators: boolean;
 }
+
+export type VerificationMethod = 'document' | 'postal';

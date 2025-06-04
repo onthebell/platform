@@ -8,10 +8,14 @@ import {
   createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
   updateProfile,
+  deleteUser,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from './config';
 import { User } from '../../types';
+import { deleteUserData } from './userDeletion';
 
 interface AuthContextType {
   user: User | null;
@@ -22,6 +26,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   updateUserProfile: (updates: Partial<User>) => Promise<void>;
   getIdToken: () => Promise<string | null>;
+  deleteAccount: (password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -164,6 +169,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return null;
     }
   };
+  const deleteAccount = async (password: string): Promise<void> => {
+    if (!user || !firebaseUser) {
+      throw new Error('You must be logged in to delete your account');
+    }
+
+    setLoading(true);
+    try {
+      // Import and use the implementation function
+      const { deleteAccount: deleteAccountImpl } = await import('./auth-impl');
+      await deleteAccountImpl(firebaseUser, user, password);
+    } catch (error) {
+      setLoading(false);
+      throw error;
+    }
+  };
 
   const value = {
     user,
@@ -174,6 +194,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signOut,
     updateUserProfile,
     getIdToken,
+    deleteAccount,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

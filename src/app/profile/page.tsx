@@ -11,6 +11,7 @@ import PostCard from '@/components/community/PostCard';
 import UserLikedPosts from '@/components/community/UserLikedPosts';
 import PrivacySettings from '@/components/profile/PrivacySettings';
 import NotificationPreferences from '@/components/profile/NotificationPreferences';
+import DeleteAccountModal from '@/components/profile/DeleteAccountModal';
 import { FollowStats } from '@/components/ui/FollowStats';
 import { formatDate, toDate } from '@/lib/utils';
 import {
@@ -27,7 +28,7 @@ import {
 import Link from 'next/link';
 
 export default function ProfilePage() {
-  const { user, signOut, updateUserProfile } = useAuth();
+  const { user, signOut, updateUserProfile, deleteAccount } = useAuth();
   const router = useRouter();
   const [userPosts, setUserPosts] = useState<CommunityPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,6 +38,7 @@ export default function ProfilePage() {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{
     type: 'success' | 'error' | null;
     text: string;
@@ -102,6 +104,18 @@ export default function ProfilePage() {
       router.push('/');
     } catch (error) {
       console.error('Error signing out:', error);
+    }
+  };
+
+  const handleDeleteAccount = async (password: string) => {
+    try {
+      await deleteAccount(password);
+      // If successful, user will be signed out and redirected
+      router.push('/');
+    } catch (error) {
+      // Error handling is done in the DeleteAccountModal component
+      console.error('Error deleting account:', error);
+      throw error; // Re-throw to be handled by the modal
     }
   };
 
@@ -471,11 +485,7 @@ export default function ProfilePage() {
                     undone.
                   </p>
                   <button
-                    onClick={() =>
-                      alert(
-                        'Account deletion feature will be implemented with proper confirmation flow'
-                      )
-                    }
+                    onClick={() => setShowDeleteModal(true)}
                     className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
                   >
                     Delete Account
@@ -486,6 +496,13 @@ export default function ProfilePage() {
           </div>
         )}
       </div>
+
+      {/* Delete Account Modal */}
+      <DeleteAccountModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteAccount}
+      />
     </div>
   );
 }

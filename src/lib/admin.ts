@@ -29,6 +29,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, AdminPermission[]> = {
  * Check if a user has admin privileges (moderator or above)
  */
 export function isAdmin(user: User | null): boolean {
+  console.log('Checking if user is admin:', user);
   if (!user) return false;
   return ['moderator', 'admin', 'super_admin'].includes(user.role);
 }

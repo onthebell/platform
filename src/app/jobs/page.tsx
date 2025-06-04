@@ -211,6 +211,7 @@ function JobsPageContent() {
           showCreateButton={false}
           emptyMessage="No job posts found. Be the first to post a job opportunity!"
           layout="grid"
+          context="jobs"
         />
       </div>
     </div>
