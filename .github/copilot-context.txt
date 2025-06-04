@@ -1,62 +1,70 @@
 # Project Overview
-OnTheBell is a community platform for the Bellarine Peninsula, built with:
+OnTheBell is a Next.js + TypeScript web platform for the Bellarine Peninsula community, including:
+- Events
+- Marketplace
+- Business Listings
+- Local Connections
+
+# Tech Stack
 - Next.js (App Router)
 - TypeScript
 - Tailwind CSS
-- Jest for testing
-- ESLint for linting
-- Prettier for code formatting
-- Firebase for backend services
+- Jest for unit/integration testing
+- ESLint (Airbnb-style config with custom rules)
+- Prettier (2-space indent, semicolons, trailing commas, single quotes)
+- Firebase for authentication and Firestore data
+- pnpm for package management
 
-# Directory Structure
-- `.github/`: GitHub-specific configurations
-- `.husky/`: Git hooks
-- `.vscode/`: VSCode settings
-- `docs/`: Documentation files
-- `public/`: Static assets
-- `src/`: Source code
-  - `components/`: Reusable React components
-  - `pages/`: Next.js pages
-  - `lib/`: Utility functions and libraries
-  - `styles/`: Global and module-specific styles
+# Folder Structure
+- /src/pages → Route files
+- /src/components → Reusable UI components
+- /src/lib → Firestore, utility logic, Firebase config
+- /src/styles → Tailwind and global CSS
+- /__tests__ → Jest tests (or colocated test files)
+- /.github → GitHub workflows
+- /.husky → Git hooks
 
-# Tooling and Configurations
-- **ESLint**: Configured with Airbnb base rules and custom overrides in `.eslintrc.json` and `eslint.config.mjs`
-- **Prettier**: Formatting rules defined in `.prettierrc.json`
-- **Jest**: Testing setup in `jest.config.js` and `jest.setup.js`
-- **Tailwind CSS**: Configuration in `tailwind.config.js` and `postcss.config.mjs`
-- **TypeScript**: Compiler options in `tsconfig.json`
-- **Firebase**: Security rules in `firestore.rules` and index definitions in `firestore.indexes.json`
+# Tooling
+- Jest config in `jest.config.js`
+- ESLint config in `.eslintrc.json` and `eslint.config.mjs`
+- Prettier config in `.prettierrc.json`
+- Tailwind config in `tailwind.config.js`
+- Firebase rules and indexes managed in root
+- TypeScript project config in `tsconfig.json`
+- pnpm workspace in `pnpm-workspace.yaml`
 
-# Environment Variables
-- Example environment variables are listed in `.env.example`
+# Development Standards
+- Functional React components with typed props
+- Arrow functions preferred
+- Tailwind for styling
+- Reuse composable hooks/components
+- Follow DRY and separation of concerns principles
+- Format all code with Prettier
+- Run lint and tests before commit
 
-# Package Management
-- Uses `pnpm` for package management
-- Workspace configuration in `pnpm-workspace.yaml`
+# Changelog Instruction (IMPORTANT)
+Any time GitHub Copilot makes or assists with a code change (new feature, fix, refactor, test, config), it must:
+1. Open or create `CHANGELOG.md` at the project root.
+2. Append a new changelog entry using this format:
 
-# Common Development Tasks
-- Creating new pages in `src/pages/`
-- Adding new components in `src/components/`
-- Writing tests in `__tests__/` or alongside components
-- Updating Firebase rules and indexes
-- Running development server with `pnpm dev`
-- Running tests with `pnpm test`
-- Linting code with `pnpm lint`
-- Formatting code with `pnpm format`
+### [YYYY-MM-DD]
+**Feature**: Short summary of new functionality added  
+**Fix**: Short summary of bug fixes  
+**Refactor**: Summary of structural code changes  
+**Test**: Summary of new or updated test coverage  
+**Chore**: Dependency updates, config changes, formatting
 
-# Coding Standards
-- Use functional React components
-- Prefer arrow functions
-- Ensure all components are typed with TypeScript
-- Follow Tailwind CSS utility-first approach
-- Write tests for all components and pages
-- Keep codebase clean and well-documented
+Example:
+### [2025-06-04]
+**Feature**: Added `/events` API route for fetching events  
+**Fix**: Resolved missing key error in EventList component  
+**Test**: Added test coverage for EventCard props handling  
 
-# Example Prompts for Copilot
-- "Create a new Next.js page for event listings"
-- "Add a reusable button component with Tailwind CSS"
-- "Write a Jest test for the EventCard component"
-- "Set up a Firebase function to handle form submissions"
-- "Fix ESLint errors in the UserProfile component"
-- "Format the Dashboard page using Prettier rules"
+# Common Copilot Prompts
+- "Generate a new `/marketplace` page"
+- "Create a reusable EventCard component"
+- "Write a test for the useAuth hook"
+- "Fix Prettier formatting for this file"
+- "Update changelog with today's feature additions"
+- "Write Firebase query for listings by user ID"
+- "Add loading/error state to page component"

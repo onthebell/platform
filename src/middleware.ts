@@ -1,6 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export function middleware(request: NextRequest) {
+  // Show coming soon page for all routes in production except /coming-soon and static assets
+  if (process.env.NODE_ENV === 'production') {
+    const { pathname } = request.nextUrl;
+    const isComingSoon = pathname.startsWith('/coming-soon');
+    const isStatic =
+      pathname.startsWith('/_next') ||
+      pathname.startsWith('/static') ||
+      pathname.startsWith('/favicon.ico') ||
+      pathname.startsWith('/api');
+    if (!isComingSoon && !isStatic) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/coming-soon';
+      return NextResponse.redirect(url);
+    }
+  }
+
   // Temporarily disabled for development - API routes handle their own auth
   // In production, this would verify Firebase ID tokens at the middleware level
 
@@ -22,5 +38,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/api/admin/:path*'],
+  matcher: ['/((?!_next|static|favicon.ico).*)'],
 };

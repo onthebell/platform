@@ -25,10 +25,12 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
 
   // Regular routes get navbar and footer
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <>
       <Navbar />
-      <main className="flex-1">{children}</main>
-      <Footer />
-    </div>
+      <div className="min-h-screen flex flex-col bg-white">
+        <main className="flex-1">{children}</main>
+        <Footer />
+      </div>
+    </>
   );
 }
