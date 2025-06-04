@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/firebase/auth';
 import { ReportReason } from '@/types';
 import { FlagIcon } from '@heroicons/react/24/outline';
 import ReportModal from './ReportModal';
+import { authenticatedFetch } from '@/lib/utils/api';
 
 interface ReportButtonProps {
   contentType: 'post' | 'comment' | 'user';
@@ -38,11 +39,10 @@ export default function ReportButton({
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/report', {
+      const response = await authenticatedFetch('/api/report', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-id': user.id,
         },
         body: JSON.stringify({
           contentType,

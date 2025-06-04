@@ -7,7 +7,7 @@ import { useAuth } from '@/lib/firebase/auth';
 import { createPost } from '@/lib/firebase/firestore';
 import { uploadImages, validateImageFile, resizeImage } from '@/lib/firebase/storage';
 import { useContentModeration } from '@/hooks/useContentModeration';
-import { CommunityPost, PostCategory, PostType } from '@/types';
+import { CommunityPost, PostCategory, JobType } from '@/types';
 import AddressAutocomplete from '@/components/ui/AddressAutocomplete';
 import { MapIcon, PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
@@ -23,7 +23,6 @@ function CreatePostForm() {
     title: '',
     description: '',
     category: 'community' as PostCategory,
-    type: 'announcement' as PostType,
     price: '',
     currency: 'AUD',
     location: {
@@ -33,18 +32,52 @@ function CreatePostForm() {
     },
     tags: '',
     visibility: 'public' as 'public' | 'verified_only',
+    // Job-specific fields
+    startDate: '',
+    jobType: 'full_time' as JobType,
+    industry: '',
+    employerType: 'person' as 'business' | 'person',
+    workType: 'onsite' as 'onsite' | 'remote' | 'hybrid',
+    // Event-specific fields
+    eventDate: '',
+    eventEndDate: '',
+    eventType: 'other' as
+      | 'workshop'
+      | 'meeting'
+      | 'festival'
+      | 'market'
+      | 'sport'
+      | 'social'
+      | 'other',
+    capacity: '',
+    // Request/Help-specific fields
+    urgency: 'medium' as 'low' | 'medium' | 'high',
+    deadline: '',
+    budget: '',
+    helpType: 'one_time' as 'one_time' | 'ongoing' | 'volunteer',
+    // Sale/Marketplace-specific fields
+    condition: 'good' as 'new' | 'like_new' | 'good' | 'fair' | 'poor',
+    brand: '',
+    deliveryAvailable: false,
+    pickupOnly: false,
+    // Offer-specific fields
+    duration: '',
+    termsConditions: '',
+    availability: 'flexible' as 'weekdays' | 'weekends' | 'flexible' | 'by_appointment',
+    // Announcement-specific fields
+    announcementType: 'info' as 'info' | 'warning' | 'update' | 'reminder',
+    importance: 'medium' as 'low' | 'medium' | 'high',
+    expiryDate: '',
   });
 
   // Handle URL parameters for pre-filling form
   useEffect(() => {
     const category = searchParams.get('category') as PostCategory;
-    const type = searchParams.get('type') as PostType;
 
-    if (category || type) {
+    if (category) {
       setFormData(prev => ({
         ...prev,
-        ...(category && { category }),
-        ...(type && { type }),
+        category,
       }));
     }
   }, [searchParams]);
@@ -58,16 +91,53 @@ function CreatePostForm() {
     { value: 'deals', label: 'Deals & Offers' },
     { value: 'food', label: 'Food & Dining' },
     { value: 'services', label: 'Services' },
+    { value: 'jobs', label: 'Jobs' },
+    { value: 'offers', label: 'Offers' },
+    { value: 'announcements', label: 'Announcements' },
+    { value: 'sales', label: 'Sales' },
   ];
 
-  const types: { value: PostType; label: string }[] = [
-    { value: 'announcement', label: 'Announcement' },
-    { value: 'event', label: 'Event' },
-    { value: 'offer', label: 'Offer' },
-    { value: 'request', label: 'Request' },
-    { value: 'sale', label: 'For Sale' },
-    { value: 'free', label: 'Free' },
-    { value: 'help', label: 'Help Needed' },
+  const jobTypes: { value: JobType; label: string }[] = [
+    { value: 'full_time', label: 'Full Time' },
+    { value: 'part_time', label: 'Part Time' },
+    { value: 'one_off', label: 'One-off Job' },
+    { value: 'contract', label: 'Contract' },
+    { value: 'volunteer', label: 'Volunteer' },
+  ];
+
+  const industries: { value: string; label: string }[] = [
+    { value: '', label: 'Select Industry (Optional)' },
+    { value: 'Accommodation & Food Services', label: 'Accommodation & Food Services' },
+    { value: 'Administrative & Support Services', label: 'Administrative & Support Services' },
+    { value: 'Agriculture, Forestry & Fishing', label: 'Agriculture, Forestry & Fishing' },
+    { value: 'Arts & Recreation Services', label: 'Arts & Recreation Services' },
+    { value: 'Construction', label: 'Construction' },
+    { value: 'Education & Training', label: 'Education & Training' },
+    {
+      value: 'Electricity, Gas, Water & Waste Services',
+      label: 'Electricity, Gas, Water & Waste Services',
+    },
+    { value: 'Financial & Insurance Services', label: 'Financial & Insurance Services' },
+    { value: 'Health Care & Social Assistance', label: 'Health Care & Social Assistance' },
+    {
+      value: 'Information Media & Telecommunications',
+      label: 'Information Media & Telecommunications',
+    },
+    { value: 'Manufacturing', label: 'Manufacturing' },
+    { value: 'Mining', label: 'Mining' },
+    {
+      value: 'Professional, Scientific & Technical Services',
+      label: 'Professional, Scientific & Technical Services',
+    },
+    { value: 'Public Administration & Safety', label: 'Public Administration & Safety' },
+    {
+      value: 'Rental, Hiring & Real Estate Services',
+      label: 'Rental, Hiring & Real Estate Services',
+    },
+    { value: 'Retail Trade', label: 'Retail Trade' },
+    { value: 'Transport, Postal & Warehousing', label: 'Transport, Postal & Warehousing' },
+    { value: 'Wholesale Trade', label: 'Wholesale Trade' },
+    { value: 'Other Services', label: 'Other Services' },
   ];
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -128,7 +198,6 @@ function CreatePostForm() {
         title: formData.title,
         description: formData.description,
         category: formData.category,
-        type: formData.type,
         authorId: user.id,
         authorName: user.displayName || user.email || 'Anonymous',
         location: formData.location.address ? formData.location : undefined,
@@ -145,6 +214,47 @@ function CreatePostForm() {
           .split(',')
           .map(tag => tag.trim())
           .filter(Boolean),
+        // Job-specific fields (only include if category is jobs)
+        ...(formData.category === 'jobs' && {
+          startDate: formData.startDate ? new Date(formData.startDate) : undefined,
+          jobType: formData.jobType,
+          industry: formData.industry || undefined,
+          employerType: formData.employerType,
+          workType: formData.workType,
+        }),
+        // Event-specific fields (only include if category is events)
+        ...(formData.category === 'events' && {
+          eventDate: formData.eventDate ? new Date(formData.eventDate) : undefined,
+          eventEndDate: formData.eventEndDate ? new Date(formData.eventEndDate) : undefined,
+          eventType: formData.eventType,
+          capacity: formData.capacity ? parseInt(formData.capacity) : undefined,
+        }),
+        // Request/Help-specific fields
+        ...(formData.category === 'help_requests' && {
+          urgency: formData.urgency,
+          deadline: formData.deadline ? new Date(formData.deadline) : undefined,
+          budget: formData.budget ? parseFloat(formData.budget) : undefined,
+          helpType: formData.helpType,
+        }),
+        // Sale/Marketplace-specific fields
+        ...((formData.category === 'sales' || formData.category === 'marketplace') && {
+          condition: formData.condition,
+          brand: formData.brand || undefined,
+          deliveryAvailable: formData.deliveryAvailable,
+          pickupOnly: formData.pickupOnly,
+        }),
+        // Offer-specific fields
+        ...(formData.category === 'offers' && {
+          duration: formData.duration || undefined,
+          termsConditions: formData.termsConditions || undefined,
+          availability: formData.availability,
+        }),
+        // Announcement-specific fields
+        ...(formData.category === 'announcements' && {
+          announcementType: formData.announcementType,
+          importance: formData.importance,
+          expiryDate: formData.expiryDate ? new Date(formData.expiryDate) : undefined,
+        }),
       };
 
       const postId = await createPost(postData);
@@ -207,49 +317,26 @@ function CreatePostForm() {
               />
             </div>
 
-            {/* Category and Type */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-                  Category *
-                </label>
-                <select
-                  id="category"
-                  required
-                  value={formData.category}
-                  onChange={e =>
-                    setFormData(prev => ({ ...prev, category: e.target.value as PostCategory }))
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  {categories.map(cat => (
-                    <option key={cat.value} value={cat.value}>
-                      {cat.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
-                  Type *
-                </label>
-                <select
-                  id="type"
-                  required
-                  value={formData.type}
-                  onChange={e =>
-                    setFormData(prev => ({ ...prev, type: e.target.value as PostType }))
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  {types.map(type => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            {/* Category */}
+            <div>
+              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+                Category *
+              </label>
+              <select
+                id="category"
+                required
+                value={formData.category}
+                onChange={e =>
+                  setFormData(prev => ({ ...prev, category: e.target.value as PostCategory }))
+                }
+                className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {categories.map(cat => (
+                  <option key={cat.value} value={cat.value}>
+                    {cat.label}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Description */}
@@ -270,7 +357,7 @@ function CreatePostForm() {
             </div>
 
             {/* Price (conditional) */}
-            {(formData.category === 'marketplace' || formData.type === 'sale') && (
+            {(formData.category === 'marketplace' || formData.category === 'sales') && (
               <div className="grid grid-cols-3 gap-4">
                 <div className="col-span-2">
                   <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
@@ -329,6 +416,536 @@ function CreatePostForm() {
                 className=""
               />
             </div>
+
+            {/* Job-specific fields */}
+            {formData.category === 'jobs' && (
+              <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h3 className="text-sm font-medium text-blue-900 mb-3">Job Details</h3>
+
+                {/* Job Type */}
+                <div>
+                  <label htmlFor="jobType" className="block text-sm font-medium text-gray-700 mb-2">
+                    Job Type
+                  </label>
+                  <select
+                    id="jobType"
+                    value={formData.jobType}
+                    onChange={e =>
+                      setFormData(prev => ({
+                        ...prev,
+                        jobType: e.target.value as JobType,
+                      }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {jobTypes.map(jobType => (
+                      <option key={jobType.value} value={jobType.value}>
+                        {jobType.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Industry */}
+                <div>
+                  <label
+                    htmlFor="industry"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Industry
+                  </label>
+                  <select
+                    id="industry"
+                    value={formData.industry}
+                    onChange={e =>
+                      setFormData(prev => ({
+                        ...prev,
+                        industry: e.target.value,
+                      }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {industries.map(industry => (
+                      <option key={industry.value} value={industry.value}>
+                        {industry.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Start Date */}
+                <div>
+                  <label
+                    htmlFor="startDate"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Start Date
+                  </label>
+                  <input
+                    type="date"
+                    id="startDate"
+                    value={formData.startDate}
+                    onChange={e => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                {/* Employer Type and Work Type */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      htmlFor="employerType"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Posted by
+                    </label>
+                    <select
+                      id="employerType"
+                      value={formData.employerType}
+                      onChange={e =>
+                        setFormData(prev => ({
+                          ...prev,
+                          employerType: e.target.value as 'business' | 'person',
+                        }))
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="person">Individual/Person</option>
+                      <option value="business">Business</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="workType"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Work Type
+                    </label>
+                    <select
+                      id="workType"
+                      value={formData.workType}
+                      onChange={e =>
+                        setFormData(prev => ({
+                          ...prev,
+                          workType: e.target.value as 'onsite' | 'remote' | 'hybrid',
+                        }))
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="onsite">On-site</option>
+                      <option value="remote">Remote</option>
+                      <option value="hybrid">Hybrid</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Event-specific fields */}
+            {formData.category === 'events' && (
+              <div className="space-y-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
+                <h3 className="text-sm font-medium text-purple-900 mb-3">Event Details</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Event Date */}
+                  <div>
+                    <label
+                      htmlFor="eventDate"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Event Date & Time *
+                    </label>
+                    <input
+                      type="datetime-local"
+                      id="eventDate"
+                      value={formData.eventDate}
+                      onChange={e => setFormData(prev => ({ ...prev, eventDate: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+
+                  {/* Event End Date */}
+                  <div>
+                    <label
+                      htmlFor="eventEndDate"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      End Date (Optional)
+                    </label>
+                    <input
+                      type="datetime-local"
+                      id="eventEndDate"
+                      value={formData.eventEndDate}
+                      onChange={e =>
+                        setFormData(prev => ({ ...prev, eventEndDate: e.target.value }))
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Event Type */}
+                  <div>
+                    <label
+                      htmlFor="eventType"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Event Type
+                    </label>
+                    <select
+                      id="eventType"
+                      value={formData.eventType}
+                      onChange={e =>
+                        setFormData(prev => ({ ...prev, eventType: e.target.value as any }))
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="workshop">Workshop</option>
+                      <option value="meeting">Meeting</option>
+                      <option value="festival">Festival</option>
+                      <option value="market">Market</option>
+                      <option value="sport">Sport</option>
+                      <option value="social">Social</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  {/* Capacity */}
+                  <div>
+                    <label
+                      htmlFor="capacity"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Max Attendees (Optional)
+                    </label>
+                    <input
+                      type="number"
+                      id="capacity"
+                      min="1"
+                      value={formData.capacity}
+                      onChange={e => setFormData(prev => ({ ...prev, capacity: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter maximum capacity"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Request/Help-specific fields */}
+            {formData.category === 'help_requests' && (
+              <div className="space-y-4 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                <h3 className="text-sm font-medium text-yellow-900 mb-3">Request Details</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Urgency */}
+                  <div>
+                    <label
+                      htmlFor="urgency"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Urgency Level
+                    </label>
+                    <select
+                      id="urgency"
+                      value={formData.urgency}
+                      onChange={e =>
+                        setFormData(prev => ({ ...prev, urgency: e.target.value as any }))
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="low">Low - No rush</option>
+                      <option value="medium">Medium - Within a week</option>
+                      <option value="high">High - ASAP</option>
+                    </select>
+                  </div>
+
+                  {/* Help Type */}
+                  <div>
+                    <label
+                      htmlFor="helpType"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Help Type
+                    </label>
+                    <select
+                      id="helpType"
+                      value={formData.helpType}
+                      onChange={e =>
+                        setFormData(prev => ({ ...prev, helpType: e.target.value as any }))
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="one_time">One-time help</option>
+                      <option value="ongoing">Ongoing assistance</option>
+                      <option value="volunteer">Volunteer opportunity</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Deadline */}
+                  <div>
+                    <label
+                      htmlFor="deadline"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Needed By (Optional)
+                    </label>
+                    <input
+                      type="date"
+                      id="deadline"
+                      value={formData.deadline}
+                      onChange={e => setFormData(prev => ({ ...prev, deadline: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  {/* Budget */}
+                  <div>
+                    <label
+                      htmlFor="budget"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Budget Available (Optional)
+                    </label>
+                    <input
+                      type="number"
+                      id="budget"
+                      min="0"
+                      step="0.01"
+                      value={formData.budget}
+                      onChange={e => setFormData(prev => ({ ...prev, budget: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Sale/Marketplace-specific fields */}
+            {(formData.category === 'sales' || formData.category === 'marketplace') && (
+              <div className="space-y-4 p-4 bg-green-50 rounded-lg border border-green-200">
+                <h3 className="text-sm font-medium text-green-900 mb-3">Item Details</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Condition */}
+                  <div>
+                    <label
+                      htmlFor="condition"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Condition
+                    </label>
+                    <select
+                      id="condition"
+                      value={formData.condition}
+                      onChange={e =>
+                        setFormData(prev => ({ ...prev, condition: e.target.value as any }))
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="new">New</option>
+                      <option value="like_new">Like New</option>
+                      <option value="good">Good</option>
+                      <option value="fair">Fair</option>
+                      <option value="poor">Poor</option>
+                    </select>
+                  </div>
+
+                  {/* Brand */}
+                  <div>
+                    <label htmlFor="brand" className="block text-sm font-medium text-gray-700 mb-2">
+                      Brand (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      id="brand"
+                      value={formData.brand}
+                      onChange={e => setFormData(prev => ({ ...prev, brand: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter brand name"
+                    />
+                  </div>
+                </div>
+
+                {/* Delivery Options */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Delivery Options
+                  </label>
+                  <div className="flex flex-col space-y-2">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={formData.deliveryAvailable}
+                        onChange={e =>
+                          setFormData(prev => ({ ...prev, deliveryAvailable: e.target.checked }))
+                        }
+                        className="mr-2"
+                      />
+                      <span className="text-sm">Delivery available</span>
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={formData.pickupOnly}
+                        onChange={e =>
+                          setFormData(prev => ({ ...prev, pickupOnly: e.target.checked }))
+                        }
+                        className="mr-2"
+                      />
+                      <span className="text-sm">Pickup only</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Offer-specific fields */}
+            {formData.category === 'offers' && (
+              <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h3 className="text-sm font-medium text-blue-900 mb-3">Offer Details</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Duration */}
+                  <div>
+                    <label
+                      htmlFor="duration"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Valid Duration
+                    </label>
+                    <input
+                      type="text"
+                      id="duration"
+                      value={formData.duration}
+                      onChange={e => setFormData(prev => ({ ...prev, duration: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g., Until end of month, 2 weeks"
+                    />
+                  </div>
+
+                  {/* Availability */}
+                  <div>
+                    <label
+                      htmlFor="availability"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Availability
+                    </label>
+                    <select
+                      id="availability"
+                      value={formData.availability}
+                      onChange={e =>
+                        setFormData(prev => ({ ...prev, availability: e.target.value as any }))
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="flexible">Flexible</option>
+                      <option value="weekdays">Weekdays only</option>
+                      <option value="weekends">Weekends only</option>
+                      <option value="by_appointment">By appointment</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Terms & Conditions */}
+                <div>
+                  <label
+                    htmlFor="termsConditions"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Terms & Conditions (Optional)
+                  </label>
+                  <textarea
+                    id="termsConditions"
+                    rows={3}
+                    value={formData.termsConditions}
+                    onChange={e =>
+                      setFormData(prev => ({ ...prev, termsConditions: e.target.value }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Any terms or conditions for this offer..."
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Announcement-specific fields */}
+            {formData.category === 'announcements' && (
+              <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h3 className="text-sm font-medium text-gray-900 mb-3">Announcement Details</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Announcement Type */}
+                  <div>
+                    <label
+                      htmlFor="announcementType"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Type
+                    </label>
+                    <select
+                      id="announcementType"
+                      value={formData.announcementType}
+                      onChange={e =>
+                        setFormData(prev => ({ ...prev, announcementType: e.target.value as any }))
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="info">Information</option>
+                      <option value="warning">Warning</option>
+                      <option value="update">Update</option>
+                      <option value="reminder">Reminder</option>
+                    </select>
+                  </div>
+
+                  {/* Importance */}
+                  <div>
+                    <label
+                      htmlFor="importance"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Importance
+                    </label>
+                    <select
+                      id="importance"
+                      value={formData.importance}
+                      onChange={e =>
+                        setFormData(prev => ({ ...prev, importance: e.target.value as any }))
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="low">Low</option>
+                      <option value="medium">Medium</option>
+                      <option value="high">High</option>
+                    </select>
+                  </div>
+
+                  {/* Expiry Date */}
+                  <div>
+                    <label
+                      htmlFor="expiryDate"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Expires On (Optional)
+                    </label>
+                    <input
+                      type="date"
+                      id="expiryDate"
+                      value={formData.expiryDate}
+                      onChange={e => setFormData(prev => ({ ...prev, expiryDate: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Images */}
             <div>

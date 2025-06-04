@@ -8,6 +8,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { formatDistanceToNow } from 'date-fns';
 import AdminLikeAnalytics from './AdminLikeAnalytics';
+import { useState } from 'react';
+import { authenticatedFetch } from '@/lib/utils/api';
 
 interface StatCardProps {
   title: string;
@@ -54,6 +56,27 @@ function StatCard({ title, value, change, changeLabel, icon: Icon, color }: Stat
 
 export default function AdminDashboard() {
   const { stats, loading, error, refetch } = useAdminDashboard();
+  const [populating, setPopulating] = useState(false);
+  const [populateMessage, setPopulateMessage] = useState<string | null>(null);
+
+  const handlePopulateDemo = async () => {
+    setPopulating(true);
+    setPopulateMessage(null);
+    try {
+      const res = await authenticatedFetch('/api/admin/populate-demo', { method: 'POST' });
+      const data = await res.json();
+      if (res.ok) {
+        setPopulateMessage('Demo data populated successfully!');
+        refetch();
+      } else {
+        setPopulateMessage(data.error || 'Failed to populate demo data.');
+      }
+    } catch (err) {
+      setPopulateMessage('Failed to populate demo data.');
+    } finally {
+      setPopulating(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -109,13 +132,30 @@ export default function AdminDashboard() {
           <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
           <p className="text-sm text-gray-600 mt-1">Overview of your community platform</p>
         </div>
-        <button
-          onClick={refetch}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Refresh
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={refetch}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Refresh
+          </button>
+          <button
+            onClick={handlePopulateDemo}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-60"
+            disabled={populating}
+            title="Delete all data except your user and repopulate with demo content"
+          >
+            {populating ? 'Populating...' : 'Populate Demo Data'}
+          </button>
+        </div>
       </div>
+      {populateMessage && (
+        <div
+          className={`rounded p-3 mb-2 ${populateMessage.includes('success') ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}
+        >
+          {populateMessage}
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

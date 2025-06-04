@@ -13,7 +13,6 @@ export async function POST(request: NextRequest) {
         content:
           "Hi everyone! We're moving interstate next week and unfortunately can't take our beautiful upright piano with us.",
         category: 'free_items',
-        type: 'offer',
         authorId: 'sample-user-1',
         authorName: 'Emma Wilson',
         location: {
@@ -37,7 +36,6 @@ export async function POST(request: NextRequest) {
         description: "Don't miss the weekly farmers market at Drysdale with fresh local produce!",
         content: 'Come down to the Drysdale Farmers Market every Saturday from 8 AM to 2 PM!',
         category: 'events',
-        type: 'event',
         authorId: 'sample-user-2',
         authorName: 'John Smith',
         location: {
@@ -61,7 +59,6 @@ export async function POST(request: NextRequest) {
         description: 'Join us for a fun community BBQ this Sunday!',
         content: 'Bring your family and friends for a great day at the beach with food and fun.',
         category: 'events',
-        type: 'event',
         authorId: 'sample-user-3',
         authorName: 'Sarah Johnson',
         location: {
@@ -85,7 +82,6 @@ export async function POST(request: NextRequest) {
         description: 'Need help with some home repairs in Portarlington.',
         content: 'I need someone reliable to help fix a leaky faucet and repair some deck boards.',
         category: 'help_requests',
-        type: 'request',
         authorId: 'sample-user-4',
         authorName: 'Mike Wilson',
         location: {
@@ -109,7 +105,6 @@ export async function POST(request: NextRequest) {
         description: 'Daily fresh catch available at Portarlington Pier.',
         content: 'I sell fresh fish caught daily from my boat. Best prices on the peninsula!',
         category: 'marketplace',
-        type: 'offer',
         authorId: 'sample-user-5',
         authorName: 'Captain Bob',
         location: {

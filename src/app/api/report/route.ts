@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { doc, addDoc, collection, serverTimestamp, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import { ContentReport, ReportReason } from '@/types';
-import { getAuthUser } from '@/lib/firebase/admin';
+import { requireAuth, handleAuthError } from '@/lib/utils/auth';
 
 interface ReportRequest {
   contentType: 'post' | 'comment' | 'user';
@@ -14,13 +14,8 @@ interface ReportRequest {
 
 export async function POST(request: NextRequest) {
   try {
-    // Get user ID from header (consistent with other API endpoints)
-    const userHeader = request.headers.get('x-user-id');
-    if (!userHeader) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
-
-    const user = await getAuthUser(userHeader);
+    // Get authenticated user
+    const user = await requireAuth(request);
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 401 });
     }
@@ -102,7 +97,9 @@ export async function POST(request: NextRequest) {
       message: 'Report submitted successfully. Our moderation team will review it shortly.',
     });
   } catch (error) {
-    console.error('Error creating report:', error);
-    return NextResponse.json({ error: 'Failed to submit report' }, { status: 500 });
+    return (
+      handleAuthError(error) ||
+      NextResponse.json({ error: 'Failed to submit report' }, { status: 500 })
+    );
   }
 }

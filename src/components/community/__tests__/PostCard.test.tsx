@@ -210,7 +210,6 @@ describe('PostCard Component', () => {
     title: 'Test Post Title',
     description: 'This is a test post description',
     category: 'marketplace',
-    type: 'sale',
     authorId: 'user-123',
     authorName: 'Test Author',
     createdAt: new Date('2023-12-15T10:00:00Z'),
@@ -248,11 +247,10 @@ describe('PostCard Component', () => {
     // Should still show basic information in compact mode
   });
 
-  it('displays category and type badges', () => {
+  it('displays category badge', () => {
     render(<PostCard post={mockPost} />);
 
     expect(screen.getByText('marketplace')).toBeInTheDocument();
-    expect(screen.getByText('sale')).toBeInTheDocument();
   });
 
   it('shows images when available', () => {

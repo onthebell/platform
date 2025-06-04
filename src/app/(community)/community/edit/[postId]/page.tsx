@@ -7,7 +7,7 @@ import { useAuth } from '@/lib/firebase/auth';
 import { getPostById, updatePost } from '@/lib/firebase/firestore';
 import { uploadImage, deleteImage, validateImageFile } from '@/lib/firebase/storage';
 import { useContentModeration } from '@/hooks/useContentModeration';
-import { CommunityPost, PostCategory, PostType } from '@/types';
+import { CommunityPost, PostCategory, JobType } from '@/types';
 import AddressAutocomplete from '@/components/ui/AddressAutocomplete';
 import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import dynamic from 'next/dynamic';
@@ -19,7 +19,6 @@ interface FormData {
   title: string;
   description: string;
   category: string;
-  type: string;
   price?: string;
   currency: string;
   location: {
@@ -29,6 +28,35 @@ interface FormData {
   };
   tags: string;
   visibility: 'public' | 'verified_only';
+  // Job-specific fields
+  startDate?: string;
+  jobType?: JobType;
+  industry?: string;
+  employerType?: 'business' | 'person';
+  workType?: 'onsite' | 'remote' | 'hybrid';
+  // Event-specific fields
+  eventDate?: string;
+  eventEndDate?: string;
+  eventType?: 'workshop' | 'meeting' | 'festival' | 'market' | 'sport' | 'social' | 'other';
+  capacity?: string;
+  // Request/Help-specific fields
+  urgency?: 'low' | 'medium' | 'high';
+  deadline?: string;
+  budget?: string;
+  helpType?: 'one_time' | 'ongoing' | 'volunteer';
+  // Sale/Marketplace-specific fields
+  condition?: 'new' | 'like_new' | 'good' | 'fair' | 'poor';
+  brand?: string;
+  deliveryAvailable?: boolean;
+  pickupOnly?: boolean;
+  // Offer-specific fields
+  duration?: string;
+  termsConditions?: string;
+  availability?: 'weekdays' | 'weekends' | 'flexible' | 'by_appointment';
+  // Announcement-specific fields
+  announcementType?: 'info' | 'warning' | 'update' | 'reminder';
+  importance?: 'low' | 'medium' | 'high';
+  expiryDate?: string;
 }
 
 export default function EditPostPage() {
@@ -37,6 +65,50 @@ export default function EditPostPage() {
   const params = useParams();
   const postId = params.postId as string;
   const { moderateContent, isLoading: isModerating } = useContentModeration();
+
+  // Job options arrays
+  const JOB_TYPES: { value: JobType; label: string }[] = [
+    { value: 'full_time', label: 'Full Time' },
+    { value: 'part_time', label: 'Part Time' },
+    { value: 'one_off', label: 'One-off Job' },
+    { value: 'contract', label: 'Contract' },
+    { value: 'volunteer', label: 'Volunteer' },
+  ];
+
+  const INDUSTRIES: { value: string; label: string }[] = [
+    { value: '', label: 'Select Industry (Optional)' },
+    { value: 'Accommodation & Food Services', label: 'Accommodation & Food Services' },
+    { value: 'Administrative & Support Services', label: 'Administrative & Support Services' },
+    { value: 'Agriculture, Forestry & Fishing', label: 'Agriculture, Forestry & Fishing' },
+    { value: 'Arts & Recreation Services', label: 'Arts & Recreation Services' },
+    { value: 'Construction', label: 'Construction' },
+    { value: 'Education & Training', label: 'Education & Training' },
+    {
+      value: 'Electricity, Gas, Water & Waste Services',
+      label: 'Electricity, Gas, Water & Waste Services',
+    },
+    { value: 'Financial & Insurance Services', label: 'Financial & Insurance Services' },
+    { value: 'Health Care & Social Assistance', label: 'Health Care & Social Assistance' },
+    {
+      value: 'Information Media & Telecommunications',
+      label: 'Information Media & Telecommunications',
+    },
+    { value: 'Manufacturing', label: 'Manufacturing' },
+    { value: 'Mining', label: 'Mining' },
+    {
+      value: 'Professional, Scientific & Technical Services',
+      label: 'Professional, Scientific & Technical Services',
+    },
+    { value: 'Public Administration & Safety', label: 'Public Administration & Safety' },
+    {
+      value: 'Rental, Hiring & Real Estate Services',
+      label: 'Rental, Hiring & Real Estate Services',
+    },
+    { value: 'Retail Trade', label: 'Retail Trade' },
+    { value: 'Transport, Postal & Warehousing', label: 'Transport, Postal & Warehousing' },
+    { value: 'Wholesale Trade', label: 'Wholesale Trade' },
+    { value: 'Other Services', label: 'Other Services' },
+  ];
 
   const [post, setPost] = useState<CommunityPost | null>(null);
   const [loading, setLoading] = useState(true);
@@ -49,7 +121,6 @@ export default function EditPostPage() {
     title: '',
     description: '',
     category: '',
-    type: '',
     currency: 'AUD',
     location: {
       lat: -38.1499,
@@ -58,6 +129,35 @@ export default function EditPostPage() {
     },
     tags: '',
     visibility: 'public',
+    // Job-specific fields
+    startDate: '',
+    jobType: 'full_time',
+    industry: '',
+    employerType: 'person',
+    workType: 'onsite',
+    // Event-specific fields
+    eventDate: '',
+    eventEndDate: '',
+    eventType: 'other',
+    capacity: '',
+    // Request/Help-specific fields
+    urgency: 'medium',
+    deadline: '',
+    budget: '',
+    helpType: 'one_time',
+    // Sale/Marketplace-specific fields
+    condition: 'good',
+    brand: '',
+    deliveryAvailable: false,
+    pickupOnly: false,
+    // Offer-specific fields
+    duration: '',
+    termsConditions: '',
+    availability: 'flexible',
+    // Announcement-specific fields
+    announcementType: 'info',
+    importance: 'medium',
+    expiryDate: '',
   });
 
   const categories = [
@@ -67,61 +167,21 @@ export default function EditPostPage() {
     { value: 'free_items', label: 'Free Items' },
     { value: 'help_requests', label: 'Help Requests' },
     { value: 'deals', label: 'Deals & Offers' },
+    { value: 'offers', label: 'Offers' },
     { value: 'food', label: 'Food & Dining' },
     { value: 'services', label: 'Services' },
+    { value: 'jobs', label: 'Jobs' },
+    { value: 'sales', label: 'Sales' },
+    { value: 'announcements', label: 'Announcements' },
   ];
 
-  const getTypesForCategory = (category: string) => {
-    switch (category) {
-      case 'community':
-        return [
-          { value: 'discussion', label: 'Discussion' },
-          { value: 'question', label: 'Question' },
-          { value: 'announcement', label: 'Announcement' },
-        ];
-      case 'events':
-        return [
-          { value: 'event', label: 'Event' },
-          { value: 'workshop', label: 'Workshop' },
-          { value: 'meetup', label: 'Meetup' },
-        ];
-      case 'marketplace':
-        return [
-          { value: 'sale', label: 'For Sale' },
-          { value: 'wanted', label: 'Wanted' },
-          { value: 'service', label: 'Service Offered' },
-        ];
-      case 'free_items':
-        return [
-          { value: 'free', label: 'Free Item' },
-          { value: 'swap', label: 'Item Swap' },
-        ];
-      case 'help_requests':
-        return [
-          { value: 'request', label: 'Help Request' },
-          { value: 'recommendation', label: 'Recommendation' },
-        ];
-      case 'deals':
-        return [
-          { value: 'discount', label: 'Discount/Sale' },
-          { value: 'promotion', label: 'Promotion' },
-        ];
-      case 'food':
-        return [
-          { value: 'restaurant', label: 'Restaurant/Cafe' },
-          { value: 'recipe', label: 'Recipe Share' },
-          { value: 'review', label: 'Food Review' },
-        ];
-      case 'services':
-        return [
-          { value: 'professional', label: 'Professional Service' },
-          { value: 'handyman', label: 'Handyman/Trades' },
-          { value: 'personal', label: 'Personal Service' },
-        ];
-      default:
-        return [{ value: 'general', label: 'General' }];
-    }
-  };
+  const jobTypes = [
+    { value: 'full_time', label: 'Full Time' },
+    { value: 'part_time', label: 'Part Time' },
+    { value: 'one_off', label: 'One-off Job' },
+    { value: 'contract', label: 'Contract' },
+    { value: 'volunteer', label: 'Volunteer' },
+  ];
 
   useEffect(() => {
     if (!user) {
@@ -149,7 +209,6 @@ export default function EditPostPage() {
           title: fetchedPost.title,
           description: fetchedPost.description,
           category: fetchedPost.category,
-          type: fetchedPost.type,
           price: fetchedPost.price?.toString() || '',
           currency: fetchedPost.currency || 'AUD',
           location: fetchedPost.location || {
@@ -159,6 +218,45 @@ export default function EditPostPage() {
           },
           tags: fetchedPost.tags.join(', '),
           visibility: fetchedPost.visibility,
+          // Job-specific fields
+          startDate: fetchedPost.startDate
+            ? new Date(fetchedPost.startDate).toISOString().split('T')[0]
+            : '',
+          jobType: fetchedPost.jobType || 'full_time',
+          industry: fetchedPost.industry || '',
+          employerType: fetchedPost.employerType || 'person',
+          workType: fetchedPost.workType || 'onsite',
+          // Event-specific fields
+          eventDate: fetchedPost.eventDate
+            ? new Date(fetchedPost.eventDate).toISOString().slice(0, 16)
+            : '',
+          eventEndDate: fetchedPost.eventEndDate
+            ? new Date(fetchedPost.eventEndDate).toISOString().slice(0, 16)
+            : '',
+          eventType: fetchedPost.eventType || 'other',
+          capacity: fetchedPost.capacity?.toString() || '',
+          // Request/Help-specific fields
+          urgency: fetchedPost.urgency || 'medium',
+          deadline: fetchedPost.deadline
+            ? new Date(fetchedPost.deadline).toISOString().split('T')[0]
+            : '',
+          budget: fetchedPost.budget?.toString() || '',
+          helpType: fetchedPost.helpType || 'one_time',
+          // Sale/Marketplace-specific fields
+          condition: fetchedPost.condition || 'good',
+          brand: fetchedPost.brand || '',
+          deliveryAvailable: fetchedPost.deliveryAvailable || false,
+          pickupOnly: fetchedPost.pickupOnly || false,
+          // Offer-specific fields
+          duration: fetchedPost.duration || '',
+          termsConditions: fetchedPost.termsConditions || '',
+          availability: fetchedPost.availability || 'flexible',
+          // Announcement-specific fields
+          announcementType: fetchedPost.announcementType || 'info',
+          importance: fetchedPost.importance || 'medium',
+          expiryDate: fetchedPost.expiryDate
+            ? new Date(fetchedPost.expiryDate).toISOString().split('T')[0]
+            : '',
         });
       } catch (error) {
         console.error('Error fetching post:', error);
@@ -246,7 +344,6 @@ export default function EditPostPage() {
         title: formData.title,
         description: formData.description,
         category: formData.category as PostCategory,
-        type: formData.type as PostType,
         price:
           formData.price && !isNaN(parseFloat(formData.price))
             ? parseFloat(formData.price)
@@ -260,6 +357,51 @@ export default function EditPostPage() {
           .map((tag: string) => tag.trim())
           .filter(Boolean),
         updatedAt: new Date(),
+        // Job-specific fields (only include if category is jobs)
+        ...(formData.category === 'jobs' && {
+          startDate: formData.startDate ? new Date(formData.startDate) : undefined,
+          jobType: formData.jobType,
+          industry: formData.industry || undefined,
+          employerType: formData.employerType,
+          workType: formData.workType,
+        }),
+        // Event-specific fields
+        ...(formData.category === 'events' && {
+          eventDate: formData.eventDate ? new Date(formData.eventDate) : undefined,
+          eventEndDate: formData.eventEndDate ? new Date(formData.eventEndDate) : undefined,
+          eventType: formData.eventType,
+          capacity: formData.capacity ? parseInt(formData.capacity) : undefined,
+        }),
+        // Request/Help-specific fields
+        ...(formData.category === 'help_requests' && {
+          urgency: formData.urgency,
+          deadline: formData.deadline ? new Date(formData.deadline) : undefined,
+          budget: formData.budget ? parseFloat(formData.budget) : undefined,
+          helpType: formData.helpType,
+        }),
+        // Sale/Marketplace-specific fields
+        ...((formData.category === 'marketplace' ||
+          formData.category === 'free_items' ||
+          formData.category === 'sales') && {
+          condition: formData.condition,
+          brand: formData.brand,
+          deliveryAvailable: formData.deliveryAvailable,
+          pickupOnly: formData.pickupOnly,
+        }),
+        // Offer-specific fields
+        ...((formData.category === 'deals' ||
+          formData.category === 'services' ||
+          formData.category === 'offers') && {
+          duration: formData.duration,
+          termsConditions: formData.termsConditions,
+          availability: formData.availability,
+        }),
+        // Announcement-specific fields
+        ...(formData.category === 'announcements' && {
+          announcementType: formData.announcementType,
+          importance: formData.importance,
+          expiryDate: formData.expiryDate ? new Date(formData.expiryDate) : undefined,
+        }),
       };
 
       await updatePost(postId, updatedData);
@@ -325,61 +467,38 @@ export default function EditPostPage() {
               />
             </div>
 
-            {/* Category and Type */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-                  Category *
-                </label>
-                <select
-                  id="category"
-                  required
-                  value={formData.category}
-                  onChange={e => {
-                    const newCategory = e.target.value;
-                    setFormData(prev => ({
-                      ...prev,
-                      category: newCategory,
-                      type: '', // Reset type when category changes
-                    }));
-                  }}
-                  className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Select a category</option>
-                  {categories.map(cat => (
-                    <option key={cat.value} value={cat.value}>
-                      {cat.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
-                  Type *
-                </label>
-                <select
-                  id="type"
-                  required
-                  value={formData.type}
-                  onChange={e => setFormData(prev => ({ ...prev, type: e.target.value }))}
-                  className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  disabled={!formData.category}
-                >
-                  <option value="">Select a type</option>
-                  {formData.category &&
-                    getTypesForCategory(formData.category).map(type => (
-                      <option key={type.value} value={type.value}>
-                        {type.label}
-                      </option>
-                    ))}
-                </select>
-              </div>
+            {/* Category */}
+            <div>
+              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+                Category *
+              </label>
+              <select
+                id="category"
+                required
+                value={formData.category}
+                onChange={e => {
+                  const newCategory = e.target.value;
+                  setFormData(prev => ({
+                    ...prev,
+                    category: newCategory,
+                  }));
+                }}
+                className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select a category</option>
+                {categories.map(cat => (
+                  <option key={cat.value} value={cat.value}>
+                    {cat.label}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Price (for marketplace items) */}
             {(formData.category === 'marketplace' ||
               formData.category === 'deals' ||
+              formData.category === 'sales' ||
+              formData.category === 'offers' ||
               formData.category === 'events') && (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="sm:col-span-2">
@@ -433,6 +552,131 @@ export default function EditPostPage() {
                 onFocus={() => moderationError && setModerationError(null)}
               />
             </div>
+
+            {/* Job-specific fields */}
+            {formData.category === 'jobs' && (
+              <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h3 className="text-sm font-medium text-blue-900 mb-3">Job Details</h3>
+
+                {/* Start Date */}
+                <div>
+                  <label
+                    htmlFor="startDate"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Start Date
+                  </label>
+                  <input
+                    type="date"
+                    id="startDate"
+                    value={formData.startDate || ''}
+                    onChange={e => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
+                    className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                {/* Employer Type and Work Type */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      htmlFor="employerType"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Posted by
+                    </label>
+                    <select
+                      id="employerType"
+                      value={formData.employerType || 'person'}
+                      onChange={e =>
+                        setFormData(prev => ({
+                          ...prev,
+                          employerType: e.target.value as 'business' | 'person',
+                        }))
+                      }
+                      className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="person">Individual/Person</option>
+                      <option value="business">Business</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="workType"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Work Type
+                    </label>
+                    <select
+                      id="workType"
+                      value={formData.workType || 'onsite'}
+                      onChange={e =>
+                        setFormData(prev => ({
+                          ...prev,
+                          workType: e.target.value as 'onsite' | 'remote' | 'hybrid',
+                        }))
+                      }
+                      className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="onsite">On-site</option>
+                      <option value="remote">Remote</option>
+                      <option value="hybrid">Hybrid</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Job Type */}
+                <div>
+                  <label htmlFor="jobType" className="block text-sm font-medium text-gray-700 mb-2">
+                    Job Type
+                  </label>
+                  <select
+                    id="jobType"
+                    value={formData.jobType || 'full_time'}
+                    onChange={e =>
+                      setFormData(prev => ({
+                        ...prev,
+                        jobType: e.target.value as JobType,
+                      }))
+                    }
+                    className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {JOB_TYPES.map(jobType => (
+                      <option key={jobType.value} value={jobType.value}>
+                        {jobType.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Industry */}
+                <div>
+                  <label
+                    htmlFor="industry"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Industry
+                  </label>
+                  <select
+                    id="industry"
+                    value={formData.industry || ''}
+                    onChange={e =>
+                      setFormData(prev => ({
+                        ...prev,
+                        industry: e.target.value,
+                      }))
+                    }
+                    className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 bg-white text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {INDUSTRIES.map(industry => (
+                      <option key={industry.value} value={industry.value}>
+                        {industry.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            )}
 
             {/* Location */}
             <div>
@@ -550,6 +794,449 @@ export default function EditPostPage() {
 
             {/* Tags */}
             <div>
+              {/* Event-specific fields */}
+              {formData.category === 'events' && (
+                <div className="border border-gray-200 rounded-lg p-4 bg-blue-50">
+                  <h3 className="text-sm font-medium text-gray-900 mb-3">Event Details</h3>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label
+                          htmlFor="eventDate"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          Event Date *
+                        </label>
+                        <input
+                          type="datetime-local"
+                          id="eventDate"
+                          value={formData.eventDate || ''}
+                          onChange={e =>
+                            setFormData(prev => ({ ...prev, eventDate: e.target.value }))
+                          }
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="eventEndDate"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          End Date
+                        </label>
+                        <input
+                          type="datetime-local"
+                          id="eventEndDate"
+                          value={formData.eventEndDate || ''}
+                          onChange={e =>
+                            setFormData(prev => ({ ...prev, eventEndDate: e.target.value }))
+                          }
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label
+                          htmlFor="eventType"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          Event Type
+                        </label>
+                        <select
+                          id="eventType"
+                          value={formData.eventType || 'social'}
+                          onChange={e =>
+                            setFormData(prev => ({
+                              ...prev,
+                              eventType: e.target.value as
+                                | 'workshop'
+                                | 'meeting'
+                                | 'festival'
+                                | 'market'
+                                | 'sport'
+                                | 'social'
+                                | 'other',
+                            }))
+                          }
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="social">Social</option>
+                          <option value="workshop">Workshop</option>
+                          <option value="meeting">Meeting</option>
+                          <option value="festival">Festival</option>
+                          <option value="market">Market</option>
+                          <option value="sport">Sport</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="capacity"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          Capacity
+                        </label>
+                        <input
+                          type="number"
+                          id="capacity"
+                          min="1"
+                          value={formData.capacity || ''}
+                          onChange={e =>
+                            setFormData(prev => ({ ...prev, capacity: e.target.value }))
+                          }
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Max attendees"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Request/Help-specific fields */}
+              {formData.category === 'help_requests' && (
+                <div className="border border-gray-200 rounded-lg p-4 bg-green-50">
+                  <h3 className="text-sm font-medium text-gray-900 mb-3">Request Details</h3>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label
+                          htmlFor="urgency"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          Urgency
+                        </label>
+                        <select
+                          id="urgency"
+                          value={formData.urgency || 'medium'}
+                          onChange={e =>
+                            setFormData(prev => ({
+                              ...prev,
+                              urgency: e.target.value as 'low' | 'medium' | 'high',
+                            }))
+                          }
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="low">Low</option>
+                          <option value="medium">Medium</option>
+                          <option value="high">High</option>
+                          <option value="urgent">Urgent</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="helpType"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          Help Type
+                        </label>
+                        <select
+                          id="helpType"
+                          value={formData.helpType || 'one_time'}
+                          onChange={e =>
+                            setFormData(prev => ({
+                              ...prev,
+                              helpType: e.target.value as 'one_time' | 'ongoing' | 'volunteer',
+                            }))
+                          }
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="one_time">One Time</option>
+                          <option value="ongoing">Ongoing</option>
+                          <option value="volunteer">Volunteer</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label
+                          htmlFor="deadline"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          Deadline
+                        </label>
+                        <input
+                          type="date"
+                          id="deadline"
+                          value={formData.deadline || ''}
+                          onChange={e =>
+                            setFormData(prev => ({ ...prev, deadline: e.target.value }))
+                          }
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="budget"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          Budget
+                        </label>
+                        <input
+                          type="text"
+                          id="budget"
+                          value={formData.budget || ''}
+                          onChange={e => setFormData(prev => ({ ...prev, budget: e.target.value }))}
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="e.g., $50-100, Free, To be discussed"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Sale/Marketplace-specific fields */}
+              {(formData.category === 'marketplace' ||
+                formData.category === 'free_items' ||
+                formData.category === 'sales') && (
+                <div className="border border-gray-200 rounded-lg p-4 bg-yellow-50">
+                  <h3 className="text-sm font-medium text-gray-900 mb-3">Item Details</h3>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label
+                          htmlFor="condition"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          Condition
+                        </label>
+                        <select
+                          id="condition"
+                          value={formData.condition || 'good'}
+                          onChange={e =>
+                            setFormData(prev => ({
+                              ...prev,
+                              condition: e.target.value as
+                                | 'new'
+                                | 'like_new'
+                                | 'good'
+                                | 'fair'
+                                | 'poor',
+                            }))
+                          }
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="new">New</option>
+                          <option value="like_new">Like New</option>
+                          <option value="good">Good</option>
+                          <option value="fair">Fair</option>
+                          <option value="poor">Poor</option>
+                          <option value="for_parts">For Parts</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="brand"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          Brand
+                        </label>
+                        <input
+                          type="text"
+                          id="brand"
+                          value={formData.brand || ''}
+                          onChange={e => setFormData(prev => ({ ...prev, brand: e.target.value }))}
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Item brand or manufacturer"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="deliveryAvailable"
+                          checked={formData.deliveryAvailable || false}
+                          onChange={e =>
+                            setFormData(prev => ({ ...prev, deliveryAvailable: e.target.checked }))
+                          }
+                          className="mr-2"
+                        />
+                        <label htmlFor="deliveryAvailable" className="text-sm text-gray-700">
+                          Delivery available
+                        </label>
+                      </div>
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="pickupOnly"
+                          checked={formData.pickupOnly || false}
+                          onChange={e =>
+                            setFormData(prev => ({ ...prev, pickupOnly: e.target.checked }))
+                          }
+                          className="mr-2"
+                        />
+                        <label htmlFor="pickupOnly" className="text-sm text-gray-700">
+                          Pickup only
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Offer-specific fields */}
+              {(formData.category === 'deals' ||
+                formData.category === 'services' ||
+                formData.category === 'offers') && (
+                <div className="border border-gray-200 rounded-lg p-4 bg-purple-50">
+                  <h3 className="text-sm font-medium text-gray-900 mb-3">Offer Details</h3>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label
+                          htmlFor="duration"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          Offer Duration
+                        </label>
+                        <input
+                          type="text"
+                          id="duration"
+                          value={formData.duration || ''}
+                          onChange={e =>
+                            setFormData(prev => ({ ...prev, duration: e.target.value }))
+                          }
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="e.g., Until end of month, Limited time"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="availability"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          Availability
+                        </label>
+                        <select
+                          id="availability"
+                          value={formData.availability || 'flexible'}
+                          onChange={e =>
+                            setFormData(prev => ({
+                              ...prev,
+                              availability: e.target.value as
+                                | 'weekdays'
+                                | 'weekends'
+                                | 'flexible'
+                                | 'by_appointment',
+                            }))
+                          }
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="weekdays">Weekdays</option>
+                          <option value="weekends">Weekends</option>
+                          <option value="flexible">Flexible</option>
+                          <option value="by_appointment">By Appointment</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="termsConditions"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
+                        Terms & Conditions
+                      </label>
+                      <textarea
+                        id="termsConditions"
+                        rows={3}
+                        value={formData.termsConditions || ''}
+                        onChange={e =>
+                          setFormData(prev => ({ ...prev, termsConditions: e.target.value }))
+                        }
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Any specific terms, conditions, or restrictions..."
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Announcement-specific fields */}
+              {formData.category === 'announcements' && (
+                <div className="border border-gray-200 rounded-lg p-4 bg-red-50">
+                  <h3 className="text-sm font-medium text-gray-900 mb-3">Announcement Details</h3>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label
+                          htmlFor="announcementType"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          Announcement Type
+                        </label>
+                        <select
+                          id="announcementType"
+                          value={formData.announcementType || 'info'}
+                          onChange={e =>
+                            setFormData(prev => ({
+                              ...prev,
+                              announcementType: e.target.value as
+                                | 'info'
+                                | 'warning'
+                                | 'update'
+                                | 'reminder',
+                            }))
+                          }
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="info">Information</option>
+                          <option value="warning">Warning</option>
+                          <option value="update">Update</option>
+                          <option value="reminder">Reminder</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="importance"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                          Importance
+                        </label>
+                        <select
+                          id="importance"
+                          value={formData.importance || 'medium'}
+                          onChange={e =>
+                            setFormData(prev => ({
+                              ...prev,
+                              importance: e.target.value as 'low' | 'medium' | 'high',
+                            }))
+                          }
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="low">Low</option>
+                          <option value="normal">Normal</option>
+                          <option value="high">High</option>
+                          <option value="critical">Critical</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="expiryDate"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
+                        Expiry Date
+                      </label>
+                      <input
+                        type="date"
+                        id="expiryDate"
+                        value={formData.expiryDate || ''}
+                        onChange={e =>
+                          setFormData(prev => ({ ...prev, expiryDate: e.target.value }))
+                        }
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <p className="mt-1 text-xs text-gray-500">
+                        When this announcement should no longer be visible
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-2">
                 Tags
               </label>

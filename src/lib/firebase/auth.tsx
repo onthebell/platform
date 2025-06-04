@@ -21,6 +21,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, displayName: string) => Promise<void>;
   signOut: () => Promise<void>;
   updateUserProfile: (updates: Partial<User>) => Promise<void>;
+  getIdToken: () => Promise<string | null>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -152,6 +153,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const getIdToken = async (): Promise<string | null> => {
+    if (!firebaseUser) return null;
+
+    try {
+      const token = await firebaseUser.getIdToken();
+      return token;
+    } catch (error) {
+      console.error('Failed to get ID token:', error);
+      return null;
+    }
+  };
+
   const value = {
     user,
     firebaseUser,
@@ -160,6 +173,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signUp,
     signOut,
     updateUserProfile,
+    getIdToken,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

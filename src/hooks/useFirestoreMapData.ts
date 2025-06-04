@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { CommunityPost, Business, Event } from '@/types';
 import { getPosts, getBusinesses, getEvents } from '@/lib/firebase/firestore';
 import { bellarineSuburbs } from '@/components/map/bellarineSuburbs';
+import { useAuth } from '@/lib/firebase/auth';
 
 export interface MapDataPoint {
   id: string;
@@ -57,6 +58,7 @@ export function useFirestoreMapData(options: UseFirestoreMapDataOptions = {}) {
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
   const [mounted, setMounted] = useState(false);
+  const { user } = useAuth();
 
   console.log('🔧 Hook state:', { mounted, loading, dataPoints: dataPoints.length });
 
@@ -257,10 +259,15 @@ export function useFirestoreMapData(options: UseFirestoreMapDataOptions = {}) {
         }))
       );
 
+      let filteredPosts = posts;
+      if (!user || !user.isVerified) {
+        filteredPosts = posts.filter(post => post.visibility !== 'verified_only');
+      }
+
       const allDataPoints: MapDataPoint[] = [];
 
       // Process posts
-      posts.forEach(post => {
+      filteredPosts.forEach(post => {
         const dataPoint = postToMapDataPoint(post);
         console.log(`📍 Processing post "${post.title}":`, {
           hasLocation: !!post.location,
@@ -333,6 +340,7 @@ export function useFirestoreMapData(options: UseFirestoreMapDataOptions = {}) {
     businessToMapDataPoint,
     eventToMapDataPoint,
     groupDataBySuburb,
+    user,
   ]);
 
   // Initial mount effect
@@ -358,10 +366,15 @@ export function useFirestoreMapData(options: UseFirestoreMapDataOptions = {}) {
           events: events.length,
         });
 
+        let filteredPosts = posts;
+        if (!user || !user.isVerified) {
+          filteredPosts = posts.filter(post => post.visibility !== 'verified_only');
+        }
+
         const allDataPoints: MapDataPoint[] = [];
 
         // Process posts
-        posts.forEach(post => {
+        filteredPosts.forEach(post => {
           const dataPoint = postToMapDataPoint(post);
           if (dataPoint) {
             allDataPoints.push(dataPoint);
@@ -385,15 +398,16 @@ export function useFirestoreMapData(options: UseFirestoreMapDataOptions = {}) {
         });
 
         console.log('✅ Final data points:', allDataPoints.length);
+        console.log('🏘️ Grouping by suburbs...');
+
         const suburbDataResult = groupDataBySuburb(allDataPoints);
-        console.log('🏘️ Suburb data result:', suburbDataResult.length);
+        console.log('🏘️ Suburb data result:', suburbDataResult.length, suburbDataResult);
 
         setDataPoints(allDataPoints);
         setSuburbData(suburbDataResult);
         setLastRefresh(new Date());
-        setMounted(true);
       } catch (err) {
-        console.error('❌ Error fetching map data:', err);
+        console.error('❌ Error fetching initial map data:', err);
         setError('Failed to load map data. Please try again.');
       } finally {
         setLoading(false);
@@ -401,44 +415,24 @@ export function useFirestoreMapData(options: UseFirestoreMapDataOptions = {}) {
     };
 
     initializeData();
-  }, []);
+  }, [groupDataBySuburb, postToMapDataPoint, businessToMapDataPoint, eventToMapDataPoint, user]);
 
-  // Remove the complex fetchData dependency useEffect
-  // useEffect(() => {
-  //   if (mounted) {
-  //     console.log('🎯 Data fetch useEffect is running - mounted:', mounted);
-  //     fetchData();
-  //   }
-  // }, [mounted, fetchData]);
-
-  // Set up refresh interval if specified
+  // Refresh data at specified interval
   useEffect(() => {
-    if (!options.refreshInterval) return;
+    if (options.refreshInterval && !loading) {
+      const intervalId = setInterval(() => {
+        console.log('⏰ Refresh interval elapsed, refetching data...');
+        fetchData();
+      }, options.refreshInterval);
 
-    const interval = setInterval(fetchData, options.refreshInterval);
-    return () => clearInterval(interval);
-  }, [fetchData, options.refreshInterval]);
+      return () => clearInterval(intervalId);
+    }
+  }, [options.refreshInterval, loading, fetchData]);
 
   // Manual refresh function
   const refresh = useCallback(() => {
     fetchData();
   }, [fetchData]);
-
-  // Get data points for specific categories
-  const getDataPointsByCategory = useCallback(
-    (category: string): MapDataPoint[] => {
-      return dataPoints.filter(point => point.category === category);
-    },
-    [dataPoints]
-  );
-
-  // Get suburb data by name
-  const getSuburbByName = useCallback(
-    (name: string): SuburbData | undefined => {
-      return suburbData.find(suburb => suburb.name === name);
-    },
-    [suburbData]
-  );
 
   return {
     dataPoints,
@@ -447,10 +441,7 @@ export function useFirestoreMapData(options: UseFirestoreMapDataOptions = {}) {
     error,
     lastRefresh,
     refresh,
-    getDataPointsByCategory,
-    getSuburbByName,
-    totalCount: dataPoints.length,
-    suburbCount: suburbData.length,
+    totalCount: dataPoints.length, // Add totalCount for consumers
   };
 }
 

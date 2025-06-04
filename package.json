@@ -18,6 +18,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.8.0",
     "@headlessui/react": "^2.2.4",
     "@heroicons/react": "^2.2.0",
     "@mux/mux-player-react": "^3.4.0",

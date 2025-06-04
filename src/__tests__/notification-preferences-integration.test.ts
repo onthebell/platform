@@ -27,6 +27,7 @@ describe('Notification Preferences Integration', () => {
             community: true,
             food: true,
             services: true,
+            jobs: true,
             ...notificationPreferences.newPosts,
           },
           likes: notificationPreferences.likes ?? true,
@@ -226,6 +227,7 @@ describe('Notification Preferences Integration', () => {
           community: true,
           food: false, // Disabled
           services: false, // Disabled
+          jobs: true,
         },
         likes: true,
         comments: false, // Disabled
@@ -255,6 +257,7 @@ describe('Notification Preferences Integration', () => {
           community: true,
           food: true,
           services: true,
+          jobs: true,
         },
         // likes, comments, follows not specified - should default to true
       });
@@ -281,6 +284,7 @@ describe('Notification Preferences Integration', () => {
           community: false,
           food: false,
           services: false,
+          jobs: false,
         },
         likes: false,
         comments: false,
@@ -308,6 +312,7 @@ describe('Notification Preferences Integration', () => {
           community: true,
           food: true,
           services: true,
+          jobs: true,
         },
         likes: true,
         comments: true,
@@ -363,6 +368,7 @@ describe('Notification Preferences Integration', () => {
           community: false,
           food: false,
           services: false,
+          jobs: false,
         },
         likes: false,
         comments: false,
@@ -393,6 +399,7 @@ describe('Notification Preferences Integration', () => {
           community: false,
           food: false,
           services: false,
+          jobs: false,
         },
         likes: true,
         comments: true,

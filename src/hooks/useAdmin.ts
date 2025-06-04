@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/firebase/auth';
 import { isAdmin, hasPermission } from '@/lib/admin';
 import { AdminStats, ContentReport, User, CommunityPost, AdminPermission } from '@/types';
+import { authenticatedFetch } from '@/lib/utils/api';
 
 // Custom hook for admin authentication and permissions
 export function useAdminAuth() {
@@ -38,11 +39,7 @@ export function useAdminDashboard() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch('/api/admin/dashboard', {
-        headers: {
-          'x-user-id': user.id,
-        },
-      });
+      const response = await authenticatedFetch('/api/admin/dashboard');
 
       if (!response.ok) {
         throw new Error('Failed to fetch dashboard statistics');
@@ -99,11 +96,7 @@ export function useAdminPosts() {
       if (options.startAfter) params.set('startAfter', options.startAfter);
       if (options.limit) params.set('limit', options.limit.toString());
 
-      const response = await fetch(`/api/admin/posts?${params}`, {
-        headers: {
-          'x-user-id': user.id,
-        },
-      });
+      const response = await authenticatedFetch(`/api/admin/posts?${params}`);
 
       if (!response.ok) {
         throw new Error('Failed to fetch posts');
@@ -130,11 +123,10 @@ export function useAdminPosts() {
     if (!user) return false;
 
     try {
-      const response = await fetch('/api/admin/posts', {
+      const response = await authenticatedFetch('/api/admin/posts', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-id': user.id,
         },
         body: JSON.stringify({ postId, action, reason }),
       });
@@ -171,11 +163,8 @@ export function useAdminPosts() {
     if (!user) return false;
 
     try {
-      const response = await fetch(`/api/admin/posts?postId=${postId}`, {
+      const response = await authenticatedFetch(`/api/admin/posts?postId=${postId}`, {
         method: 'DELETE',
-        headers: {
-          'x-user-id': user.id,
-        },
       });
 
       if (!response.ok) {
@@ -229,11 +218,7 @@ export function useAdminUsers() {
       if (options.limit) params.set('limit', options.limit.toString());
       if (options.nextPageToken) params.set('nextPageToken', options.nextPageToken);
 
-      const response = await fetch(`/api/admin/users?${params}`, {
-        headers: {
-          'x-user-id': user.id,
-        },
-      });
+      const response = await authenticatedFetch(`/api/admin/users?${params}`);
 
       if (!response.ok) {
         throw new Error('Failed to fetch users');
@@ -260,11 +245,10 @@ export function useAdminUsers() {
     if (!user) return false;
 
     try {
-      const response = await fetch('/api/admin/users', {
+      const response = await authenticatedFetch('/api/admin/users', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-id': user.id,
         },
         body: JSON.stringify({ userId, action, ...updateData }),
       });
@@ -323,11 +307,7 @@ export function useAdminReports() {
       if (options.startAfter) params.set('startAfter', options.startAfter);
       if (options.limit) params.set('limit', options.limit.toString());
 
-      const response = await fetch(`/api/admin/reports?${params}`, {
-        headers: {
-          'x-user-id': user.id,
-        },
-      });
+      const response = await authenticatedFetch(`/api/admin/reports?${params}`);
 
       if (!response.ok) {
         throw new Error('Failed to fetch reports');
@@ -359,11 +339,10 @@ export function useAdminReports() {
     if (!user) return false;
 
     try {
-      const response = await fetch('/api/admin/reports', {
+      const response = await authenticatedFetch('/api/admin/reports', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-id': user.id,
         },
         body: JSON.stringify({ reportId, action, reason, notes }),
       });

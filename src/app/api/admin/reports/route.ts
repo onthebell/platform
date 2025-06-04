@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminFirestore } from '@/lib/firebase/admin';
-import { getAuthUser } from '@/lib/firebase/admin';
+import { requireAuth, handleAuthError } from '@/lib/utils/auth';
 import { isAdmin, hasPermission } from '@/lib/admin';
 import { ContentReport, ReportStatus, ModerationAction, User } from '@/types';
 import type { Query, CollectionReference, DocumentData } from 'firebase-admin/firestore';
@@ -9,13 +9,8 @@ import type { Query, CollectionReference, DocumentData } from 'firebase-admin/fi
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const userHeader = request.headers.get('x-user-id');
 
-    if (!userHeader) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
-
-    const user = await getAuthUser(userHeader);
+    const user = await requireAuth(request);
     if (!user || !isAdmin(user)) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
@@ -65,8 +60,10 @@ export async function GET(request: NextRequest) {
       lastId: snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1].id : null,
     });
   } catch (error) {
-    console.error('Error fetching reports:', error);
-    return NextResponse.json({ error: 'Failed to fetch reports' }, { status: 500 });
+    return (
+      handleAuthError(error) ||
+      NextResponse.json({ error: 'Failed to fetch reports' }, { status: 500 })
+    );
   }
 }
 
@@ -80,12 +77,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Report ID and action are required' }, { status: 400 });
     }
 
-    const userHeader = request.headers.get('x-user-id');
-    if (!userHeader) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
-
-    const user = await getAuthUser(userHeader);
+    const user = await requireAuth(request);
     if (!user || !isAdmin(user)) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
@@ -148,7 +140,9 @@ export async function POST(request: NextRequest) {
       message: `Report ${updates.status} and action taken successfully`,
     });
   } catch (error) {
-    console.error('Error processing report:', error);
-    return NextResponse.json({ error: 'Failed to process report' }, { status: 500 });
+    return (
+      handleAuthError(error) ||
+      NextResponse.json({ error: 'Failed to process report' }, { status: 500 })
+    );
   }
 }

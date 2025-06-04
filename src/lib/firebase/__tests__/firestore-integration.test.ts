@@ -71,7 +71,6 @@ describe('Firestore integration', () => {
       description: 'Test description',
       authorId: 'user',
       authorName: 'User',
-      type: 'offer',
       category: 'deals',
       status: 'active',
       visibility: 'public',

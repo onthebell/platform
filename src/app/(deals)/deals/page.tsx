@@ -3,10 +3,12 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getPosts } from '@/lib/firebase/firestore';
+import { useAuth } from '@/lib/firebase/auth';
 import PostsGrid from '@/components/community/PostsGrid';
 import { CommunityPost } from '@/types';
 
 export default function DealsPage() {
+  const { user } = useAuth();
   const [dealPosts, setDealPosts] = useState<CommunityPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,7 +21,23 @@ export default function DealsPage() {
 
         // Fetch deals posts
         const postsData = await getPosts({ category: 'deals' }, 50);
-        setDealPosts(postsData);
+
+        // Filter posts based on user verification status
+        const filteredPosts = postsData.filter(post => {
+          // Always show public posts
+          if (post.visibility === 'public') {
+            return true;
+          }
+
+          // Only show verified_only posts to verified users
+          if (post.visibility === 'verified_only') {
+            return user && user.isVerified;
+          }
+
+          return false;
+        });
+
+        setDealPosts(filteredPosts);
       } catch (err) {
         console.error('Error loading deals:', err);
         setError('Failed to load deals. Please try again.');
@@ -29,7 +47,7 @@ export default function DealsPage() {
     }
 
     loadDeals();
-  }, []);
+  }, [user]);
 
   if (loading) {
     return (

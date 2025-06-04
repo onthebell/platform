@@ -26,6 +26,7 @@ describe('Notification Preferences', () => {
           community: true,
           food: true,
           services: false,
+          jobs: true,
         },
         likes: true,
         comments: true,
@@ -81,6 +82,7 @@ describe('Notification Preferences', () => {
           community: true,
           food: true,
           services: false, // User doesn't want services notifications
+          jobs: true,
         },
         likes: true,
         comments: true,

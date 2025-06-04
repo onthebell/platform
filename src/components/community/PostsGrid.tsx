@@ -40,6 +40,7 @@ export default function PostsGrid({
     'community',
     'food',
     'services',
+    'jobs',
   ];
 
   const filteredPosts = posts

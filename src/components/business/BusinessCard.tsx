@@ -23,12 +23,12 @@ export default function BusinessCard({ business }: BusinessCardProps) {
   const [imageError, setImageError] = useState(false);
 
   const formatHours = (hours: Business['hours']) => {
+    if (!hours || typeof hours !== 'object') return 'Hours not available';
     const today = new Intl.DateTimeFormat('en-AU', { weekday: 'long' }).format(new Date());
     const todayHours = hours[today];
 
     if (!todayHours) return 'Hours not available';
     if (todayHours.isClosed) return 'Closed today';
-
     return `${todayHours.open} - ${todayHours.close}`;
   };
 
@@ -56,7 +56,7 @@ export default function BusinessCard({ business }: BusinessCardProps) {
     <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden border border-gray-200">
       {/* Business Image */}
       <div className="relative h-40 sm:h-48 lg:h-44 bg-gray-200">
-        {business.images.length > 0 && !imageError ? (
+        {(business.images?.length ?? 0) > 0 && !imageError ? (
           <Image
             src={business.images[0]}
             alt={business.name}

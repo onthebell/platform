@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminFirestore, getAuthUser } from '@/lib/firebase/admin';
+import { getAdminFirestore } from '@/lib/firebase/admin';
+import { requireAuth, handleAuthError } from '@/lib/utils/auth';
 import { isAdmin } from '@/lib/admin';
 import { AdminStats } from '@/types';
 
@@ -7,12 +8,7 @@ import { AdminStats } from '@/types';
 export async function GET(request: NextRequest) {
   try {
     // Check authentication and admin permissions
-    const userHeader = request.headers.get('x-user-id');
-    if (!userHeader) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
-
-    const user = await getAuthUser(userHeader);
+    const user = await requireAuth(request);
     if (!user || !isAdmin(user)) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
@@ -92,7 +88,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(stats);
   } catch (error) {
-    console.error('Error in dashboard API:', error);
-    return NextResponse.json({ error: 'Failed to fetch dashboard statistics' }, { status: 500 });
+    return (
+      handleAuthError(error) ||
+      NextResponse.json({ error: 'Failed to fetch dashboard statistics' }, { status: 500 })
+    );
   }
 }

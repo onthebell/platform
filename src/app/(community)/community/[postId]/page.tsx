@@ -12,6 +12,11 @@ import {
   TagIcon,
   UserIcon,
   ArrowLeftIcon,
+  CalendarIcon,
+  ExclamationTriangleIcon,
+  ShoppingBagIcon,
+  GiftIcon,
+  SpeakerWaveIcon,
 } from '@heroicons/react/24/outline';
 import { HeartIcon, ShareIcon } from '@heroicons/react/24/solid';
 import { HeartIcon as HeartIconOutline } from '@heroicons/react/24/outline';
@@ -211,9 +216,6 @@ export default function PostDetailPage() {
                   >
                     {post.category.replace('_', ' ')}
                   </span>
-                  <span className="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                    {post.type}
-                  </span>
                 </div>
                 <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2 leading-tight">
                   {post.title}
@@ -286,6 +288,196 @@ export default function PostDetailPage() {
                   Location
                 </h3>
                 <p className="text-sm sm:text-base text-gray-600 mb-4">{post.location.address}</p>
+              </div>
+            )}
+
+            {/* Event Details */}
+            {post.category === 'events' && (
+              <div className="mb-6 sm:mb-8">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
+                  <CalendarIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                  Event Details
+                </h3>
+                <div className="bg-blue-50 rounded-lg p-4 space-y-3">
+                  {post.eventDate && (
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium text-gray-700">Date & Time:</span>
+                      <span className="text-sm text-gray-900">{formatDate(post.eventDate)}</span>
+                    </div>
+                  )}
+                  {post.eventEndDate && (
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium text-gray-700">End Date:</span>
+                      <span className="text-sm text-gray-900">{formatDate(post.eventEndDate)}</span>
+                    </div>
+                  )}
+                  {post.eventType && (
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium text-gray-700">Type:</span>
+                      <span className="text-sm text-gray-900 capitalize">
+                        {post.eventType.replace('_', ' ')}
+                      </span>
+                    </div>
+                  )}
+                  {post.capacity && (
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium text-gray-700">Capacity:</span>
+                      <span className="text-sm text-gray-900">{post.capacity} attendees</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Request Details */}
+            {post.category === 'help_requests' && (
+              <div className="mb-6 sm:mb-8">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
+                  <ExclamationTriangleIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                  Request Details
+                </h3>
+                <div className="bg-yellow-50 rounded-lg p-4 space-y-3">
+                  {post.urgency && (
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium text-gray-700">Urgency:</span>
+                      <span
+                        className={`text-sm font-medium ${post.urgency === 'high' ? 'text-red-600' : post.urgency === 'medium' ? 'text-yellow-600' : 'text-green-600'}`}
+                      >
+                        {post.urgency.charAt(0).toUpperCase() + post.urgency.slice(1)}
+                      </span>
+                    </div>
+                  )}
+                  {post.helpType && (
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium text-gray-700">Help Type:</span>
+                      <span className="text-sm text-gray-900 capitalize">
+                        {post.helpType.replace('_', ' ')}
+                      </span>
+                    </div>
+                  )}
+                  {post.deadline && (
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium text-gray-700">Deadline:</span>
+                      <span className="text-sm text-gray-900">{formatDate(post.deadline)}</span>
+                    </div>
+                  )}
+                  {post.budget && (
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium text-gray-700">Budget:</span>
+                      <span className="text-sm text-gray-900">${post.budget.toLocaleString()}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Item Details */}
+            {(post.category === 'marketplace' || post.category === 'free_items') && (
+              <div className="mb-6 sm:mb-8">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
+                  <ShoppingBagIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                  Item Details
+                </h3>
+                <div className="bg-green-50 rounded-lg p-4 space-y-3">
+                  {post.condition && (
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium text-gray-700">Condition:</span>
+                      <span className="text-sm text-gray-900 capitalize">
+                        {post.condition.replace('_', ' ')}
+                      </span>
+                    </div>
+                  )}
+                  {post.brand && (
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium text-gray-700">Brand:</span>
+                      <span className="text-sm text-gray-900">{post.brand}</span>
+                    </div>
+                  )}
+                  {(post.deliveryAvailable || post.pickupOnly) && (
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium text-gray-700">Pickup/Delivery:</span>
+                      <span className="text-sm text-gray-900">
+                        {post.pickupOnly
+                          ? 'Pickup Only'
+                          : post.deliveryAvailable
+                            ? 'Delivery Available'
+                            : 'Contact for details'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Offer Details */}
+            {(post.category === 'deals' || post.category === 'services') && (
+              <div className="mb-6 sm:mb-8">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
+                  <GiftIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                  Offer Details
+                </h3>
+                <div className="bg-purple-50 rounded-lg p-4 space-y-3">
+                  {post.duration && (
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium text-gray-700">Duration:</span>
+                      <span className="text-sm text-gray-900">{post.duration}</span>
+                    </div>
+                  )}
+                  {post.availability && (
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium text-gray-700">Availability:</span>
+                      <span className="text-sm text-gray-900 capitalize">
+                        {post.availability.replace('_', ' ')}
+                      </span>
+                    </div>
+                  )}
+                  {post.termsConditions && (
+                    <div>
+                      <span className="text-sm font-medium text-gray-700 block mb-2">
+                        Terms & Conditions:
+                      </span>
+                      <p className="text-sm text-gray-900 bg-white p-3 rounded border">
+                        {post.termsConditions}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Announcement Details */}
+            {post.category === 'announcements' && (
+              <div className="mb-6 sm:mb-8">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
+                  <SpeakerWaveIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                  Announcement Details
+                </h3>
+                <div className="bg-red-50 rounded-lg p-4 space-y-3">
+                  {post.announcementType && (
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium text-gray-700">Type:</span>
+                      <span className="text-sm text-gray-900 capitalize">
+                        {post.announcementType}
+                      </span>
+                    </div>
+                  )}
+                  {post.importance && (
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium text-gray-700">Importance:</span>
+                      <span
+                        className={`text-sm font-medium ${post.importance === 'high' ? 'text-red-600' : post.importance === 'medium' ? 'text-yellow-600' : 'text-green-600'}`}
+                      >
+                        {post.importance.charAt(0).toUpperCase() + post.importance.slice(1)}
+                      </span>
+                    </div>
+                  )}
+                  {post.expiryDate && (
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium text-gray-700">Expires:</span>
+                      <span className="text-sm text-gray-900">{formatDate(post.expiryDate)}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 

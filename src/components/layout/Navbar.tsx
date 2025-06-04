@@ -17,6 +17,7 @@ import {
   BuildingStorefrontIcon,
   GiftIcon,
   UserGroupIcon,
+  BriefcaseIcon,
 } from '@heroicons/react/24/outline';
 import { NotificationDropdown } from '@/components/notifications';
 
@@ -34,6 +35,7 @@ const navigation: NavigationItem[] = [
   { name: 'Business', href: '/business', icon: BuildingStorefrontIcon },
   { name: 'Deals', href: '/deals', icon: GiftIcon },
   { name: 'Events', href: '/events', icon: CalendarIcon },
+  { name: 'Jobs', href: '/jobs', icon: BriefcaseIcon },
   { name: 'Marketplace', href: '/marketplace', icon: ShoppingBagIcon },
   { name: 'Community', href: '/community', icon: HeartIcon, verifiedOnly: true },
   { name: 'Discover', href: '/discover', icon: UserGroupIcon, requiresAuth: true },
@@ -86,7 +88,7 @@ export default function Navbar() {
       className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40"
       role="navigation"
     >
-      <div className="mx-auto max-w-7xl px-3 sm:px-4 lg:px-6 xl:px-8">
+      <div className="mx-auto max-w-8xl px-3 sm:px-4 lg:px-6 xl:px-8">
         <div className="flex justify-between h-14 sm:h-16">
           {/* Logo and brand */}
           <div className="flex items-center flex-shrink-0">
@@ -118,7 +120,7 @@ export default function Navbar() {
                   }`}
                 >
                   <item.icon className="h-4 w-4 flex-shrink-0" />
-                  <span className="hidden lg:inline">{item.name}</span>
+                  <span className="hidden xl:inline">{item.name}</span>
                 </button>
               );
             })}

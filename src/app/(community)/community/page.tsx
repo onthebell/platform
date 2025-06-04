@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import PostsGrid from '@/components/community/PostsGrid';
 import { getPosts } from '@/lib/firebase/firestore';
+import { useAuth } from '@/lib/firebase/auth';
 import { CommunityPost } from '@/types';
 
 export default function CommunityPage() {
+  const { user } = useAuth();
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +20,23 @@ export default function CommunityPage() {
 
         // Fetch all community posts
         const postsData = await getPosts({}, 50); // Get up to 50 active posts
-        setPosts(postsData);
+
+        // Filter posts based on user verification status
+        const filteredPosts = postsData.filter(post => {
+          // Always show public posts
+          if (post.visibility === 'public') {
+            return true;
+          }
+
+          // Only show verified_only posts to verified users
+          if (post.visibility === 'verified_only') {
+            return user && user.isVerified;
+          }
+
+          return false;
+        });
+
+        setPosts(filteredPosts);
       } catch (err) {
         console.error('Error loading community posts:', err);
         setError('Failed to load community posts. Please try again.');
@@ -28,7 +46,7 @@ export default function CommunityPage() {
     }
 
     loadPosts();
-  }, []);
+  }, [user]);
 
   if (loading) {
     return (

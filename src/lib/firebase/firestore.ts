@@ -617,3 +617,91 @@ export function subscribeToPosts(
 
   return unsubscribe;
 }
+
+// Job saving operations
+export const savedJobsCollection = collection(db, 'savedJobs');
+
+/**
+ * Save a job post for a user
+ */
+export async function saveJob(
+  userId: string,
+  postId: string,
+  postTitle: string,
+  postCategory: PostCategory
+) {
+  const now = new Date();
+
+  // Check if already saved
+  const existingQuery = query(
+    savedJobsCollection,
+    where('userId', '==', userId),
+    where('postId', '==', postId)
+  );
+
+  const existingDocs = await getDocs(existingQuery);
+  if (!existingDocs.empty) {
+    throw new Error('Job already saved');
+  }
+
+  const savedJobData = {
+    userId,
+    postId,
+    postTitle,
+    postCategory,
+    savedAt: Timestamp.fromDate(now),
+  };
+
+  const docRef = await addDoc(savedJobsCollection, savedJobData);
+  return docRef.id;
+}
+
+/**
+ * Unsave a job post for a user
+ */
+export async function unsaveJob(userId: string, postId: string) {
+  const q = query(
+    savedJobsCollection,
+    where('userId', '==', userId),
+    where('postId', '==', postId)
+  );
+
+  const querySnapshot = await getDocs(q);
+
+  if (querySnapshot.empty) {
+    throw new Error('Saved job not found');
+  }
+
+  // Delete all matching documents (there should only be one)
+  const deletePromises = querySnapshot.docs.map(doc => deleteDoc(doc.ref));
+  await Promise.all(deletePromises);
+}
+
+/**
+ * Get saved jobs for a user
+ */
+export async function getSavedJobs(userId: string) {
+  const q = query(savedJobsCollection, where('userId', '==', userId), orderBy('savedAt', 'desc'));
+
+  const querySnapshot = await getDocs(q);
+
+  return querySnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+    savedAt: doc.data().savedAt?.toDate() || new Date(),
+  }));
+}
+
+/**
+ * Check if a job is saved by a user
+ */
+export async function isJobSaved(userId: string, postId: string): Promise<boolean> {
+  const q = query(
+    savedJobsCollection,
+    where('userId', '==', userId),
+    where('postId', '==', postId)
+  );
+
+  const querySnapshot = await getDocs(q);
+  return !querySnapshot.empty;
+}

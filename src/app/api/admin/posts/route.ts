@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminFirestore } from '@/lib/firebase/admin';
-import { getAuthUser } from '@/lib/firebase/admin';
+import { requireAuth } from '@/lib/utils/auth';
 import { isAdmin, hasPermission } from '@/lib/admin';
 import { CommunityPost } from '@/types';
 import type { Query, CollectionReference, DocumentData } from 'firebase-admin/firestore';
@@ -11,13 +11,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
 
     // Check authentication and admin permissions
-    const userHeader = request.headers.get('x-user-id');
-    if (!userHeader) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
-
-    const user = await getAuthUser(userHeader);
-    if (!user || !isAdmin(user)) {
+    const user = await requireAuth(request);
+    if (!isAdmin(user)) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
@@ -90,13 +85,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Check authentication and admin permissions
-    const userHeader = request.headers.get('x-user-id');
-    if (!userHeader) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
-
-    const user = await getAuthUser(userHeader);
-    if (!user || !isAdmin(user)) {
+    const user = await requireAuth(request);
+    if (!isAdmin(user)) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
@@ -143,6 +133,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, message: `Post ${action}d successfully` });
   } catch (error) {
+    if (error instanceof Error && error.message === 'Authentication required') {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
     console.error('Error moderating post:', error);
     return NextResponse.json({ error: 'Failed to moderate post' }, { status: 500 });
   }
@@ -159,13 +152,8 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Check authentication and admin permissions
-    const userHeader = request.headers.get('x-user-id');
-    if (!userHeader) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
-
-    const user = await getAuthUser(userHeader);
-    if (!user || !isAdmin(user)) {
+    const user = await requireAuth(request);
+    if (!isAdmin(user)) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
@@ -185,6 +173,9 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true, message: 'Post deleted permanently' });
   } catch (error) {
+    if (error instanceof Error && error.message === 'Authentication required') {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
     console.error('Error deleting post:', error);
     return NextResponse.json({ error: 'Failed to delete post' }, { status: 500 });
   }

@@ -5,6 +5,7 @@ import {
   updateUserAsAdmin,
   deleteUserAsAdmin,
 } from '@/lib/firebase/admin';
+import { requireAuth } from '@/lib/utils/auth';
 import { isAdmin, hasPermission, canManageUser } from '@/lib/admin';
 import { UserRole, AdminPermission } from '@/types';
 
@@ -12,14 +13,9 @@ import { UserRole, AdminPermission } from '@/types';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const userHeader = request.headers.get('x-user-id');
 
-    if (!userHeader) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
-
-    const user = await getAuthUser(userHeader);
-    if (!user || !isAdmin(user)) {
+    const user = await requireAuth(request);
+    if (!isAdmin(user)) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
@@ -39,6 +35,9 @@ export async function GET(request: NextRequest) {
       hasMore: !!result.nextPageToken,
     });
   } catch (error) {
+    if (error instanceof Error && error.message === 'Authentication required') {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
     console.error('Error fetching users:', error);
     return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
   }
@@ -47,13 +46,8 @@ export async function GET(request: NextRequest) {
 // PUT /api/admin/users - Update user (role, suspension, etc.)
 export async function PUT(request: NextRequest) {
   try {
-    const userHeader = request.headers.get('x-user-id');
-    if (!userHeader) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
-
-    const admin = await getAuthUser(userHeader);
-    if (!admin || !isAdmin(admin)) {
+    const admin = await requireAuth(request);
+    if (!isAdmin(admin)) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
@@ -145,6 +139,9 @@ export async function PUT(request: NextRequest) {
       message: `User ${action} completed successfully`,
     });
   } catch (error) {
+    if (error instanceof Error && error.message === 'Authentication required') {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
     console.error('Error updating user:', error);
     return NextResponse.json({ error: 'Failed to update user' }, { status: 500 });
   }
@@ -153,13 +150,8 @@ export async function PUT(request: NextRequest) {
 // DELETE /api/admin/users - Delete user
 export async function DELETE(request: NextRequest) {
   try {
-    const userHeader = request.headers.get('x-user-id');
-    if (!userHeader) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
-
-    const admin = await getAuthUser(userHeader);
-    if (!admin || !isAdmin(admin)) {
+    const admin = await requireAuth(request);
+    if (!isAdmin(admin)) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
@@ -195,6 +187,9 @@ export async function DELETE(request: NextRequest) {
       message: 'User deleted successfully',
     });
   } catch (error) {
+    if (error instanceof Error && error.message === 'Authentication required') {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
     console.error('Error deleting user:', error);
     return NextResponse.json({ error: 'Failed to delete user' }, { status: 500 });
   }

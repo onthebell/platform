@@ -35,6 +35,10 @@ export interface User {
       community: boolean;
       food: boolean;
       services: boolean;
+      jobs: boolean;
+      offers: boolean;
+      announcements: boolean;
+      sales: boolean;
     };
     likes: boolean;
     comments: boolean;
@@ -65,7 +69,6 @@ export interface CommunityPost {
   description: string;
   content?: string; // Full content/body text for admin moderation
   category: PostCategory;
-  type: PostType;
   authorId: string;
   authorName: string;
   location?: {
@@ -82,6 +85,40 @@ export interface CommunityPost {
   updatedAt: Date;
   expiresAt?: Date;
   tags: string[];
+  // Job-specific fields
+  startDate?: Date; // For jobs - when the job starts
+  jobType?: JobType; // Type of job (full_time, part_time, etc.)
+  industry?: string; // Industry/sector for the job
+  employerType?: 'business' | 'person'; // Whether posted by business or individual
+  workType?: 'onsite' | 'remote' | 'hybrid'; // Work location type
+
+  // Event-specific fields
+  eventDate?: Date; // Date and time of the event
+  eventEndDate?: Date; // End date for multi-day events
+  eventType?: 'workshop' | 'meeting' | 'festival' | 'market' | 'sport' | 'social' | 'other';
+  capacity?: number; // Maximum number of attendees
+
+  // Request/Help-specific fields
+  urgency?: 'low' | 'medium' | 'high'; // How urgent the request is
+  deadline?: Date; // When the help/request is needed by
+  budget?: number; // Budget available for the request
+  helpType?: 'one_time' | 'ongoing' | 'volunteer'; // Type of help needed
+
+  // Sale/Marketplace-specific fields
+  condition?: 'new' | 'like_new' | 'good' | 'fair' | 'poor'; // Condition of item
+  brand?: string; // Brand of the item
+  deliveryAvailable?: boolean; // Whether delivery is available
+  pickupOnly?: boolean; // Whether pickup only
+
+  // Offer-specific fields
+  duration?: string; // How long the offer is valid
+  termsConditions?: string; // Terms and conditions for the offer
+  availability?: 'weekdays' | 'weekends' | 'flexible' | 'by_appointment'; // When offer is available
+
+  // Announcement-specific fields
+  announcementType?: 'info' | 'warning' | 'update' | 'reminder';
+  importance?: 'low' | 'medium' | 'high'; // Importance level
+  expiryDate?: Date; // When the announcement expires
   // Admin/moderation fields
   isHidden?: boolean;
   isDeleted?: boolean;
@@ -102,9 +139,13 @@ export type PostCategory =
   | 'help_requests'
   | 'community'
   | 'food'
-  | 'services';
+  | 'services'
+  | 'jobs'
+  | 'offers'
+  | 'announcements'
+  | 'sales';
 
-export type PostType = 'offer' | 'request' | 'announcement' | 'event' | 'sale' | 'free' | 'help';
+export type JobType = 'full_time' | 'part_time' | 'one_off' | 'contract' | 'volunteer';
 
 export interface Event {
   id: string;
@@ -188,6 +229,15 @@ export interface Comment {
   createdAt: Date;
   updatedAt: Date;
   isEdited: boolean;
+}
+
+export interface SavedPost {
+  id: string;
+  userId: string;
+  postId: string;
+  postTitle: string;
+  postCategory: PostCategory;
+  savedAt: Date;
 }
 
 export interface Notification {

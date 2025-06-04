@@ -81,7 +81,6 @@ describe('Comments Firebase Service', () => {
       description: 'Test post description',
       content: 'Test post content',
       category: 'community',
-      type: 'announcement',
       authorId: 'post-author-id',
       authorName: 'Test Author',
       status: 'active',

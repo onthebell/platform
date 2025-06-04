@@ -18,7 +18,27 @@ const CATEGORY_LABELS: Record<PostCategory, string> = {
   community: 'Community Posts',
   food: 'Food & Dining',
   services: 'Local Services',
+  jobs: 'Job Opportunities',
+  offers: 'Special Offers',
+  announcements: 'Announcements',
+  sales: 'Sales',
 };
+
+// Helper for all post categories
+const ALL_POST_CATEGORIES: PostCategory[] = [
+  'deals',
+  'events',
+  'marketplace',
+  'free_items',
+  'help_requests',
+  'community',
+  'food',
+  'services',
+  'jobs',
+  'offers',
+  'announcements',
+  'sales',
+];
 
 export default function NotificationPreferences({
   initialPreferences,
@@ -26,16 +46,10 @@ export default function NotificationPreferences({
 }: NotificationPreferencesProps) {
   const [preferences, setPreferences] = useState<User['notificationPreferences']>(
     initialPreferences || {
-      newPosts: {
-        deals: true,
-        events: true,
-        marketplace: true,
-        free_items: true,
-        help_requests: true,
-        community: true,
-        food: true,
-        services: true,
-      },
+      newPosts: Object.fromEntries(ALL_POST_CATEGORIES.map(cat => [cat, true])) as Record<
+        PostCategory,
+        boolean
+      >,
       likes: true,
       comments: true,
       follows: true,
@@ -74,16 +88,10 @@ export default function NotificationPreferences({
   const handleToggleAll = (section: 'newPosts', value: boolean) => {
     if (section === 'newPosts') {
       setPreferences(prev => ({
-        newPosts: {
-          deals: value,
-          events: value,
-          marketplace: value,
-          free_items: value,
-          help_requests: value,
-          community: value,
-          food: value,
-          services: value,
-        },
+        newPosts: Object.fromEntries(ALL_POST_CATEGORIES.map(cat => [cat, value])) as Record<
+          PostCategory,
+          boolean
+        >,
         likes: prev?.likes ?? true,
         comments: prev?.comments ?? true,
         follows: prev?.follows ?? true,
@@ -93,18 +101,11 @@ export default function NotificationPreferences({
 
   const toggleCategory = (category: PostCategory) => {
     setPreferences(prev => {
-      // Ensure prev and prev.newPosts are always defined
       const current = prev ?? {
-        newPosts: {
-          deals: true,
-          events: true,
-          marketplace: true,
-          free_items: true,
-          help_requests: true,
-          community: true,
-          food: true,
-          services: true,
-        },
+        newPosts: Object.fromEntries(ALL_POST_CATEGORIES.map(cat => [cat, true])) as Record<
+          PostCategory,
+          boolean
+        >,
         likes: true,
         comments: true,
         follows: true,
@@ -112,23 +113,14 @@ export default function NotificationPreferences({
       return {
         ...current,
         newPosts: {
-          deals: category === 'deals' ? !current.newPosts.deals : current.newPosts.deals,
-          events: category === 'events' ? !current.newPosts.events : current.newPosts.events,
-          marketplace:
-            category === 'marketplace'
-              ? !current.newPosts.marketplace
-              : current.newPosts.marketplace,
-          free_items:
-            category === 'free_items' ? !current.newPosts.free_items : current.newPosts.free_items,
-          help_requests:
-            category === 'help_requests'
-              ? !current.newPosts.help_requests
-              : current.newPosts.help_requests,
-          community:
-            category === 'community' ? !current.newPosts.community : current.newPosts.community,
-          food: category === 'food' ? !current.newPosts.food : current.newPosts.food,
-          services:
-            category === 'services' ? !current.newPosts.services : current.newPosts.services,
+          ...ALL_POST_CATEGORIES.reduce(
+            (acc, cat) => {
+              acc[cat] = current.newPosts[cat] ?? true;
+              return acc;
+            },
+            {} as Record<PostCategory, boolean>
+          ),
+          [category]: !current.newPosts[category],
         },
       };
     });
@@ -137,16 +129,10 @@ export default function NotificationPreferences({
   const togglePreference = (key: 'likes' | 'comments' | 'follows') => {
     setPreferences(prev => {
       const current = prev ?? {
-        newPosts: {
-          deals: true,
-          events: true,
-          marketplace: true,
-          free_items: true,
-          help_requests: true,
-          community: true,
-          food: true,
-          services: true,
-        },
+        newPosts: Object.fromEntries(ALL_POST_CATEGORIES.map(cat => [cat, true])) as Record<
+          PostCategory,
+          boolean
+        >,
         likes: true,
         comments: true,
         follows: true,

@@ -49,7 +49,6 @@ describe('Firestore operations', () => {
     const mockPost = {
       title: 'Test Post',
       description: 'Test content',
-      type: 'offer' as const,
       category: 'community' as const,
       authorId: 'user123',
       authorName: 'Test User',

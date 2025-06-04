@@ -24,6 +24,7 @@ const mockUser: User = {
       community: true,
       food: true,
       services: false, // User doesn't want services notifications
+      jobs: true,
     },
     likes: true,
     comments: true,

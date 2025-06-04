@@ -1,0 +1,62 @@
+# Project Overview
+OnTheBell is a community platform for the Bellarine Peninsula, built with:
+- Next.js (App Router)
+- TypeScript
+- Tailwind CSS
+- Jest for testing
+- ESLint for linting
+- Prettier for code formatting
+- Firebase for backend services
+
+# Directory Structure
+- `.github/`: GitHub-specific configurations
+- `.husky/`: Git hooks
+- `.vscode/`: VSCode settings
+- `docs/`: Documentation files
+- `public/`: Static assets
+- `src/`: Source code
+  - `components/`: Reusable React components
+  - `pages/`: Next.js pages
+  - `lib/`: Utility functions and libraries
+  - `styles/`: Global and module-specific styles
+
+# Tooling and Configurations
+- **ESLint**: Configured with Airbnb base rules and custom overrides in `.eslintrc.json` and `eslint.config.mjs`
+- **Prettier**: Formatting rules defined in `.prettierrc.json`
+- **Jest**: Testing setup in `jest.config.js` and `jest.setup.js`
+- **Tailwind CSS**: Configuration in `tailwind.config.js` and `postcss.config.mjs`
+- **TypeScript**: Compiler options in `tsconfig.json`
+- **Firebase**: Security rules in `firestore.rules` and index definitions in `firestore.indexes.json`
+
+# Environment Variables
+- Example environment variables are listed in `.env.example`
+
+# Package Management
+- Uses `pnpm` for package management
+- Workspace configuration in `pnpm-workspace.yaml`
+
+# Common Development Tasks
+- Creating new pages in `src/pages/`
+- Adding new components in `src/components/`
+- Writing tests in `__tests__/` or alongside components
+- Updating Firebase rules and indexes
+- Running development server with `pnpm dev`
+- Running tests with `pnpm test`
+- Linting code with `pnpm lint`
+- Formatting code with `pnpm format`
+
+# Coding Standards
+- Use functional React components
+- Prefer arrow functions
+- Ensure all components are typed with TypeScript
+- Follow Tailwind CSS utility-first approach
+- Write tests for all components and pages
+- Keep codebase clean and well-documented
+
+# Example Prompts for Copilot
+- "Create a new Next.js page for event listings"
+- "Add a reusable button component with Tailwind CSS"
+- "Write a Jest test for the EventCard component"
+- "Set up a Firebase function to handle form submissions"
+- "Fix ESLint errors in the UserProfile component"
+- "Format the Dashboard page using Prettier rules"
