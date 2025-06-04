@@ -2,14 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export function middleware(request: NextRequest) {
   // Show coming soon page for all routes in production except /coming-soon and static assets
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.VERCEL_ENV === 'production') {
     const { pathname } = request.nextUrl;
     const isComingSoon = pathname.startsWith('/coming-soon');
     const isStatic =
       pathname.startsWith('/_next') ||
       pathname.startsWith('/static') ||
-      pathname.startsWith('/favicon.ico') ||
-      pathname.startsWith('/api');
+      pathname.startsWith('/favicon.ico');
     if (!isComingSoon && !isStatic) {
       const url = request.nextUrl.clone();
       url.pathname = '/coming-soon';
