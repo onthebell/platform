@@ -5,11 +5,6 @@ import { useAdminReports } from '@/hooks/useAdmin';
 import { ContentReport, ReportStatus, ModerationAction } from '@/types';
 import {
   FlagIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-  EyeSlashIcon,
-  TrashIcon,
-  ExclamationTriangleIcon,
   UserCircleIcon,
   DocumentTextIcon,
   ChatBubbleLeftIcon,
@@ -95,10 +90,24 @@ function ReportCard({ report, onUpdate }: ReportCardProps) {
                 {(() => {
                   if (!report.createdAt) return 'Unknown';
                   try {
-                    const date =
-                      report.createdAt instanceof Date
-                        ? report.createdAt
-                        : new Date(report.createdAt);
+                    let date;
+                    // Firestore Timestamp compatibility
+                    if (report.createdAt instanceof Date) {
+                      date = report.createdAt;
+                    } else if (
+                      report.createdAt &&
+                      typeof report.createdAt === 'object' &&
+                      typeof (report.createdAt as any).toDate === 'function'
+                    ) {
+                      date = (report.createdAt as any).toDate();
+                    } else if (
+                      typeof report.createdAt === 'string' ||
+                      typeof report.createdAt === 'number'
+                    ) {
+                      date = new Date(report.createdAt);
+                    } else {
+                      return 'Unknown';
+                    }
                     if (isNaN(date.getTime())) return 'Unknown';
                     return formatDistanceToNow(date, { addSuffix: true });
                   } catch {
