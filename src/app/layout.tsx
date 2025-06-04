@@ -1,3 +1,5 @@
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
@@ -26,6 +28,8 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans antialiased`}>
         <AuthProvider>
           <ConditionalLayout>{children}</ConditionalLayout>
+          <Analytics />
+          <SpeedInsights />
         </AuthProvider>
       </body>
     </html>
