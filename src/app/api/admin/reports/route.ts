@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminFirestore } from '@/lib/firebase/admin';
 import { requireAuth, handleAuthError } from '@/lib/utils/auth';
 import { isAdmin, hasPermission } from '@/lib/admin';
-import { ContentReport, ReportStatus, ModerationAction, User } from '@/types';
+import { ContentReport, ReportStatus, ModerationAction, User, CommunityPost } from '@/types';
 import type { Query, CollectionReference, DocumentData } from 'firebase-admin/firestore';
 
 // GET /api/admin/reports - Get all reports with pagination
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
     const reportData = reportDoc.data() as ContentReport;
 
     // Update report status
-    const updates: any = {
+    const updates: Partial<ContentReport> = {
       status: action === 'approve' ? 'resolved' : action === 'reject' ? 'dismissed' : 'resolved',
       moderatedAt: new Date(),
       moderatedBy: user.id,
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
       const contentDoc = await contentRef.get();
 
       if (contentDoc.exists) {
-        const contentUpdates: any = {
+        const contentUpdates: Partial<CommunityPost> = {
           moderatedAt: new Date(),
           moderatedBy: user.id,
         };

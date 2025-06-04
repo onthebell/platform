@@ -68,6 +68,17 @@ const reportReasons: { value: ReportReason; label: string; description: string }
   },
 ];
 
+/**
+ * ReportModal displays a modal dialog for submitting a report about a post, comment, or user.
+ * @param isOpen - Whether the modal is open.
+ * @param onClose - Function to close the modal.
+ * @param contentType - The type of content being reported ('post', 'comment', or 'user').
+ * @param contentId - The ID of the content being reported.
+ * @param contentAuthorId - The ID of the author of the content.
+ * @param onSubmit - Handler for submitting the report data.
+ * @returns A modal dialog for reporting content.
+ */
+
 export default function ReportModal({
   isOpen,
   onClose,

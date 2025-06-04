@@ -21,13 +21,13 @@ community connections, and services.
 
 ## Key Features & Architecture
 
-1. **User Authentication & Verification**:
+1. **User Authentication & Verification**
 
    - Firebase Auth for user management
    - Street address verification system for "On the Bell" access
    - Tiered access: verified residents vs. general public
 
-2. **Community Features**:
+2. **Community Features**
 
    - Deals and discounts
    - Local events calendar
@@ -35,19 +35,19 @@ community connections, and services.
    - Community requests for help
    - Neighborhood connections
 
-3. **Location Services**:
+3. **Location Services**
 
    - Leaflet maps for location-based features
    - Address verification integration
    - Location-based content filtering
 
-4. **Content Management**:
+4. **Content Management**
 
    - Firebase Firestore for data storage
    - Firebase Storage for media files
    - Mux integration for video content
 
-5. **Monetization**:
+5. **Monetization**
    - Stripe integration for voluntary donations
    - Support platform development funding
 
@@ -55,7 +55,7 @@ community connections, and services.
 
 - Use TypeScript for type safety
 - Follow Next.js App Router conventions
-- Use TailwindCSS for styling with mobile-first approach
+- Use TailwindCSS for styling with a mobile-first approach
 - Implement proper error handling and loading states
 - Use React Server Components where appropriate
 - Follow Firebase security rules best practices
@@ -63,12 +63,14 @@ community connections, and services.
 
 ## File Structure Conventions
 
-- `/src/app` - Next.js App Router pages and layouts
-- `/src/components` - Reusable React components
-- `/src/lib` - Utility functions and configurations
-- `/src/hooks` - Custom React hooks
-- `/src/types` - TypeScript type definitions
-- `/src/styles` - Global styles and TailwindCSS configs
+```
+/src/app         → Next.js App Router pages and layouts
+/src/components  → Reusable React components
+/src/lib         → Utility functions and configurations
+/src/hooks       → Custom React hooks
+/src/types       → TypeScript type definitions
+/src/styles      → Global styles and TailwindCSS configs
+```
 
 ## Security Considerations
 
@@ -83,3 +85,47 @@ community connections, and services.
 - Use Next.js built-in optimizations
 - Implement proper caching strategies
 - Minimize bundle size with tree shaking
+
+---
+
+## 🔁 Copilot Changelog Instruction
+
+Copilot **must** append a new entry to `CHANGELOG.md` for any change it assists
+with.
+
+Each entry should include the **date** and categorized changes using the format
+below:
+
+```
+### [YYYY-MM-DD]
+**Feature**: Describe new functionality
+**Fix**: Describe bug fix
+**Refactor**: Describe code reorganization
+**Test**: Describe new or updated test coverage
+**Chore**: Linting, formatting, dependency updates, config changes
+```
+
+**Example:**
+
+```
+### [2025-06-04]
+**Feature**: Added Leaflet map integration for event pages
+**Fix**: Corrected Firestore query for user verification status
+**Test**: Created tests for AddressVerification component
+**Chore**: Ran Prettier and ESLint cleanup across /src/app/pages
+```
+
+---
+
+## ✅ Approved Copilot Tasks
+
+Copilot is encouraged to:
+
+- Scaffold new pages, routes, and components using Next.js App Router
+- Write unit and integration tests with Jest + React Testing Library
+- Fix ESLint or Prettier issues
+- Improve Tailwind styling and responsiveness
+- Write Firebase Firestore queries with type safety
+- Suggest performance optimizations
+- Generate accessible, SEO-friendly components
+- Automatically document changelog entries

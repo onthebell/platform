@@ -29,6 +29,20 @@ export interface PostNotification {
   createdAt: Date;
 }
 
+// Local type for notification payload
+interface NewPostNotification {
+  type: 'new_post';
+  recipientId: string;
+  actorId: string;
+  actorName: string;
+  postId: string;
+  postTitle: string;
+  postCategory: PostCategory;
+  message: string;
+  isRead: boolean;
+  createdAt: Timestamp;
+}
+
 /**
  * Create notifications for users who have enabled notifications for specific post categories
  */
@@ -54,7 +68,7 @@ export async function createPostNotifications(
 
     // Create batch for better performance with multiple notifications
     const batch = writeBatch(db);
-    const notificationsToCreate: { ref: DocumentReference; data: any }[] = [];
+    const notificationsToCreate: { ref: DocumentReference; data: NewPostNotification }[] = [];
 
     // Create a notification for each interested user
     for (const user of interestedUsers) {
@@ -68,7 +82,7 @@ export async function createPostNotifications(
         continue;
       }
 
-      const notification = {
+      const notification: NewPostNotification = {
         type: 'new_post',
         recipientId: user.id,
         actorId: authorId,

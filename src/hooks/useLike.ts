@@ -8,7 +8,10 @@ import {
 } from '@/lib/firebase/likes';
 
 /**
- * Custom hook for managing post like functionality with real-time updates
+ * Custom hook for managing post like functionality with real-time updates.
+ * @param postId - The ID of the post to like/unlike.
+ * @param initialLikeCount - The initial like count for the post.
+ * @returns An object with like state, count, loading, error, toggleLike, and canLike.
  */
 export function useLike(postId: string, initialLikeCount: number = 0) {
   const { user } = useAuth();
@@ -90,7 +93,9 @@ export function useLike(postId: string, initialLikeCount: number = 0) {
 }
 
 /**
- * Hook for getting like analytics (admin use)
+ * Hook for getting like analytics (admin use).
+ * @param days - Number of days to include in analytics (default: 30).
+ * @returns An object with analytics data, loading state, error, and a refetch function.
  */
 export function useLikeAnalytics(days: number = 30) {
   const [analytics, setAnalytics] = useState<LikeAnalytics | null>(null);

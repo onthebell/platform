@@ -6,7 +6,8 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { Notification, PostCategory } from '@/types';
 
 /**
- * Hook to get filtered notifications based on user preferences
+ * Hook to get filtered notifications based on user preferences.
+ * @returns An object with filtered notifications, loading state, unread count, and markAsRead/markAllAsRead functions.
  */
 export function useFilteredNotifications() {
   const { notifications, loading, unreadCount, markAsRead, markAllAsRead } = useNotifications();
@@ -40,7 +41,10 @@ export function useFilteredNotifications() {
 }
 
 /**
- * Filter notifications based on user notification preferences
+ * Filter notifications based on user notification preferences.
+ * @param notifications - Array of notifications to filter.
+ * @param userPrefs - User's notification preferences.
+ * @returns Filtered notifications array.
  */
 import { User } from '@/types'; // Make sure User type is imported if not already
 

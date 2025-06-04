@@ -1,5 +1,10 @@
 import OpenAIModule from 'openai';
-import { moderateContent, isContentSafe, getFlaggedContentMessage } from '@/lib/moderation';
+import {
+  moderateContent,
+  isContentSafe,
+  getFlaggedContentMessage,
+  ModerationResult,
+} from '@/lib/moderation';
 
 const mockOpenAI = OpenAIModule as unknown as jest.Mock;
 
@@ -138,8 +143,32 @@ describe('moderation', () => {
         results: [
           {
             flagged: false,
-            categories: {},
-            category_scores: {},
+            categories: {
+              sexual: false,
+              hate: false,
+              harassment: false,
+              'self-harm': false,
+              'sexual/minors': false,
+              'hate/threatening': false,
+              'violence/graphic': false,
+              'self-harm/intent': false,
+              'self-harm/instructions': false,
+              'harassment/threatening': false,
+              violence: false,
+            },
+            category_scores: {
+              sexual: 0,
+              hate: 0,
+              harassment: 0,
+              'self-harm': 0,
+              'sexual/minors': 0,
+              'hate/threatening': 0,
+              'violence/graphic': 0,
+              'self-harm/intent': 0,
+              'self-harm/instructions': 0,
+              'harassment/threatening': 0,
+              violence: 0,
+            },
           },
         ],
       };
@@ -192,7 +221,19 @@ describe('moderation', () => {
           'harassment/threatening': false,
           violence: false,
         },
-        category_scores: {} as any,
+        category_scores: {
+          sexual: 0,
+          hate: 0,
+          harassment: 0,
+          'self-harm': 0,
+          'sexual/minors': 0,
+          'hate/threatening': 0,
+          'violence/graphic': 0,
+          'self-harm/intent': 0,
+          'self-harm/instructions': 0,
+          'harassment/threatening': 0,
+          violence: 0,
+        } as any,
       };
 
       expect(getFlaggedContentMessage(result)).toBe('');
@@ -214,7 +255,19 @@ describe('moderation', () => {
           'harassment/threatening': false,
           violence: false,
         },
-        category_scores: {} as any,
+        category_scores: {
+          sexual: 0,
+          hate: 0,
+          harassment: 0,
+          'self-harm': 0,
+          'sexual/minors': 0,
+          'hate/threatening': 0,
+          'violence/graphic': 0,
+          'self-harm/intent': 0,
+          'self-harm/instructions': 0,
+          'harassment/threatening': 0,
+          violence: 0,
+        } as any,
       };
 
       const message = getFlaggedContentMessage(result);
@@ -238,7 +291,19 @@ describe('moderation', () => {
           'harassment/threatening': false,
           violence: false,
         },
-        category_scores: {} as any,
+        category_scores: {
+          sexual: 0,
+          hate: 0,
+          harassment: 0,
+          'self-harm': 0,
+          'sexual/minors': 0,
+          'hate/threatening': 0,
+          'violence/graphic': 0,
+          'self-harm/intent': 0,
+          'self-harm/instructions': 0,
+          'harassment/threatening': 0,
+          violence: 0,
+        } as any,
       };
 
       const message = getFlaggedContentMessage(result);
@@ -262,7 +327,19 @@ describe('moderation', () => {
           'harassment/threatening': false,
           violence: true,
         },
-        category_scores: {} as any,
+        category_scores: {
+          sexual: 0,
+          hate: 0,
+          harassment: 0,
+          'self-harm': 0,
+          'sexual/minors': 0,
+          'hate/threatening': 0,
+          'violence/graphic': 0,
+          'self-harm/intent': 0,
+          'self-harm/instructions': 0,
+          'harassment/threatening': 0,
+          violence: 0,
+        } as any,
       };
 
       const message = getFlaggedContentMessage(result);
@@ -286,7 +363,19 @@ describe('moderation', () => {
           'harassment/threatening': false,
           violence: false,
         },
-        category_scores: {} as any,
+        category_scores: {
+          sexual: 0,
+          hate: 0,
+          harassment: 0,
+          'self-harm': 0,
+          'sexual/minors': 0,
+          'hate/threatening': 0,
+          'violence/graphic': 0,
+          'self-harm/intent': 0,
+          'self-harm/instructions': 0,
+          'harassment/threatening': 0,
+          violence: 0,
+        } as any,
       };
 
       const message = getFlaggedContentMessage(result);
@@ -310,7 +399,19 @@ describe('moderation', () => {
           'harassment/threatening': false,
           violence: false,
         },
-        category_scores: {} as any,
+        category_scores: {
+          sexual: 0,
+          hate: 0,
+          harassment: 0,
+          'self-harm': 0,
+          'sexual/minors': 0,
+          'hate/threatening': 0,
+          'violence/graphic': 0,
+          'self-harm/intent': 0,
+          'self-harm/instructions': 0,
+          'harassment/threatening': 0,
+          violence: 0,
+        } as any,
       };
 
       const message = getFlaggedContentMessage(result);
@@ -334,7 +435,19 @@ describe('moderation', () => {
           'harassment/threatening': false,
           violence: false,
         },
-        category_scores: {} as any,
+        category_scores: {
+          sexual: 0,
+          hate: 0,
+          harassment: 0,
+          'self-harm': 0,
+          'sexual/minors': 0,
+          'hate/threatening': 0,
+          'violence/graphic': 0,
+          'self-harm/intent': 0,
+          'self-harm/instructions': 0,
+          'harassment/threatening': 0,
+          violence: 0,
+        } as any,
       };
 
       const message = getFlaggedContentMessage(result);

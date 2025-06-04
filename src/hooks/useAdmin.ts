@@ -1,10 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/firebase/auth';
 import { isAdmin, hasPermission } from '@/lib/admin';
-import { AdminStats, ContentReport, User, CommunityPost, AdminPermission } from '@/types';
+import {
+  AdminStats,
+  ContentReport,
+  User,
+  CommunityPost,
+  AdminPermission,
+  ModerationAction,
+} from '@/types';
 import { authenticatedFetch } from '@/lib/utils/api';
 
-// Custom hook for admin authentication and permissions
+/**
+ * Custom hook for admin authentication and permissions.
+ * @returns An object containing the current user, loading state, admin status, permission checkers, and admin capabilities.
+ */
 export function useAdminAuth() {
   const { user, loading } = useAuth();
 
@@ -25,7 +35,10 @@ export function useAdminAuth() {
   };
 }
 
-// Hook for fetching dashboard statistics
+/**
+ * Hook for fetching admin dashboard statistics.
+ * @returns An object with dashboard stats, loading state, error, and a refetch function.
+ */
 export function useAdminDashboard() {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -66,7 +79,10 @@ export function useAdminDashboard() {
   };
 }
 
-// Hook for managing posts
+/**
+ * Hook for managing admin posts (fetch, update, delete).
+ * @returns An object with posts, loading state, error, pagination, and CRUD functions.
+ */
 export function useAdminPosts() {
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [loading, setLoading] = useState(false);
@@ -139,7 +155,7 @@ export function useAdminPosts() {
       setPosts(prev =>
         prev.map(post => {
           if (post.id === postId) {
-            const updates: any = { updatedAt: new Date() };
+            const updates: Partial<CommunityPost> = { updatedAt: new Date() };
             if (action === 'hide') updates.isHidden = true;
             if (action === 'restore') {
               updates.isHidden = false;
@@ -192,7 +208,10 @@ export function useAdminPosts() {
   };
 }
 
-// Hook for managing users
+/**
+ * Hook for managing admin users (fetch, update).
+ * @returns An object with users, loading state, error, pagination, and update function.
+ */
 export function useAdminUsers() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
@@ -241,7 +260,7 @@ export function useAdminUsers() {
     }
   };
 
-  const updateUser = async (userId: string, action: string, updateData?: any) => {
+  const updateUser = async (userId: string, action: string, updateData?: Partial<User>) => {
     if (!user) return false;
 
     try {
@@ -277,7 +296,10 @@ export function useAdminUsers() {
   };
 }
 
-// Hook for managing reports
+/**
+ * Hook for managing admin content reports (fetch, update).
+ * @returns An object with reports, loading state, error, pagination, and update function.
+ */
 export function useAdminReports() {
   const [reports, setReports] = useState<ContentReport[]>([]);
   const [loading, setLoading] = useState(false);
@@ -360,7 +382,7 @@ export function useAdminReports() {
               status: action === 'dismiss' ? 'dismissed' : 'resolved',
               moderatorId: user.id,
               moderatorName: user.displayName || user.email,
-              moderatorAction: action as any,
+              moderatorAction: action as ModerationAction,
               moderatorReason: reason,
               moderatorNotes: notes,
               updatedAt: new Date(),

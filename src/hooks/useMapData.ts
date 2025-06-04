@@ -29,6 +29,11 @@ export interface UseMapDataProps {
   onMarkerSelect?: (marker: MapMarker | null) => void;
 }
 
+/**
+ * Custom hook for managing map markers, categories, and filtering/searching logic for map UIs.
+ * @param props - Optional props for markers, categories, initial category, and marker selection callback.
+ * @returns An object with state, filtered markers, category counts, and filter/search/reset actions.
+ */
 export function useMapData({
   markers = [],
   categories = [],

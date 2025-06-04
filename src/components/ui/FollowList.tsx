@@ -4,6 +4,7 @@ import { useFollowers, useFollowing } from '@/hooks/useFollow';
 import { User, Business } from '@/types';
 import { UserCircleIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import Image from 'next/image';
 import { FollowButton } from './FollowButton';
 
 interface FollowListProps {
@@ -12,6 +13,14 @@ interface FollowListProps {
   listType: 'followers' | 'following';
   className?: string;
 }
+
+/**
+ * FollowList displays a list of followers or following users/businesses.
+ * @param entityId - The ID of the user or business
+ * @param entityType - 'user' or 'business'
+ * @param listType - 'followers' or 'following'
+ * @param className - Optional CSS class for styling
+ */
 
 export function FollowList({ entityId, entityType, listType, className = '' }: FollowListProps) {
   const followersQuery = useFollowers(entityId, entityType);
@@ -91,7 +100,14 @@ export function FollowList({ entityId, entityType, listType, className = '' }: F
           >
             <Link href={profileUrl} className="flex-shrink-0">
               {imageUrl ? (
-                <img src={imageUrl} alt={name} className="w-12 h-12 rounded-full object-cover" />
+                <Image
+                  src={imageUrl}
+                  alt={name}
+                  width={48}
+                  height={48}
+                  className="w-12 h-12 rounded-full object-cover"
+                  unoptimized
+                />
               ) : (
                 <UserCircleIcon className="w-12 h-12 text-gray-400" />
               )}

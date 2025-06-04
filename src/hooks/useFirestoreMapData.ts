@@ -48,6 +48,11 @@ interface UseFirestoreMapDataOptions {
   refreshInterval?: number; // in milliseconds
 }
 
+/**
+ * Custom hook for fetching and aggregating map data from Firestore for posts, businesses, and events.
+ * @param options - Options to include/exclude categories and set refresh interval.
+ * @returns An object with map data points, suburb data, loading state, error, last refresh, refresh function, and total count.
+ */
 export function useFirestoreMapData(options: UseFirestoreMapDataOptions = {}) {
   console.log('🔧 useFirestoreMapData hook initialized with options:', options);
 

@@ -5,6 +5,7 @@ import { SavedPost, PostCategory } from '@/types';
 
 /**
  * Custom hook for managing saved jobs functionality
+ * @returns An object with saved jobs, loading state, error, and save/unsave/toggle helpers.
  */
 export function useSavedJobs() {
   const { user } = useAuth();
@@ -61,9 +62,10 @@ export function useSavedJobs() {
 
       setSavedJobs(prev => [newSavedJob, ...prev]);
       return true;
-    } catch (err: any) {
-      console.error('Error saving job:', err);
-      setError(err.message || 'Failed to save job');
+    } catch (err) {
+      const errorObj = err as Error;
+      console.error('Error saving job:', errorObj);
+      setError(errorObj.message || 'Failed to save job');
       return false;
     }
   };
@@ -84,9 +86,10 @@ export function useSavedJobs() {
       // Remove from local state
       setSavedJobs(prev => prev.filter(job => job.postId !== postId));
       return true;
-    } catch (err: any) {
-      console.error('Error unsaving job:', err);
-      setError(err.message || 'Failed to unsave job');
+    } catch (err) {
+      const errorObj = err as Error;
+      console.error('Error unsaving job:', errorObj);
+      setError(errorObj.message || 'Failed to unsave job');
       return false;
     }
   };
@@ -122,7 +125,9 @@ export function useSavedJobs() {
 }
 
 /**
- * Hook for checking if a specific job is saved (lightweight version)
+ * Hook for checking if a specific job is saved by the current user (lightweight version).
+ * @param postId - The ID of the job post to check.
+ * @returns An object with isSaved and isLoading state.
  */
 export function useIsJobSaved(postId: string) {
   const { user } = useAuth();

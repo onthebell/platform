@@ -11,6 +11,12 @@ interface CommentsSectionProps {
   className?: string;
 }
 
+/**
+ * CommentsSection displays a list of comments and a form for adding new comments.
+ * @param postId - The ID of the post to show comments for
+ * @param className - Optional CSS class for styling
+ */
+
 export function CommentsSection({ postId, className = '' }: CommentsSectionProps) {
   const { user } = useAuth();
   const { comments, commentCount, loading, error, addComment, updateComment, deleteComment } =

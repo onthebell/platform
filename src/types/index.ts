@@ -1,3 +1,5 @@
+import type { FieldValue } from 'firebase/firestore';
+
 export interface User {
   id: string;
   email: string;
@@ -276,8 +278,13 @@ export interface ContentReport {
   reviewedAt?: Date;
   moderatorNotes?: string;
   action?: ModerationAction;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | FieldValue;
+  updatedAt: Date | FieldValue;
+  // Moderation fields
+  moderationReason?: string;
+  moderatedBy?: string;
+  moderatedAt?: Date;
+  moderationAction?: ModerationAction;
 }
 
 export type ReportReason =
@@ -339,7 +346,7 @@ export interface AdminActivity {
   targetType: 'user' | 'post' | 'comment' | 'report';
   targetId: string;
   description: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   createdAt: Date;
 }
 

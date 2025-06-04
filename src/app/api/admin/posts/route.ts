@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     }
 
-    const updates: any = {
+    const updates: Partial<CommunityPost> = {
       moderatedAt: new Date(),
       moderatedBy: user.id,
     };

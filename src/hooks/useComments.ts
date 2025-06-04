@@ -10,6 +10,12 @@ import {
   subscribeToPostCommentCount,
 } from '@/lib/firebase/comments';
 
+/**
+ * Custom hook for managing comments on a post with real-time updates.
+ * @param postId - The ID of the post to fetch comments for.
+ * @returns An object with comments, commentCount, loading, error, and CRUD functions.
+ */
+
 interface UseCommentsReturn {
   comments: Comment[];
   commentCount: number;

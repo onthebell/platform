@@ -10,6 +10,11 @@ interface UserLikedPostsProps {
   showTitle?: boolean;
 }
 
+/**
+ * UserLikedPosts displays a list of posts liked by a user.
+ * @param userId - Optional user ID to show likes for (defaults to current user)
+ * @param showTitle - Whether to show the section title
+ */
 export default function UserLikedPosts({ userId, showTitle = true }: UserLikedPostsProps) {
   const { user } = useAuth();
   const [likedPostIds, setLikedPostIds] = useState<string[]>([]);

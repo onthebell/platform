@@ -17,6 +17,15 @@ interface FollowButtonProps {
   onFollowChange?: (isFollowing: boolean) => void;
 }
 
+/**
+ * FollowButton allows the current user to follow or unfollow a user or business.
+ * @param entityId - The ID of the user or business to follow
+ * @param entityType - 'user' or 'business'
+ * @param variant - Button style variant
+ * @param className - Optional CSS class for styling
+ * @param onFollowChange - Optional callback for follow state changes
+ */
+
 export function FollowButton({
   entityId,
   entityType,

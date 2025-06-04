@@ -47,10 +47,7 @@ export async function authenticatedFetch(
 /**
  * Make an authenticated API request and parse JSON response
  */
-export async function authenticatedRequest<T = any>(
-  url: string,
-  options: RequestInit = {}
-): Promise<T> {
+export async function authenticatedRequest<T>(url: string, options: RequestInit = {}): Promise<T> {
   const response = await authenticatedFetch(url, options);
 
   if (!response.ok) {
@@ -58,5 +55,5 @@ export async function authenticatedRequest<T = any>(
     throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
   }
 
-  return response.json();
+  return response.json() as Promise<T>;
 }

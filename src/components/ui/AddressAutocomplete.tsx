@@ -91,6 +91,17 @@ const loadGoogleMapsAPI = (): Promise<void> => {
   });
 };
 
+/**
+ * GooglePlacesAutocomplete provides an address input with Google Places autocomplete restricted to Bellarine Peninsula postcodes.
+ * Falls back to manual entry if Google Maps API is unavailable.
+ * @param value - The current address value
+ * @param onChange - Handler for address changes (returns address and coordinates)
+ * @param placeholder - Optional placeholder text
+ * @param required - Whether the input is required
+ * @param className - Optional CSS class for styling
+ * @param forceManualMode - Force manual entry mode (for testing)
+ * @param type - Google Places type (default: 'address')
+ */
 export default function GooglePlacesAutocomplete({
   value,
   onChange,

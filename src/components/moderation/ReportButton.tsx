@@ -7,6 +7,16 @@ import { FlagIcon } from '@heroicons/react/24/outline';
 import ReportModal from './ReportModal';
 import { authenticatedFetch } from '@/lib/utils/api';
 
+/**
+ * ReportButton allows users to report a post, comment, or user for moderation.
+ * @param contentType - The type of content being reported ('post', 'comment', or 'user').
+ * @param contentId - The ID of the content being reported.
+ * @param contentAuthorId - The ID of the author of the content.
+ * @param className - Optional CSS class for styling.
+ * @param size - Button size ('sm' or 'md').
+ * @returns A button that opens a modal for submitting a report.
+ */
+
 interface ReportButtonProps {
   contentType: 'post' | 'comment' | 'user';
   contentId: string;

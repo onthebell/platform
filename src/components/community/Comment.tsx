@@ -7,6 +7,12 @@ import { formatRelativeTime } from '@/lib/utils';
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import ReportButton from '@/components/moderation/ReportButton';
 
+/**
+ * Comment displays a single comment with edit, delete, and report actions.
+ * @param comment - The comment object
+ * @param onUpdate - Handler for updating the comment
+ * @param onDelete - Handler for deleting the comment
+ */
 interface CommentProps {
   comment: CommentType;
   onUpdate: (commentId: string, content: string) => Promise<void>;
@@ -54,6 +60,64 @@ export function Comment({ comment, onUpdate, onDelete }: CommentProps) {
     }
   };
 
+  /**
+   * Action buttons for a comment (edit, delete, report)
+   */
+  interface CommentActionsProps {
+    canModify: boolean;
+    isEditing: boolean;
+    isDeleting: boolean;
+    onEdit: () => void;
+    onDelete: () => void;
+    commentId: string;
+    commentAuthorId: string;
+    user: { id: string } | null | undefined;
+  }
+
+  function CommentActions({
+    canModify,
+    isEditing,
+    isDeleting,
+    onEdit,
+    onDelete,
+    commentId,
+    commentAuthorId,
+    user,
+  }: CommentActionsProps) {
+    if (canModify && !isEditing) {
+      return (
+        <div className="flex items-center space-x-1">
+          <button
+            onClick={onEdit}
+            className="p-1 text-gray-400 hover:text-gray-600 rounded"
+            title="Edit comment"
+          >
+            <PencilIcon className="w-4 h-4" />
+          </button>
+          <button
+            onClick={onDelete}
+            disabled={isDeleting}
+            className="p-1 text-gray-400 hover:text-red-600 rounded disabled:opacity-50"
+            title="Delete comment"
+          >
+            <TrashIcon className="w-4 h-4" />
+          </button>
+        </div>
+      );
+    }
+    if (!canModify && user && !isEditing) {
+      return (
+        <ReportButton
+          contentType="comment"
+          contentId={commentId}
+          contentAuthorId={commentAuthorId}
+          size="sm"
+        />
+      );
+    }
+    return null;
+  }
+
   return (
     <div className="flex space-x-3 py-4">
       {/* Avatar placeholder */}
@@ -75,35 +139,16 @@ export function Comment({ comment, onUpdate, onDelete }: CommentProps) {
           </div>
 
           {/* Action buttons for comment author */}
-          {canModify && !isEditing && (
-            <div className="flex items-center space-x-1">
-              <button
-                onClick={() => setIsEditing(true)}
-                className="p-1 text-gray-400 hover:text-gray-600 rounded"
-                title="Edit comment"
-              >
-                <PencilIcon className="w-4 h-4" />
-              </button>
-              <button
-                onClick={handleDelete}
-                disabled={isDeleting}
-                className="p-1 text-gray-400 hover:text-red-600 rounded disabled:opacity-50"
-                title="Delete comment"
-              >
-                <TrashIcon className="w-4 h-4" />
-              </button>
-            </div>
-          )}
-
-          {/* Report button for other users */}
-          {!canModify && user && !isEditing && (
-            <ReportButton
-              contentType="comment"
-              contentId={comment.id}
-              contentAuthorId={comment.authorId}
-              size="sm"
-            />
-          )}
+          <CommentActions
+            canModify={canModify}
+            isEditing={isEditing}
+            isDeleting={isDeleting}
+            onEdit={() => setIsEditing(true)}
+            onDelete={handleDelete}
+            commentId={comment.id}
+            commentAuthorId={comment.authorId}
+            user={user}
+          />
         </div>
 
         {/* Comment content */}

@@ -16,6 +16,12 @@ import {
 } from '@/lib/firebase/follows';
 import { FollowStats, User, Business } from '@/types';
 
+/**
+ * Custom hook for following/unfollowing a user or business and tracking follow state in real-time.
+ * @param entityId - The ID of the user or business to follow.
+ * @param entityType - The type of entity ('user' or 'business').
+ * @returns An object with follow state, loading, error, and follow/unfollow/toggle functions.
+ */
 export function useFollow(entityId: string, entityType: 'user' | 'business') {
   const { user } = useAuth();
   const [isFollowingEntity, setIsFollowingEntity] = useState(false);
@@ -92,6 +98,11 @@ export function useFollow(entityId: string, entityType: 'user' | 'business') {
   };
 }
 
+/**
+ * Custom hook for fetching real-time follower/following stats for a user or business.
+ * @param entityId - The ID of the user or business.
+ * @returns An object with stats, loading, and error.
+ */
 export function useFollowStats(entityId: string) {
   const [stats, setStats] = useState<FollowStats>({ followersCount: 0, followingCount: 0 });
   const [loading, setLoading] = useState(false);
@@ -114,6 +125,12 @@ export function useFollowStats(entityId: string) {
   return { stats, loading, error };
 }
 
+/**
+ * Custom hook for fetching followers for a user or business.
+ * @param entityId - The ID of the user or business.
+ * @param entityType - The type of entity ('user' or 'business').
+ * @returns An object with followers, loading, error, and refetch function.
+ */
 export function useFollowers(entityId: string, entityType: 'user' | 'business') {
   const [followers, setFollowers] = useState<(User | Business)[]>([]);
   const [loading, setLoading] = useState(false);
@@ -142,6 +159,12 @@ export function useFollowers(entityId: string, entityType: 'user' | 'business') 
   return { followers, loading, error, refetch: fetchFollowers };
 }
 
+/**
+ * Custom hook for fetching entities a user is following.
+ * @param userId - The ID of the user.
+ * @param entityType - Optional type of entity ('user' or 'business').
+ * @returns An object with following, loading, error, and refetch function.
+ */
 export function useFollowing(userId: string, entityType?: 'user' | 'business') {
   const [following, setFollowing] = useState<(User | Business)[]>([]);
   const [loading, setLoading] = useState(false);
@@ -170,6 +193,10 @@ export function useFollowing(userId: string, entityType?: 'user' | 'business') {
   return { following, loading, error, refetch: fetchFollowing };
 }
 
+/**
+ * Custom hook for fetching suggested users to follow for the current user.
+ * @returns An object with suggested users, loading, and error.
+ */
 export function useSuggestedUsers() {
   const { user } = useAuth();
   const [suggestedUsers, setSuggestedUsers] = useState<User[]>([]);
@@ -199,6 +226,12 @@ export function useSuggestedUsers() {
   return { suggestedUsers, loading, error };
 }
 
+/**
+ * Custom hook for fetching mutual followers between two users.
+ * @param userId1 - The first user ID.
+ * @param userId2 - The second user ID.
+ * @returns An object with mutual followers, loading, and error.
+ */
 export function useMutualFollowers(userId1: string, userId2: string) {
   const [mutualFollowers, setMutualFollowers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);

@@ -5,6 +5,10 @@ import { useAuth } from '@/lib/firebase/auth';
 import { markNotificationAsRead, subscribeToUserNotifications } from '@/lib/firebase/firestore';
 import { Notification } from '@/types';
 
+/**
+ * Custom hook for real-time user notifications.
+ * @returns An object with notifications, loading state, unread count, markAsRead, markAllAsRead, and refetch.
+ */
 export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);

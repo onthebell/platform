@@ -10,6 +10,12 @@ interface SuggestedUsersProps {
   limit?: number;
 }
 
+/**
+ * SuggestedUsers displays a list of suggested users to follow.
+ * @param className - Optional CSS class for styling
+ * @param limit - Maximum number of users to show
+ */
+
 export function SuggestedUsers({ className = '', limit = 5 }: SuggestedUsersProps) {
   const { suggestedUsers, loading, error } = useSuggestedUsers();
 

@@ -11,6 +11,15 @@ interface FollowStatsProps {
   variant?: 'default' | 'compact';
 }
 
+/**
+ * FollowStats displays follower and following counts for a user or business.
+ * @param entityId - The ID of the user or business
+ * @param entityType - 'user' or 'business'
+ * @param className - Optional CSS class for styling
+ * @param showLabels - Whether to show text labels
+ * @param variant - 'default' or 'compact' style
+ */
+
 export function FollowStats({
   entityId,
   entityType,

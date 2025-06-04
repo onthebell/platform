@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create the report data (without timestamps initially)
-    const reportData: any = {
+    const reportData: Partial<ContentReport> = {
       reporterId: user.id,
       reporterName: user.displayName || user.email,
       contentType,

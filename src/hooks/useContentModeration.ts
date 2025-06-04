@@ -26,8 +26,8 @@ export interface UseContentModerationReturn {
 }
 
 /**
- * Custom hook for content moderation using OpenAI's moderation API
- * @returns UseContentModerationReturn - Hook return values
+ * Custom hook for content moderation using OpenAI's moderation API.
+ * @returns {UseContentModerationReturn} Hook return values including moderateContent, isLoading, and error.
  */
 export function useContentModeration(): UseContentModerationReturn {
   const [isLoading, setIsLoading] = useState(false);

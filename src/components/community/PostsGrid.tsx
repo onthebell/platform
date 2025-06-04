@@ -19,6 +19,15 @@ interface PostsGridProps {
   layout?: 'grid' | 'list';
 }
 
+/**
+ * PostsGrid displays a list of community posts with optional filters and layout options.
+ * @param posts - Array of CommunityPost objects to display
+ * @param title - Optional title for the grid
+ * @param showFilters - Whether to show the filter/search bar
+ * @param showCreateButton - Whether to show the create post button
+ * @param emptyMessage - Message to display when no posts are found
+ * @param layout - 'grid' or 'list' layout
+ */
 export default function PostsGrid({
   posts,
   title = 'Community Posts',
@@ -71,52 +80,17 @@ export default function PostsGrid({
       </div>
 
       {showFilters && (
-        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 space-y-3 sm:space-y-4">
-          <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:gap-4">
-            <div className="relative flex-1">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <MagnifyingGlassIcon
-                  className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400"
-                  aria-hidden="true"
-                />
-              </div>
-              <input
-                type="text"
-                placeholder="Search posts..."
-                className="block w-full pl-9 sm:pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-              />
-            </div>
-
-            <div className="flex items-center">
-              <AdjustmentsHorizontalIcon
-                className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 mr-2"
-                aria-hidden="true"
-              />
-              <select
-                className="block w-full sm:w-auto pl-3 pr-8 sm:pr-10 py-2 text-sm border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-md min-w-0 sm:min-w-[140px]"
-                value={selectedCategory || 'all'}
-                onChange={e =>
-                  setSelectedCategory(e.target.value === 'all' ? null : e.target.value)
-                }
-                aria-label="Filter by category"
-              >
-                {categories.map(category => (
-                  <option key={category} value={category}>
-                    {category.charAt(0).toUpperCase() + category.slice(1).replace('_', ' ')}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
+        <PostsGridFilters
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+          categories={categories}
+        />
       )}
 
       {filteredPosts.length === 0 ? (
-        <div className="bg-white p-6 sm:p-8 rounded-lg shadow-sm border border-gray-200 text-center">
-          <p className="text-sm sm:text-base text-gray-600">{emptyMessage}</p>
-        </div>
+        <PostsGridEmpty message={emptyMessage} />
       ) : (
         <div
           className={
@@ -131,6 +105,81 @@ export default function PostsGrid({
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+/**
+ * Filter and search bar for PostsGrid
+ */
+interface PostsGridFiltersProps {
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  selectedCategory: string | null;
+  setSelectedCategory: (category: string | null) => void;
+  categories: string[];
+}
+
+function PostsGridFilters({
+  searchQuery,
+  setSearchQuery,
+  selectedCategory,
+  setSelectedCategory,
+  categories,
+}: PostsGridFiltersProps) {
+  return (
+    <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 space-y-3 sm:space-y-4">
+      <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:gap-4">
+        <div className="relative flex-1">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <MagnifyingGlassIcon
+              className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400"
+              aria-hidden="true"
+            />
+          </div>
+          <input
+            type="text"
+            placeholder="Search posts..."
+            className="block w-full pl-9 sm:pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+          />
+        </div>
+
+        <div className="flex items-center">
+          <AdjustmentsHorizontalIcon
+            className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 mr-2"
+            aria-hidden="true"
+          />
+          <select
+            className="block w-full sm:w-auto pl-3 pr-8 sm:pr-10 py-2 text-sm border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-md min-w-0 sm:min-w-[140px]"
+            value={selectedCategory || 'all'}
+            onChange={e => setSelectedCategory(e.target.value === 'all' ? null : e.target.value)}
+            aria-label="Filter by category"
+          >
+            {categories.map(category => (
+              <option key={category} value={category}>
+                {category.charAt(0).toUpperCase() + category.slice(1).replace('_', ' ')}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Empty state for PostsGrid
+ */
+interface PostsGridEmptyProps {
+  message: string;
+}
+
+function PostsGridEmpty({ message }: PostsGridEmptyProps) {
+  return (
+    <div className="bg-white p-6 sm:p-8 rounded-lg shadow-sm border border-gray-200 text-center">
+      <p className="text-sm sm:text-base text-gray-600">{message}</p>
     </div>
   );
 }

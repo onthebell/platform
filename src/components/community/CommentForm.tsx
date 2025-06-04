@@ -9,6 +9,11 @@ interface CommentFormProps {
   placeholder?: string;
 }
 
+/**
+ * CommentForm allows users to submit a new comment with moderation.
+ * @param onSubmit - Handler for submitting the comment
+ * @param placeholder - Optional placeholder text
+ */
 export function CommentForm({ onSubmit, placeholder = 'Write your comment...' }: CommentFormProps) {
   const { user } = useAuth();
   const { moderateContent, isLoading: isModerating } = useContentModeration();

@@ -7,6 +7,7 @@ import {
 } from '@/lib/firebase/admin';
 import { requireAuth } from '@/lib/utils/auth';
 import { isAdmin, hasPermission, canManageUser } from '@/lib/admin';
+import type { User } from '@/types';
 import { UserRole, AdminPermission } from '@/types';
 
 // GET /api/admin/users - Get all users with pagination
@@ -71,7 +72,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const updates: any = {};
+    const updates: Partial<User> = {};
 
     switch (action) {
       case 'updateRole':
@@ -106,8 +107,8 @@ export async function PUT(request: NextRequest) {
         }
 
         updates.isSuspended = false;
-        updates.suspensionReason = null;
-        updates.suspensionExpiresAt = null;
+        updates.suspensionReason = undefined;
+        updates.suspensionExpiresAt = undefined;
         break;
 
       case 'verify':
@@ -116,7 +117,7 @@ export async function PUT(request: NextRequest) {
         }
 
         updates.isVerified = true;
-        updates.verificationStatus = 'verified';
+        updates.verificationStatus = 'approved';
         break;
 
       case 'unverify':
