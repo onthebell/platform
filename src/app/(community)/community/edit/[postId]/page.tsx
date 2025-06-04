@@ -419,7 +419,7 @@ export default function EditPostPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 flex items-center justify-center px-4">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-3 sm:mt-4 text-sm sm:text-base text-gray-600">Loading post...</p>
@@ -430,7 +430,7 @@ export default function EditPostPage() {
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 flex items-center justify-center px-4">
         <div className="text-center">
           <p className="text-sm sm:text-base text-gray-600">Post not found.</p>
         </div>
@@ -439,7 +439,7 @@ export default function EditPostPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-4 sm:py-8 lg:py-12">
+    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 py-4 sm:py-8 lg:py-12">
       <div className="max-w-2xl mx-auto px-3 sm:px-4 lg:px-6">
         <div className="bg-white rounded-lg shadow-sm sm:shadow px-4 py-6 sm:px-6 sm:py-8">
           <div className="mb-6 sm:mb-8">

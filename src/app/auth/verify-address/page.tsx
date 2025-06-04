@@ -145,7 +145,7 @@ export default function VerifyAddressPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-3 sm:px-4">
+      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 flex items-center justify-center px-3 sm:px-4">
         <div className="text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Sign In Required</h2>
           <p className="text-sm sm:text-base text-gray-600 mb-6">
@@ -163,7 +163,7 @@ export default function VerifyAddressPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
           <div className="mb-8">

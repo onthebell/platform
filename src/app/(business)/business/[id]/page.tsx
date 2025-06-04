@@ -110,7 +110,7 @@ export default function BusinessDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
+      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 py-4 sm:py-8">
         <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
           <div className="animate-pulse">
             <div className="h-6 sm:h-8 bg-gray-300 rounded w-1/4 mb-3 sm:mb-4"></div>
@@ -128,7 +128,7 @@ export default function BusinessDetailPage() {
 
   if (!business) {
     return (
-      <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
+      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 py-4 sm:py-8">
         <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
           <div className="text-center">
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Business not found</h1>
@@ -145,7 +145,7 @@ export default function BusinessDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
+    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 py-4 sm:py-8">
       <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
         {/* Back button */}
         <button

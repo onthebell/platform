@@ -4,6 +4,12 @@
 In production, all routes except static assets and /coming-soon now show the
 coming soon page, regardless of the requested path.
 
+**Feature**: Added bellarineSuburbs GeoJSON as a map layer for suburb boundaries
+in MapboxMap using react-map-gl/mapbox Source and Layer components.
+
+**Feature**: Reintroduced Supercluster for marker clustering in MapboxMap, with
+correct GeoJSON typing and cluster rendering using react-map-gl/mapbox.
+
 **Refactor**: Removed all usages of `any` type across main code and tests,
 replacing with proper types for improved type safety and maintainability
 **Refactor**: Updated `AdminActivity` metadata to use `Record<string, unknown>`
@@ -30,3 +36,6 @@ follow code style guidelines **Docs**: Added JSDoc documentation to CommentForm,
 CommentsSection, UserLikedPosts, FollowList, FollowStats, and SuggestedUsers
 components for improved maintainability **Docs**: Added JSDoc documentation to
 FollowButton and AddressAutocomplete components for improved maintainability
+**Refactor**: Migrated MapboxMap component to use Map from 'react-map-gl/mapbox'
+instead of direct mapbox-gl usage. All map rendering and markers now use the
+React Map component for improved maintainability and compatibility.

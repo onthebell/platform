@@ -273,7 +273,7 @@ function CreatePostForm() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Sign In Required</h2>
           <p className="text-gray-600 mb-6">You need to be signed in to create a post.</p>
@@ -289,7 +289,7 @@ function CreatePostForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
           <div className="mb-8">
@@ -1082,7 +1082,7 @@ function CreatePostForm() {
 // Loading fallback component
 function CreatePostLoading() {
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 py-12">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="animate-pulse">

@@ -11,7 +11,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-[calc(100vh-4rem)] bg-gray-100">
       {/* Navbar is deliberately omitted here */}
       {children}
       {/* Footer is also removed for admin pages */}

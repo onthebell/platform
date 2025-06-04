@@ -127,7 +127,7 @@ export default function PostDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-3 sm:px-4">
+      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 flex items-center justify-center px-3 sm:px-4">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-sm sm:text-base text-gray-600">Loading post...</p>
@@ -138,7 +138,7 @@ export default function PostDetailPage() {
 
   if (error || !post) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-3 sm:px-4">
+      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 flex items-center justify-center px-3 sm:px-4">
         <div className="text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Post Not Found</h2>
           <p className="text-sm sm:text-base text-gray-600 mb-6">
@@ -156,7 +156,7 @@ export default function PostDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
       <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 py-4 sm:py-6 lg:py-8">
         {/* Back Button */}
         <button

@@ -5,7 +5,6 @@ import mapboxgl from 'mapbox-gl';
 import Supercluster from 'supercluster';
 import { bellarineSuburbs } from './bellarineSuburbs';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import './map-styles.css';
 
 interface MapboxMapProps {
   center: [number, number];

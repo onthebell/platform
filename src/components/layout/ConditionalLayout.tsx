@@ -27,7 +27,7 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
   return (
     <>
       <Navbar />
-      <div className="min-h-screen flex flex-col bg-white">
+      <div className="min-h-[calc(100vh-4rem)] flex flex-col bg-white">
         <main className="flex-1">{children}</main>
         <Footer />
       </div>

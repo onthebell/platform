@@ -60,23 +60,6 @@ jest.mock('@/lib/firebase/firestore', () => ({
   }),
 }));
 
-// Firebase Comments mocks are handled in individual test files to avoid conflicts
-
-// Comment hook mocks are handled in individual test files to avoid conflicts
-
-// Mock Leaflet and React Leaflet
-jest.mock('react-leaflet', () => ({
-  MapContainer: ({ children }) => <div data-testid="map-container">{children}</div>,
-  TileLayer: () => <div data-testid="tile-layer" />,
-  Marker: () => <div data-testid="marker" />,
-  Popup: ({ children }) => <div data-testid="popup">{children}</div>,
-}));
-
-jest.mock('leaflet', () => ({
-  icon: jest.fn(() => ({})),
-  divIcon: jest.fn(() => ({})),
-}));
-
 // Mock window.matchMedia for responsive tests
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

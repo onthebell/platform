@@ -78,7 +78,7 @@ export default function BusinessDirectoryPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-6 sm:py-8">
+      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 py-6 sm:py-8">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
           <div className="animate-pulse">
             <div className="h-6 sm:h-8 bg-gray-200 rounded w-1/2 sm:w-1/4 mb-4 sm:mb-6"></div>
@@ -99,7 +99,7 @@ export default function BusinessDirectoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6 sm:py-8">
+    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 py-6 sm:py-8">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
         {/* Header */}
         <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
