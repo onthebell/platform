@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * PrivacySummary displays a summary of a user's privacy settings.
+ * @param settings - The user's privacy settings object.
+ * @param className - Optional CSS class for styling.
+ * @returns A summary UI for privacy settings.
+ */
+
 import { User } from '@/types';
 import {
   EyeIcon,

@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * NotificationDropdown displays a dropdown panel of notifications for the current user.
+ * @returns A dropdown UI with notifications and mark-all-read functionality.
+ */
+
 import { Fragment } from 'react';
 import { Popover, PopoverButton, Transition } from '@headlessui/react';
 import { BellIcon } from '@heroicons/react/24/outline';

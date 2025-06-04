@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * JobDetailDrawer displays detailed information about a job post in a drawer UI.
+ * @param isOpen - Whether the drawer is open.
+ * @param onClose - Function to close the drawer.
+ * @param job - The job post to display details for.
+ * @returns A drawer UI with job details.
+ */
+
 import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import {

@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * NotificationItem displays a single notification with icon, message, and mark-as-read functionality.
+ * @param notification - The notification object to display.
+ * @param onMarkAsRead - Handler to mark the notification as read.
+ * @returns A notification list item.
+ */
+
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
 import { Notification } from '@/types';
